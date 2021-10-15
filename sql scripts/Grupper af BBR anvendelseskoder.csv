@@ -1,0 +1,106 @@
+bbr_anv_kode;bbr_anv_tekst;skade_gruppe
+-9999;No Data;Ingen data
+110;Stuehus til landbrugsejendom;Helårsbeboelse
+120;Fritliggende enfamilieshus (parcelhus);Helårsbeboelse
+121;Sammenbygget enfamiliehus;Helårsbeboelse
+122;Fritliggende enfamiliehus i tæt-lav bebyggelse;Helårsbeboelse
+130;(UDFASES) Række-, kæde-, eller dobbelthus (lodret adskillelse mellem enhederne).;Helårsbeboelse
+131;Række- og kædehus;Helårsbeboelse
+132;Dobbelthus;Helårsbeboelse
+140;Etagebolig-bygning, flerfamilehus eller to-familiehus;Helårsbeboelse
+150;Kollegium;Helårsbeboelse
+160;Boligbygning til døgninstitution;Helårsbeboelse
+185;Anneks i tilknytning til helårsbolig.;Helårsbeboelse
+190;Anden bygning til helårsbeboelse;Helårsbeboelse
+210;(UDFASES) Bygning til erhvervsmæssig produktion vedrørende landbrug, gartneri, råstofudvinding o. lign;Erhverv
+211;Stald til svin;Erhverv
+212;Stald til kvæg, får mv.;Erhverv
+213;Stald til fjerkræ;Erhverv
+214;Minkhal;Erhverv
+215;Væksthus;Erhverv
+216;Lade til foder, afgrøder mv.;Erhverv
+217;Maskinhus, garage mv.;Erhverv
+218;Lade til halm, hø mv.;Erhverv
+219;Anden bygning til landbrug mv.;Erhverv
+220;(UDFASES) Bygning til erhvervsmæssig produktion vedrørende industri, håndværk m.v. (fabrik, værksted o.lign.);Erhverv
+221;Bygning til industri med integreret produktionsapparat;Erhverv
+222;Bygning til industri uden integreret produktionsapparat;Erhverv
+223;Værksted;Erhverv
+229;Anden bygning til produktion;Erhverv
+230;(UDFASES) El-, gas-, vand- eller varmeværk, forbrændingsanstalt m.v.;Forsyning
+231;Bygning til energiproduktion;Forsyning
+232;Bygning til forsyning- og energidistribution;Forsyning
+233;Bygning til vandforsyning;Forsyning
+234;Bygning til håndtering af affald og spildevand;Forsyning
+239;Anden bygning til energiproduktion og -distribution;Forsyning
+290;(UDFASES) Anden bygning til landbrug, industri etc.;Erhverv
+310;(UDFASES) Transport- og garageanlæg (fragtmandshal, lufthavnsbygning, banegårdsbygning, parkeringshus).;Erhverv
+311;Bygning til jernbane- og busdrift;Erhverv
+312;Bygning til luftfart;Erhverv
+313;Bygning til parkering- og transportanlæg;Erhverv
+314;Bygning til parkering af flere end to køretøjer i tilknytning til boliger;Garage mm.
+315;Havneanlæg;Erhverv
+319;Andet transportanlæg;Erhverv
+320;(UDFASES) Bygning til kontor, handel, lager, herunder offentlig administration;Erhverv
+321;Bygning til kontor;Erhverv
+322;Bygning til detailhandel;Erhverv
+323;Bygning til lager;Erhverv
+324;Butikscenter;Erhverv
+325;Tankstation;Erhverv
+329;Anden bygning til kontor, handel og lager;Erhverv
+330;(UDFASES) Bygning til hotel, restaurant, vaskeri, frisør og anden servicevirksomhed;Erhverv
+331;Hotel, kro eller konferencecenter med overnatning;Erhverv
+332;Bed & breakfast mv.;Erhverv
+333;Restaurant, café og konferencecenter uden overnatning;Erhverv
+334;Privat servicevirksomhed som frisør, vaskeri, netcafé mv.;Erhverv
+339;Anden bygning til serviceerhverv;Erhverv
+390;(UDFASES) Anden bygning til transport, handel etc;Erhverv
+410;(UDFASES) Bygning til biograf, teater, erhvervsmæssig udstilling, bibliotek, museum, kirke o. lign.;Kultur
+411;Biograf, teater, koncertsted mv.;Kultur
+412;Museum;Kultur
+413;Bibliotek;Kultur
+414;Kirke eller anden bygning til trosudøvelse for statsanerkendte trossamfund;Kultur
+415;Forsamlingshus;Kultur
+416;Forlystelsespark;Erhverv
+419;Anden bygning til kulturelle formål;Kultur
+420;(UDFASES) Bygning til undervisning og forskning (skole, gymnasium, forskningslabratorium o.lign.).;Offentlig
+421;Grundskole;Offentlig
+422;Universitet;Offentlig
+429;Anden bygning til undervisning og forskning;Offentlig
+430;(UDFASES) Bygning til hospital, sygehjem, fødeklinik o. lign.;Offentlig
+431;Hospital og sygehus;Offentlig
+432;Hospice, behandlingshjem mv.;Erhverv
+433;Sundhedscenter, lægehus, fødeklinik mv.;Offentlig
+439;Anden bygning til sundhedsformål;Offentlig
+440;(UDFASES) Bygning til daginstitution;Offentlig
+441;Daginstitution;Offentlig
+442;Servicefunktion på døgninstitution;Offentlig
+443;Kaserne;Offentlig
+444;Fængsel, arresthus mv.;Offentlig
+449;Anden bygning til institutionsformål;Offentlig
+490;(UDFASES) Bygning til anden institution, herunder kaserne, fængsel o. lign.;Offentlig
+510;Bygninger til sommerhus;Sommerhus
+520;(UDFASES) Bygning til feriekoloni, vandrehjem o.lign. bortset fra sommerhus;Erhverv
+521;Feriecenter, center til campingplads mv.;Erhverv
+522;Bygning med ferielejligheder til erhvervsmæssig udlejning;Erhverv
+523;Bygning med ferielejligheder til eget brug;Erhverv
+532;Svømmehal;Erhverv
+529;Anden bygning til ferieformål;Erhverv
+530;(UDFASES) Bygning i forbindelse med idrætsudøvelse (klubhus, idrætshal, svømmehal o. lign.);Erhverv
+531;Klubhus i forbindelse med fritid og idræt;Erhverv
+533;Idrætshal;Erhverv
+534;Tribune i forbindelse med stadion;Erhverv
+535;Rideskole;Erhverv
+539;Anden bygning til idrætformål;Erhverv
+540;Kolonihavehus;Sommerhus
+585;Anneks i tilknytning til fritids- og sommerhus;Anneks
+590;Anden bygning til fritidsformål;Anneks
+910;Garage (med plads til et eller to køretøjer);Garage mm.
+920;Carport;Garage mm.
+930;Udhus;Garage mm.
+940;Drivhus;Andet
+950;Fritliggende overdækning;Andet
+960;Fritliggende udestue;Andet
+970;Tiloversbleven landbrugsbygning;Andet
+990;Faldefærdig bygning;Andet
+999;Ukendt bygning;Andet

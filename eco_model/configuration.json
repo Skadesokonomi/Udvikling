@@ -1,0 +1,10 @@
+{
+    "Data": {
+        "Database": "postgres: skadesmodel on localhost",
+        "Parametertable": "data.parameters",
+		"Parameterkeyfield" : "name",
+		"Parametervaluefield" : "value",
+		"Parameterkeyvalue" : "Fetch parameter table",
+        "Item delimiter" : "¤"
+    }
+}
