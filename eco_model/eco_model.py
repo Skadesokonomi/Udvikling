@@ -695,37 +695,40 @@ class EcoModel:
             self.contype = setting[0]
 
             self.parmDict, hl = self.createParmDict(spd["Parametertable"], spd["Parameterkeyfield"], spd["Parameterkeyvalue"], spd["Parametervaluefield"])        
-            sd.leGroupName.setText(self.parmDict['Group name template']['value'])
-            (modG, modD, modQ, modM, modR) = self.createTreeModels (QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), self.parmDict, 'name', 'parent', 'checkable', 'explanation', hl)
-        
-            sd.tvGeneral.setModel(modG)
-            sd.tvData.setModel(modD)
-            sd.tvQueries.setModel(modQ)
-            sd.tvModels.setModel(modM)
-            sd.tvReports.setModel(modR)
-
-            for tv in [sd.tvGeneral, sd.tvData, sd.tvQueries, sd.tvModels, sd.tvReports]:
-                for i in range(modG.columnCount()): tv.hideColumn(i)
-                for i in [0,2]: tv.showColumn(i)
-                tv.header().setStretchLastSection(True);
-                tv.header().setSectionResizeMode(QHeaderView.ResizeToContents)
-                tv.setAlternatingRowColors(True)        
-                tv.setUniformRowHeights(True)
+            if hl:
+                sd.leGroupName.setText(self.parmDict['Group name template']['value'])
+                (modG, modD, modQ, modM, modR) = self.createTreeModels (QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), self.parmDict, 'name', 'parent', 'checkable', 'explanation', hl)
+            
+                sd.tvGeneral.setModel(modG)
+                sd.tvData.setModel(modD)
+                sd.tvQueries.setModel(modQ)
+                sd.tvModels.setModel(modM)
+                sd.tvReports.setModel(modR)
+    
+                for tv in [sd.tvGeneral, sd.tvData, sd.tvQueries, sd.tvModels, sd.tvReports]:
+                    for i in range(modG.columnCount()): tv.hideColumn(i)
+                    for i in [0,2]: tv.showColumn(i)
+                    tv.header().setStretchLastSection(True);
+                    tv.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+                    tv.setAlternatingRowColors(True)        
+                    tv.setUniformRowHeights(True)
+                    
+                sd.tvGeneral.expandAll()
+                sd.tvData.expandAll()
+                sd.tvQueries.expandAll()
+                sd.tvModels.expandAll()
+                sd.tvReports.expandAll()
+    
+                celllayer = self.parmDict['Cell layername']['value']
+                sd.leLayerName.setText(celllayer)
                 
-            sd.tvGeneral.expandAll()
-            sd.tvData.expandAll()
-            sd.tvQueries.expandAll()
-            sd.tvModels.expandAll()
-            sd.tvReports.expandAll()
-
-            celllayer = self.parmDict['Cell layername']['value']
-            sd.leLayerName.setText(celllayer)
-            
-            cellsize = float(self.parmDict['Cell size']['value'])
-            sd.dsbCellSize.setValue(cellsize)
-            
-            self.pbMapperExtentsClicked()
-            self.pbUpdateLayerTreeClicked()
+                cellsize = float(self.parmDict['Cell size']['value'])
+                sd.dsbCellSize.setValue(cellsize)
+                
+                self.pbMapperExtentsClicked()
+                self.pbUpdateLayerTreeClicked()
+            else:
+                messC(self.tr('Error accessing parameter table'))
         else:
             messC(self.tr('Database connection and/or parametertable not set'))
             
@@ -900,28 +903,32 @@ class EcoModel:
     def createParmDict(self, ptable, pkfield, pkvalue, pvfield):
 
 
-        query = QSqlQuery()
+                           
 
         txt = 'SELECT {0} FROM {1} WHERE {2}=\'{3}\''.format( pvfield, ptable, pkfield, pkvalue)
 
 #        query.exec(txt)
         query = executeSQL(txt) 
-        while query.next():
-            txt = query.value(0)
+        if query:
+            while query.next(): txt = query.value(0)
+                                
 
 
-        txt = txt.format(parametertable=ptable)
-        #query.exec(txt)
-        query = executeSQL(txt) 
-        pdict = {}    
-        while query.next():
-            ldict = {}
-            rec = query.record()
-            for i in range(rec.count()-1): ldict[rec.fieldName(i)] = query.value(i)
-            pdict[query.value(pkfield)] = ldict
+            txt = txt.format(parametertable=ptable)
 
-        return pdict, [rec.fieldName(i) for i in range(rec.count()-1)]
-
+            query = executeSQL(txt) 
+            if query:
+                pdict = {}    
+                while query.next():
+                    ldict = {}
+                    rec = query.record()
+                    for i in range(rec.count()-1): ldict[rec.fieldName(i)] = query.value(i)
+                    pdict[query.value(pkfield)] = ldict
+        
+                return pdict, [rec.fieldName(i) for i in range(rec.count()-1)]
+        
+        return None, None
+        
     def createTreeModels (self, modG, modD, modQ, modM, modR, pDict, fieldN, fieldP, fieldC, fieldE, hl):
 
         #QStandardItemModel()

@@ -1,7 +1,7 @@
 {
     "Data": {
-        "Database": "postgres: skadesmodel on localhost",
-        "Parametertable": "data.parameters",
+        "Database": "postgres: flood_damage_costs on localhost",
+        "Parametertable": "fdc_admin.parametre",
 		"Parameterkeyfield" : "name",
 		"Parametervaluefield" : "value",
 		"Parameterkeyvalue" : "Fetch parameter table",

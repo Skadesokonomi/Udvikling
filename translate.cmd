@@ -1,5 +1,5 @@
 echo on
-set prj=eco_model_da
+set prj=eco_model
 
 cd %0\..\%prj%\i18n
 pause
