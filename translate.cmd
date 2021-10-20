@@ -1,7 +1,6 @@
-echo on
-set prj=eco_model
 
-cd %0\..\%prj%\i18n
-pause
-start/wait "C:\Program Files\QGIS 3.20.3\OSGeo4W.bat" "C:\Program Files\QGIS 3.20.3\apps\Python39\Scripts\pylupdate5.exe" %prj%.pro
+echo on
+call "C:\Program Files\QGIS 3.20.3\bin\o4w_env.bat"
+@echo on
+"C:\Program Files\QGIS 3.20.3\apps\Python39\Scripts\pylupdate5.exe" %0\..%prj%\i18n\%prj%.pro
 pause
