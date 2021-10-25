@@ -365,7 +365,7 @@ class EcoModel:
             metadata = QgsProviderRegistry.instance().providerMetadata(k)
 
             try:
-                conn = metadata.connections()
+                conn = metadata.connections(False)
                 for c,i in conn.items(): sd.cbDatabase.addItem('{}: {}'.format(k, c), [k, c])
 
             except Exception as e:
