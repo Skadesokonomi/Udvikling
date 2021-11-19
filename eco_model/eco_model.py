@@ -785,46 +785,59 @@ class EcoModel:
         query = executeSQL(qct)
 #        query.exec(qct) 
 
-        if 'f_geom_'+ lTxt in lDict:
+        cnt = -99
+        query = executeSQL('SELECT COUNT(*) FROM "{}"."{}"'.format(lDict['Result_schema'],lDict['tablename_ts']))
+        if query:
+            while query.next(): 
+                cnt = query.value(0)
 
-            # Create artificial geom_column entry in lDict using actual query name        
-            lDict['geom_column'] = lDict['f_geom_' + lTxt] 
-            geom_col = lDict['geom_column']
-    
-            # Create spatial index... command
-            qct = lDict['Create_result_index'].format(**lDict)
-            #logI(qct)    
-            # Create spatial index by executing command
-#            query.exec(qct) # Create table with create spatial index and set primary key
-            query = executeSQL(qct) 
-        else:
-            geom_col = ''
+        if cnt > 0:        
         
-
-        if 'f_pkey_'+ lTxt in lDict:
-            # Create artificial pkey_column entry in lDict using actual query name        
-
-            lDict['pkey_column'] = lDict['f_pkey_'+ lTxt]
-            pkey_col = lDict['pkey_column']
+            if 'f_geom_'+ lTxt in lDict:
     
-            # Create primary key... command
-            qct = lDict['Create_result_pkey'].format(**lDict)
-            #logI(qct)    
+                # Create artificial geom_column entry in lDict using actual query name        
+                lDict['geom_column'] = lDict['f_geom_' + lTxt] 
+                geom_col = lDict['geom_column']
+        
+                # Create spatial index... command
+                qct = lDict['Create_result_index'].format(**lDict)
+                #logI(qct)    
+                # Create spatial index by executing command
+    #            query.exec(qct) # Create table with create spatial index and set primary key
+                query = executeSQL(qct) 
+            else:
+                geom_col = ''
+            
     
-            # Create primary key by executing command
-#            query.exec(qct) 
-            query = executeSQL(qct) 
+            if 'f_pkey_'+ lTxt in lDict:
+                # Create artificial pkey_column entry in lDict using actual query name        
+    
+                lDict['pkey_column'] = lDict['f_pkey_'+ lTxt]
+                pkey_col = lDict['pkey_column']
+        
+                # Create primary key... command
+                qct = lDict['Create_result_pkey'].format(**lDict)
+                #logI(qct)    
+        
+                # Create primary key by executing command
+    #            query.exec(qct) 
+                query = executeSQL(qct) 
+            else:
+                pkey_col = ''
+    
+            # Create layer with new table and add it to mapper
+    
+            contype = self.contype
+            uri = self.conuri
+            uri.setDataSource(lDict['Result_schema'], lDict['tablename_ts'], geom_col , '', pkey_col)
+            vlayer=QgsVectorLayer (uri.uri(), nTxt, contype)
+    
+            return lTxt, vlayer
+
         else:
-            pkey_col = ''
+            messW(self.tr('Execution of model: "{}" did not yield any results').format(nTxt))
+            return lTxt, None
 
-        # Create layer with new table and add it to mapper
-
-        contype = self.contype
-        uri = self.conuri
-        uri.setDataSource(lDict['Result_schema'], lDict['tablename_ts'], geom_col , '', pkey_col)
-        vlayer=QgsVectorLayer (uri.uri(), nTxt, contype)
-
-        return lTxt, vlayer
         
 #    def createTempParmDict (self, roots):
 #
