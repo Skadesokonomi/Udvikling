@@ -551,6 +551,8 @@ class EcoModel:
         cUri = cLtl.layer().dataProvider().uri()
         cell_table = cUri.quotedTablename() 
         geom_cell = cUri.geometryColumn()        
+        pci = cLtl.layer().dataProvider().pkAttributeIndexes()[0]
+        pkey_cell = cLtl.layer().dataProvider().fields()[pci].name()
 
         query = QSqlQuery()
         ltRoot = QgsProject.instance().layerTreeRoot()
@@ -564,7 +566,7 @@ class EcoModel:
             value_table = vUri.quotedTablename() 
             geom_value = vUri.geometryColumn()        
             value_value = item.text()
-            updCmd = updTemplate.format(cell_table=cell_table, geom_cell=geom_cell, value_table=value_table, geom_value=geom_value, value_value=value_value)
+            updCmd = updTemplate.format(cell_table=cell_table, pkey_cell=pkey_cell, geom_cell=geom_cell, value_table=value_table, geom_value=geom_value, value_value=value_value)
 #            logI(updCmd)
 #            query.exec(updCmd)    
 #            error = query.lastError().text()
