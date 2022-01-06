@@ -622,7 +622,7 @@
       <item>
        <widget class="QPushButton" name="pbParameterReset">
         <property name="text">
-         <string>Reset parameters</string>
+         <string>Reload parameters</string>
         </property>
        </widget>
       </item>
