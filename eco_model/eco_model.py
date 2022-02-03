@@ -32,7 +32,8 @@ from qgis.PyQt.QtCore import (QSettings,
                               QUrl,
                               QDate,
                               QTime,
-                              QDateTime)
+                              QDateTime
+                              )
                           
 from qgis.PyQt.QtGui import QIcon
 
@@ -54,7 +55,9 @@ from qgis.PyQt.QtWidgets import (QDialog,
                                  QTimeEdit,
                                  QLayout,
                                  QHeaderView,
-                                 QVBoxLayout)
+                                 QVBoxLayout,
+                                 QHBoxLayout,
+                                 QLabel)
 
 from qgis.PyQt.Qt import (QStandardItemModel,
                           QStandardItem)
@@ -65,7 +68,8 @@ from qgis.core import (QgsProject,
                        QgsProviderRegistry,
                        QgsDataSourceUri,
                        QgsExpressionContextUtils,
-                       QgsVectorLayer)
+                       QgsVectorLayer,
+                       QgsAbstractDatabaseProviderConnection)
 
 from qgis.gui import QgsFileWidget, QgsCheckableComboBox
 
@@ -318,6 +322,8 @@ class EcoModel:
                 sd.pbClearAll.clicked.connect(self.pbClearAllClicked)
                 sd.pbCellExtract.clicked.connect(self.pbCellExtractClicked)
                 sd.pbAdministration.clicked.connect(self.pbAdministrationClicked)
+                sd.cbDatabase.currentIndexChanged.connect(self.cbDatabaseCurrentIndexChanged)
+
 
                 for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels, sd.tvReports]:
                     tv.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -567,10 +573,6 @@ class EcoModel:
             geom_value = vUri.geometryColumn()        
             value_value = item.text()
             updCmd = updTemplate.format(cell_table=cell_table, pkey_cell=pkey_cell, geom_cell=geom_cell, value_table=value_table, geom_value=geom_value, value_value=value_value)
-#            logI(updCmd)
-#            query.exec(updCmd)    
-#            error = query.lastError().text()
-#            if error != '': messC(error)                
             query = executeSQL(updCmd)
  
         cLtl.layer().triggerRepaint()
@@ -676,9 +678,18 @@ class EcoModel:
             table = sd.leParameterTable.text()
         uri.setDataSource(schema, table, '','','name')
         uri.setUseEstimatedMetadata(True)
-        #logI(uri.uri())
         self.parameterLayer = QgsVectorLayer(uri.uri(), "parameters", self.contype)
         if self.parameterLayer: addLayer2Tree(QgsProject.instance().layerTreeRoot(), self.parameterLayer, False, 'eco_layername', sd.leParameterTable.text(), os.path.join(self.plugin_dir, 'styles', 'parameters.qml'),'Parameters')
+
+    def cbDatabaseCurrentIndexChanged(self, index):
+    
+        sd = self.dockwidget
+
+        if sd.cbDatabase.currentIndex() >= 0:
+            setting = sd.cbDatabase.itemData(sd.cbDatabase.currentIndex())
+            metadata = QgsProviderRegistry.instance().providerMetadata(setting[0])
+            self.connection = metadata.findConnection(setting[1])
+            
     
 
     def pbParameterResetClicked(self):
@@ -691,7 +702,12 @@ class EcoModel:
         write_config(os.path.join(self.plugin_dir, 'configuration.json'), self.parm)
 
         if sd.cbDatabase.currentIndex() >= 0:
+
             setting = sd.cbDatabase.itemData(sd.cbDatabase.currentIndex())
+            metadata = QgsProviderRegistry.instance().providerMetadata(setting[0])
+            self.connection = metadata.findConnection(setting[1])
+            uri = QgsDataSourceUri(self.connection.uri())
+
 
             self.conuri = self.dbConnection2Db (setting[0], setting[1])
             self.contype = setting[0]
@@ -771,21 +787,16 @@ class EcoModel:
         parent = item.parent()
         lTxt = parent.child(item.row(),7).text() # From column "default"
         nTxt = parent.child(item.row(),0).text() # From column "name"
-        #logI (lTxt)
-        #logI ( lDict[lTxt])
         # Create new tablename for result datasaet using model name and timestamp
         lDict['tablename_ts'] = createDateTimeName(item.text())
-        #logI (lDict['tablename_ts'])
         # Create artificial query entry in lDict using actual query entry        
         lDict['sqlquery'] = lDict[lTxt].format(**lDict)
 
         # Create create table... command
         qct = lDict['Create_result_table'].format(**lDict)
-        #logI(qct)    
 
         # Create table by executing command
         query = executeSQL(qct)
-#        query.exec(qct) 
 
         cnt = -99
         query = executeSQL('SELECT COUNT(*) FROM "{}"."{}"'.format(lDict['Result_schema'],lDict['tablename_ts']))
@@ -803,9 +814,7 @@ class EcoModel:
         
                 # Create spatial index... command
                 qct = lDict['Create_result_index'].format(**lDict)
-                #logI(qct)    
                 # Create spatial index by executing command
-    #            query.exec(qct) # Create table with create spatial index and set primary key
                 query = executeSQL(qct) 
             else:
                 geom_col = ''
@@ -819,7 +828,6 @@ class EcoModel:
         
                 # Create primary key... command
                 qct = lDict['Create_result_pkey'].format(**lDict)
-                #logI(qct)    
         
                 # Create primary key by executing command
     #            query.exec(qct) 
@@ -903,17 +911,6 @@ class EcoModel:
                     child0 = parent.child(row, 0)
                     if child0.hasChildren(): stack.append(child0)
 
-                
-#    def iterItemsChecked(self, root, dontCheck=False, match=None):
-#        if root is not None:
-#            stack = [root]
-#            while stack:
-#                parent = stack.pop(0)
-#                for row in range(parent.rowCount()):
-#                    child = parent.child(row, 0)
-#                    if (child.checkState() == Qt.Checked or dontCheck): yield child
-#                    # and (match is None or match == child.text()) 
-#                    if child.hasChildren(): stack.append(child)
 
     def createParmDict(self, ptable, pkfield, pkvalue, pvfield):
 
@@ -984,7 +981,6 @@ class EcoModel:
                 qsi = QStandardItem('' if str(val)=='NULL' else str(val))
                 if key==fieldN:
                     if v[fieldC].upper() in ('T','Y','J','C'):
-                        #qsi.setCheckable(True)
                         qsi.setFlags(qsi.flags() | Qt.ItemIsUserCheckable)
                         qsi.setCheckState(Qt.Unchecked)
                         cable = True
@@ -993,7 +989,6 @@ class EcoModel:
                 
             parent.appendRow(row)
             if cable: parent.setFlags(parent.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable)
-#            parent.appendRow([QStandardItem('' if str(val)=='NULL' else str(val)) for val in v.values()])
             pDict[k]['_Id_'] = parent.child(parent.rowCount() - 1)
 
         return (modG, modD, modQ, modM, modR)
@@ -1024,7 +1019,8 @@ class EcoModel:
         for col in range(PARM_NO_COLUMNS - 1):
             it = parent.child(row, col)
             val.append(str(it.data()))
-
+        # Horrible kludge to get value from parent for "Field selector" type
+        if val[3].lower() == 'f': val.append(str(parent.parent().child(parent.row(),2).data()))
         rect = tree.visualRect(parent.child(row, 0))
         pos = tree.viewport().mapToGlobal(rect.topLeft())
         width = int(sd.width()*0.8)
@@ -1046,10 +1042,9 @@ class EcoModel:
 
         func = val[3].strip().upper()
 
-        if func in ['T','P','R','I','O','M','X','D','E','B']:
+        if func in ['T','P','R','I','O','M','X','D','E','B','S','F']:
 
             layout = QVBoxLayout()
-            #logI(str(val))
 
             if func=='T': # Single line
 
@@ -1114,6 +1109,16 @@ class EcoModel:
             elif func=='B': # Boolean
                 input= QCheckBox(val[6])
                 input.setChecked(val[2].upper()=='TRUE')
+
+            if func=='S': # Schema/table selector
+
+                input = DBTableSelector(self.connection)
+                input.setFullName(val[2])
+
+            if func=='F': # Field selector
+
+                input = DBFieldSelector(self.connection)
+                input.setFieldName(val[len(val)-1],val[2])
                 
             layout.addWidget(input)
 
@@ -1172,6 +1177,14 @@ class EcoModel:
                 elif func=='B': # Boolean
 
                     value = 'True' if input.isChecked() else 'False'
+
+                elif func=='S': # Schema / Table selector
+
+                    value = input.getFullName()
+
+                elif func=='F': # Field selector
+
+                    value = input.getFieldName()
                 
             else:
                 value = None
@@ -1180,29 +1193,137 @@ class EcoModel:
             
         return None, None
 
+class DBTableSelector(QWidget):
+    """
+    TBD
+    """
 
-#   def ModelItemChanged(self, item):
-#
-#       if not item.checkable(): return
-#   
-#       parent = item.parent();
-#
-#       if not parent:
-#           newState = item.checkState();
-#           if(newState != Qt.PartiallyChecked):
-#               for i in range(item.rowCount()): 
-#                   if item.child(i).isCheckable(): item.child(i).setCheckState(newState)
-#       else:
-#       checkCount = 0
-#       for i in range(parent.rowCount()):
-#           if (parent->child(i)->checkState() == Qt::Checked): checkCount +=1
-#
-#       if(checkCount == 0)
-#           parent->setCheckState(Qt::Unchecked);
-#       else if (checkCount ==  parent->rowCount())
-#           parent->setCheckState(Qt::Checked);
-#       else
-#           parent->setCheckState(Qt::PartiallyChecked);
-#   else: 
-#
-#
+    def __init__(self, connection, schemaPrefix='Schema Name: ', tablePrefix='Table Name: '):
+
+        super(DBTableSelector, self).__init__()
+
+        self.connection = connection
+        self.sName= None
+        self.tName= None
+
+        layout = QVBoxLayout()
+        
+        if (self.connection.capabilities() & QgsAbstractDatabaseProviderConnection.Schemas):
+
+            self.schemaLabel = QLabel()
+            self.schemaLabel.setText(schemaPrefix)
+            self.schemaNames = QComboBox()
+            for s in self.connection.schemas(): self.schemaNames.addItem(s)
+            self.schemaNames.currentIndexChanged.connect (self.schemaNamesCurrentIndexChanged)
+
+            hlayout = QHBoxLayout()
+            hlayout.addWidget(self.schemaLabel)
+            hlayout.addWidget(self.schemaNames)
+            layout.addLayout(hlayout)
+
+        else:
+           self.schemaNames = None
+
+        self.tableLabel = QLabel()
+        self.tableLabel.setText(tablePrefix)
+        self.tableNames = QComboBox()
+        self.tableNames.currentIndexChanged.connect (self.tableNamesCurrentIndexChanged)
+
+        hlayout = QHBoxLayout()
+        hlayout.addWidget(self.tableLabel)
+        hlayout.addWidget(self.tableNames)
+        layout.addLayout(hlayout)
+
+        self.setLayout(layout)
+
+    def schemaNamesCurrentIndexChanged(self, index):
+
+        if self.schemaNames is not None: self.sName = self.schemaNames.currentText() 
+        self.setTableNames(self.sName, self.tName)
+
+    def setTableNames(self, schema, table):
+
+        tables = self.connection.tables(schema, QgsAbstractDatabaseProviderConnection.Aspatial | QgsAbstractDatabaseProviderConnection.Vector)
+
+        self.tableNames.clear()
+        for t in tables: self.tableNames.addItem(t.tableName())
+        
+        self.tableNames.setCurrentIndex(self.tableNames.findText(table))                
+
+    def tableNamesCurrentIndexChanged(self, index):
+        self.tName = self.tableNames.currentText() 
+    
+    def getFullName(self):
+        if self.sName is not None:
+            return '"{}"."{}"'.format(self.sName,self.tName)
+        else:
+            return '"{}"'.format(self.tName)
+    
+    def setFullName(self,fullName=''):
+
+        if fullName != '':
+
+            names = fullName.replace('"','').split('.')
+
+            if len(names) == 2:
+                self.sName = names[0]        
+                self.tName = names[1] 
+
+            else:            
+                self.tName = names[0]        
+
+        if self.sName is not None: self.schemaNames.setCurrentIndex(self.schemaNames.findText(self.sName))                
+        self.setTableNames(self.sName, self.tName)
+
+class DBFieldSelector(QWidget):
+
+    """
+    TBD
+    """
+
+    def __init__(self, connection, fieldPrefix='Fieldname: '):
+
+        super(DBFieldSelector, self).__init__()
+
+        self.connection = connection
+
+        self.fieldLabel = QLabel()
+        self.fieldLabel.setText(fieldPrefix)
+        self.fieldNames = QComboBox()
+        self.fieldNames.currentIndexChanged.connect (self.fieldNamesCurrentIndexChanged)
+
+        layout = QHBoxLayout()
+        layout.addWidget(self.fieldLabel)
+        layout.addWidget(self.fieldNames)
+        self.setLayout(layout)
+
+
+    def fieldNamesCurrentIndexChanged(self, index):
+        self.fName = self.fieldNames.currentText() 
+    
+    def getFieldName(self):
+        return '"{}"'.format(self.fName)
+    
+    def setFieldName(self, fullName='', fieldName=''):
+
+        self.fName = fieldName
+        
+        if fullName != '':
+
+            names = fullName.replace('"','').split('.')
+
+            if len(names) == 2:
+                self.sName = names[0]        
+                self.tName = names[1] 
+
+            else:            
+                self.tName = names[0]        
+
+        self.fieldNames.clear()
+
+        if self.connection.tableExists (self.sName, self.tName):
+ 
+            fields = self.connection.fields(self.sName, self.tName)
+            for f in fields: self.fieldNames.addItem(f.name())
+
+        self.fieldNames.setCurrentIndex(self.fieldNames.findText(fieldName))                

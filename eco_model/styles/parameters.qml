@@ -1,13 +1,44 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis version="3.20.0-Odense" styleCategories="Fields|Forms|AttributeTable|Legend">
-  <legend type="default-vector" showLabelLegend="0"/>
+<qgis styleCategories="AllStyleCategories" minScale="0" version="3.22.0-Białowieża" readOnly="0" maxScale="0" hasScaleBasedVisibilityFlag="0">
+  <flags>
+    <Identifiable>1</Identifiable>
+    <Removable>1</Removable>
+    <Searchable>1</Searchable>
+    <Private>0</Private>
+  </flags>
+  <temporal endField="" durationField="" fixedDuration="0" accumulate="0" enabled="0" startField="" mode="0" limitMode="0" endExpression="" durationUnit="min" startExpression="">
+    <fixedRange>
+      <start></start>
+      <end></end>
+    </fixedRange>
+  </temporal>
+  <customproperties>
+    <Option type="Map">
+      <Option name="dualview/previewExpressions" type="List">
+        <Option value="&quot;name&quot;" type="QString"/>
+      </Option>
+      <Option value="0" name="embeddedWidgets/count" type="int"/>
+      <Option name="variableNames" type="StringList">
+        <Option value="eco_layername" type="QString"/>
+      </Option>
+      <Option name="variableValues" type="StringList">
+        <Option value="fdc_admin.parametre" type="QString"/>
+      </Option>
+    </Option>
+  </customproperties>
+  <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
+    <activeChecks/>
+    <checkConfiguration/>
+  </geometryOptions>
+  <legend showLabelLegend="0" type="default-vector"/>
+  <referencedLayers/>
   <fieldConfiguration>
     <field name="name" configurationFlags="None">
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
-            <Option type="bool" name="IsMultiline" value="false"/>
-            <Option type="bool" name="UseHtml" value="false"/>
+            <Option value="false" name="IsMultiline" type="bool"/>
+            <Option value="false" name="UseHtml" type="bool"/>
           </Option>
         </config>
       </editWidget>
@@ -16,8 +47,8 @@
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
-            <Option type="bool" name="IsMultiline" value="false"/>
-            <Option type="bool" name="UseHtml" value="false"/>
+            <Option value="false" name="IsMultiline" type="bool"/>
+            <Option value="false" name="UseHtml" type="bool"/>
           </Option>
         </config>
       </editWidget>
@@ -26,8 +57,8 @@
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
-            <Option type="bool" name="IsMultiline" value="true"/>
-            <Option type="bool" name="UseHtml" value="false"/>
+            <Option value="true" name="IsMultiline" type="bool"/>
+            <Option value="false" name="UseHtml" type="bool"/>
           </Option>
         </config>
       </editWidget>
@@ -36,39 +67,45 @@
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
-            <Option type="List" name="map">
+            <Option name="map" type="List">
               <Option type="Map">
-                <Option type="QString" name="Tekst" value="T"/>
+                <Option value="T" name="Tekst" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Multilinje tekst" value="P"/>
+                <Option value="P" name="Multilinje tekst" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Heltal" value="I"/>
+                <Option value="I" name="Heltal" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Reelt tal" value="R"/>
+                <Option value="R" name="Reelt tal" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Valgliste, enkeltvalg" value="O"/>
+                <Option value="O" name="Valgliste, enkeltvalg" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Valgliste, multiple valg" value="M"/>
+                <Option value="M" name="Valgliste, multiple valg" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Dato/tid" value="X"/>
+                <Option value="X" name="Dato/tid" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Dato" value="D"/>
+                <Option value="D" name="Dato" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Tid" value="E"/>
+                <Option value="E" name="Tid" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Ja/Nej" value="B"/>
+                <Option value="B" name="Ja/Nej" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Gruppe" value="G"/>
+                <Option value="G" name="Gruppe" type="QString"/>
+              </Option>
+              <Option type="Map">
+                <Option value="S" name="Tabelvælger" type="QString"/>
+              </Option>
+              <Option type="Map">
+                <Option value="F" name="Feltvælger" type="QString"/>
               </Option>
             </Option>
           </Option>
@@ -79,8 +116,8 @@
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
-            <Option type="bool" name="IsMultiline" value="false"/>
-            <Option type="bool" name="UseHtml" value="false"/>
+            <Option value="false" name="IsMultiline" type="bool"/>
+            <Option value="false" name="UseHtml" type="bool"/>
           </Option>
         </config>
       </editWidget>
@@ -89,8 +126,8 @@
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
-            <Option type="bool" name="IsMultiline" value="false"/>
-            <Option type="bool" name="UseHtml" value="false"/>
+            <Option value="false" name="IsMultiline" type="bool"/>
+            <Option value="false" name="UseHtml" type="bool"/>
           </Option>
         </config>
       </editWidget>
@@ -99,8 +136,8 @@
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
-            <Option type="bool" name="IsMultiline" value="false"/>
-            <Option type="bool" name="UseHtml" value="false"/>
+            <Option value="false" name="IsMultiline" type="bool"/>
+            <Option value="false" name="UseHtml" type="bool"/>
           </Option>
         </config>
       </editWidget>
@@ -109,8 +146,8 @@
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
-            <Option type="bool" name="IsMultiline" value="false"/>
-            <Option type="bool" name="UseHtml" value="false"/>
+            <Option value="false" name="IsMultiline" type="bool"/>
+            <Option value="false" name="UseHtml" type="bool"/>
           </Option>
         </config>
       </editWidget>
@@ -119,8 +156,8 @@
       <editWidget type="TextEdit">
         <config>
           <Option type="Map">
-            <Option type="bool" name="IsMultiline" value="true"/>
-            <Option type="bool" name="UseHtml" value="false"/>
+            <Option value="true" name="IsMultiline" type="bool"/>
+            <Option value="false" name="UseHtml" type="bool"/>
           </Option>
         </config>
       </editWidget>
@@ -129,48 +166,48 @@
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
-            <Option type="List" name="map">
+            <Option name="map" type="List">
               <Option type="Map">
-                <Option type="QString" name="1" value="1"/>
+                <Option value="1" name="1" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="2" value="2"/>
+                <Option value="2" name="2" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="3" value="3"/>
+                <Option value="3" name="3" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="4" value="4"/>
+                <Option value="4" name="4" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="5" value="5"/>
+                <Option value="5" name="5" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="6" value="6"/>
+                <Option value="6" name="6" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="7" value="7"/>
+                <Option value="7" name="7" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="8" value="8"/>
+                <Option value="8" name="8" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="9" value="9"/>
+                <Option value="9" name="9" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="10" value="10"/>
+                <Option value="10" name="10" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="11" value="11"/>
+                <Option value="11" name="11" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="12" value="12"/>
+                <Option value="12" name="12" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="13" value="13"/>
+                <Option value="13" name="13" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="14" value="14"/>
+                <Option value="14" name="14" type="QString"/>
               </Option>
             </Option>
           </Option>
@@ -181,12 +218,12 @@
       <editWidget type="ValueMap">
         <config>
           <Option type="Map">
-            <Option type="List" name="map">
+            <Option name="map" type="List">
               <Option type="Map">
-                <Option type="QString" name="Ja" value="T"/>
+                <Option value="T" name="Ja" type="QString"/>
               </Option>
               <Option type="Map">
-                <Option type="QString" name="Nej" value=" "/>
+                <Option value=" " name="Nej" type="QString"/>
               </Option>
             </Option>
           </Option>
@@ -195,72 +232,75 @@
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias name="" field="name" index="0"/>
-    <alias name="" field="parent" index="1"/>
-    <alias name="" field="value" index="2"/>
-    <alias name="" field="type" index="3"/>
-    <alias name="" field="minval" index="4"/>
-    <alias name="" field="maxval" index="5"/>
-    <alias name="" field="lookupvalues" index="6"/>
-    <alias name="" field="default" index="7"/>
-    <alias name="" field="explanation" index="8"/>
-    <alias name="" field="sort" index="9"/>
-    <alias name="" field="checkable" index="10"/>
+    <alias index="0" field="name" name=""/>
+    <alias index="1" field="parent" name=""/>
+    <alias index="2" field="value" name=""/>
+    <alias index="3" field="type" name=""/>
+    <alias index="4" field="minval" name=""/>
+    <alias index="5" field="maxval" name=""/>
+    <alias index="6" field="lookupvalues" name=""/>
+    <alias index="7" field="default" name=""/>
+    <alias index="8" field="explanation" name=""/>
+    <alias index="9" field="sort" name=""/>
+    <alias index="10" field="checkable" name=""/>
   </aliases>
   <defaults>
-    <default expression="" applyOnUpdate="0" field="name"/>
-    <default expression="" applyOnUpdate="0" field="parent"/>
-    <default expression="" applyOnUpdate="0" field="value"/>
-    <default expression="" applyOnUpdate="0" field="type"/>
-    <default expression="" applyOnUpdate="0" field="minval"/>
-    <default expression="" applyOnUpdate="0" field="maxval"/>
-    <default expression="" applyOnUpdate="0" field="lookupvalues"/>
-    <default expression="" applyOnUpdate="0" field="default"/>
-    <default expression="" applyOnUpdate="0" field="explanation"/>
-    <default expression="" applyOnUpdate="0" field="sort"/>
-    <default expression="" applyOnUpdate="0" field="checkable"/>
+    <default applyOnUpdate="0" field="name" expression=""/>
+    <default applyOnUpdate="0" field="parent" expression=""/>
+    <default applyOnUpdate="0" field="value" expression=""/>
+    <default applyOnUpdate="0" field="type" expression=""/>
+    <default applyOnUpdate="0" field="minval" expression=""/>
+    <default applyOnUpdate="0" field="maxval" expression=""/>
+    <default applyOnUpdate="0" field="lookupvalues" expression=""/>
+    <default applyOnUpdate="0" field="default" expression=""/>
+    <default applyOnUpdate="0" field="explanation" expression=""/>
+    <default applyOnUpdate="0" field="sort" expression=""/>
+    <default applyOnUpdate="0" field="checkable" expression=""/>
   </defaults>
   <constraints>
-    <constraint exp_strength="0" field="name" notnull_strength="1" constraints="3" unique_strength="1"/>
-    <constraint exp_strength="0" field="parent" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="value" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="type" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="minval" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="maxval" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="lookupvalues" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="default" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="explanation" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="sort" notnull_strength="1" constraints="1" unique_strength="0"/>
-    <constraint exp_strength="0" field="checkable" notnull_strength="1" constraints="1" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="3" field="name" unique_strength="1"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="parent" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="value" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="type" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="minval" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="maxval" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="lookupvalues" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="default" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="explanation" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="sort" unique_strength="0"/>
+    <constraint notnull_strength="1" exp_strength="0" constraints="1" field="checkable" unique_strength="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint exp="" field="name" desc=""/>
-    <constraint exp="" field="parent" desc=""/>
-    <constraint exp="" field="value" desc=""/>
-    <constraint exp="" field="type" desc=""/>
-    <constraint exp="" field="minval" desc=""/>
-    <constraint exp="" field="maxval" desc=""/>
-    <constraint exp="" field="lookupvalues" desc=""/>
-    <constraint exp="" field="default" desc=""/>
-    <constraint exp="" field="explanation" desc=""/>
-    <constraint exp="" field="sort" desc=""/>
-    <constraint exp="" field="checkable" desc=""/>
+    <constraint field="name" exp="" desc=""/>
+    <constraint field="parent" exp="" desc=""/>
+    <constraint field="value" exp="" desc=""/>
+    <constraint field="type" exp="" desc=""/>
+    <constraint field="minval" exp="" desc=""/>
+    <constraint field="maxval" exp="" desc=""/>
+    <constraint field="lookupvalues" exp="" desc=""/>
+    <constraint field="default" exp="" desc=""/>
+    <constraint field="explanation" exp="" desc=""/>
+    <constraint field="sort" exp="" desc=""/>
+    <constraint field="checkable" exp="" desc=""/>
   </constraintExpressions>
   <expressionfields/>
-  <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="&quot;type&quot;">
+  <attributeactions>
+    <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
+  </attributeactions>
+  <attributetableconfig sortOrder="1" actionWidgetStyle="dropDown" sortExpression="&quot;parent&quot;">
     <columns>
-      <column width="452" type="field" hidden="0" name="name"/>
-      <column width="207" type="field" hidden="0" name="parent"/>
-      <column width="-1" type="field" hidden="0" name="value"/>
-      <column width="-1" type="field" hidden="0" name="type"/>
-      <column width="-1" type="field" hidden="0" name="minval"/>
-      <column width="-1" type="field" hidden="0" name="maxval"/>
-      <column width="-1" type="field" hidden="0" name="lookupvalues"/>
-      <column width="-1" type="field" hidden="0" name="default"/>
-      <column width="384" type="field" hidden="0" name="explanation"/>
-      <column width="-1" type="field" hidden="0" name="sort"/>
-      <column width="-1" type="field" hidden="0" name="checkable"/>
-      <column width="-1" type="actions" hidden="1"/>
+      <column hidden="0" width="452" name="name" type="field"/>
+      <column hidden="0" width="207" name="parent" type="field"/>
+      <column hidden="0" width="-1" name="value" type="field"/>
+      <column hidden="0" width="-1" name="type" type="field"/>
+      <column hidden="0" width="-1" name="minval" type="field"/>
+      <column hidden="0" width="-1" name="maxval" type="field"/>
+      <column hidden="0" width="-1" name="lookupvalues" type="field"/>
+      <column hidden="0" width="-1" name="default" type="field"/>
+      <column hidden="0" width="384" name="explanation" type="field"/>
+      <column hidden="0" width="-1" name="sort" type="field"/>
+      <column hidden="0" width="-1" name="checkable" type="field"/>
+      <column hidden="1" width="-1" type="actions"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -332,5 +372,7 @@ def my_form_open(dialog, layer, feature):
   </reuseLastValue>
   <dataDefinedFieldProperties/>
   <widgets/>
+  <previewExpression>"name"</previewExpression>
+  <mapTip></mapTip>
   <layerGeometryType>4</layerGeometryType>
 </qgis>
