@@ -1035,6 +1035,7 @@ class EcoModel:
 
     def treeViewEditItem(self, pos, width, val):
 
+        sd = self.dockwidget
         spdid = self.parm["Data"]["Item delimiter"]
 
         dlg = QDialog()
@@ -1042,7 +1043,7 @@ class EcoModel:
 
         func = val[3].strip().upper()
 
-        if func in ['T','P','R','I','O','M','X','D','E','B','S','F']:
+        if func in ['T','P','R','I','O','M','X','D','E','B','S','F','Q']:
 
             layout = QVBoxLayout()
 
@@ -1110,15 +1111,20 @@ class EcoModel:
                 input= QCheckBox(val[6])
                 input.setChecked(val[2].upper()=='TRUE')
 
-            if func=='S': # Schema/table selector
+            elif func=='S': # Schema/table selector
 
                 input = DBTableSelector(self.connection)
                 input.setFullName(val[2])
 
-            if func=='F': # Field selector
+            elif func=='F': # Field selector
 
                 input = DBFieldSelector(self.connection)
                 input.setFieldName(val[len(val)-1],val[2])
+
+            elif func=='Q': # Tab tree selector
+
+                input = TreeItemSelector(sd.tvData)
+                input.setFullName(val[2],'S','t_flood')
                 
             layout.addWidget(input)
 
@@ -1185,6 +1191,10 @@ class EcoModel:
                 elif func=='F': # Field selector
 
                     value = input.getFieldName()
+
+                elif func=='Q': # Tree selector
+
+                    value = input.getFullName()
                 
             else:
                 value = None
@@ -1327,3 +1337,49 @@ class DBFieldSelector(QWidget):
             for f in fields: self.fieldNames.addItem(f.name())
 
         self.fieldNames.setCurrentIndex(self.fieldNames.findText(fieldName))                
+
+class TreeItemSelector(QWidget):
+
+    """
+    TBD
+    """
+
+    def __init__(self, tree, treePrefix='Tablename: '):
+
+        super(TreeItemSelector, self).__init__()
+
+        self.tree = tree
+        self.fName = None
+        self.fVal = None
+        
+        self.treeLabel = QLabel()
+        self.treeLabel.setText(treePrefix)
+        self.treeNames = QComboBox()
+        self.treeNames.currentIndexChanged.connect (self.treeNamesCurrentIndexChanged)
+
+        layout = QHBoxLayout()
+        layout.addWidget(self.treeLabel)
+        layout.addWidget(self.treeNames)
+        self.setLayout(layout)
+
+    def treeNamesCurrentIndexChanged(self, index):
+        self.fName = self.treeNames.currentText() 
+        self.fVal = self.treeNames.currentData() 
+    
+    def getFullName(self):
+        
+        return self.fName
+    
+    def setFullName(self, fullName, treeType='', treeSearch=''):
+
+        self.treeNames.clear()
+
+        root = self.tree.model().invisibleRootItem().child(0,0)
+
+        for row in range(root.rowCount()):
+            name  = root.child(row,0).text()
+            value = root.child(row,2).text()
+            type  = root.child(row,3).text()
+            if name.startswith(treeSearch) and type == treeType: self.treeNames.addItem(value)
+
+        self.treeNames.setCurrentIndex(self.treeNames.findText(fullName))     
