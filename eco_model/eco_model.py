@@ -757,12 +757,25 @@ class EcoModel:
         #mDict = self.createTempParmDict([[sd.tvGeneral.model().invisibleRootItem().child(0,0), True], [sd.tvQueries.model().invisibleRootItem().child(0,0), True], [sd.tvData.model().invisibleRootItem().child(0,0), True], [sd.tvModels.model().invisibleRootItem().child(0,0), True]])
 
         mDict = {}
+        nDict = {}
+      
         for root in [sd.tvGeneral.model().invisibleRootItem().child(0,0),sd.tvQueries.model().invisibleRootItem().child(0,0),sd.tvData.model().invisibleRootItem().child(0,0),sd.tvModels.model().invisibleRootItem().child(0,0)]:
             for item in self.iterItemsChecked(root, True):
                 parent = item.parent()
                 key = parent.child(item.row(),0).text()
-                value = parent.child(item.row(),2).text()
-                mDict[key] = value
+                if parent.child(item.row(),3).text() == 'Q': # Key is an alias
+                    alias = parent.child(item.row(),6).text()
+                    logI('alias='+alias)                    
+                    for k in mDict:
+                        logI('key={}, value={}'.format(k,mDict[k]))                    
+                        if k.endswith(alias): 
+                            nDict[k.replace(alias,'')+key] = mDict[k] 
+                            logI('***key={}, value={}'.format(k.replace(alias,'')+key,nDict[k.replace(alias,'')+key]))                    
+                else:
+                    value = parent.child(item.row(),2).text()
+                    mDict[key] = value
+
+        for k,v in nDict.items(): mDict[k] = v
 
         # Create results layergroup
         rGroup = createGroup(mDict['Model_layergroup'], QgsProject.instance().layerTreeRoot(), True)
@@ -1025,11 +1038,15 @@ class EcoModel:
         pos = tree.viewport().mapToGlobal(rect.topLeft())
         width = int(sd.width()*0.8)
         
-        result, newval =  self.treeViewEditItem(pos, width, val)
+        result, newval, newval2 =  self.treeViewEditItem(pos, width, val)
         
         if result and newval:
             it = parent.child(row, 2)
             it.model().setData(it, newval)
+
+        if result and newval2:
+            it = parent.child(row, 6)
+            it.model().setData(it, newval2)
 
 
 
@@ -1141,7 +1158,9 @@ class EcoModel:
             dlg.move(pos)
             dlg.setSizeGripEnabled(True)
             res = dlg.exec()
-
+            
+            value2 = None
+            
             if res:
 
                 if func=='T': # Single line
@@ -1194,12 +1213,12 @@ class EcoModel:
 
                 elif func=='Q': # Tree selector
 
-                    value = input.getFullName()
+                    value, value2 = input.getFullName()
                 
             else:
                 value = None
                 
-            return res, value
+            return res, value, value2
             
         return None, None
 
@@ -1368,7 +1387,7 @@ class TreeItemSelector(QWidget):
     
     def getFullName(self):
         
-        return self.fName
+        return self.fName, self.fVal
     
     def setFullName(self, fullName, treeType='', treeSearch=''):
 
@@ -1380,6 +1399,6 @@ class TreeItemSelector(QWidget):
             name  = root.child(row,0).text()
             value = root.child(row,2).text()
             type  = root.child(row,3).text()
-            if name.startswith(treeSearch) and type == treeType: self.treeNames.addItem(value)
+            if name.startswith(treeSearch) and type == treeType: self.treeNames.addItem(value, name)
 
         self.treeNames.setCurrentIndex(self.treeNames.findText(fullName))     
