@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twEcoModel">
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -588,23 +588,6 @@
            </widget>
           </item>
          </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>Reports</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <widget class="QTreeView" name="tvReports"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbReportRun">
-          <property name="text">
-           <string>Run selected report(s)</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>

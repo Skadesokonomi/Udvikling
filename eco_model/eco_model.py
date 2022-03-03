@@ -325,7 +325,7 @@ class EcoModel:
                 sd.cbDatabase.currentIndexChanged.connect(self.cbDatabaseCurrentIndexChanged)
 
 
-                for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels, sd.tvReports]:
+                for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels]: #, sd.tvReports]:
                     tv.setEditTriggers(QAbstractItemView.NoEditTriggers)
                     tv.setSelectionBehavior(QAbstractItemView.SelectRows)
                     tv.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -334,7 +334,7 @@ class EcoModel:
                 sd.tvQueries.doubleClicked.connect(self.tvQueriesDoubleClicked)
                 sd.tvData.doubleClicked.connect(self.tvDataDoubleClicked)
                 sd.tvModels.doubleClicked.connect(self.tvModelsDoubleClicked)
-                sd.tvReports.doubleClicked.connect(self.tvReportsDoubleClicked)
+                #sd.tvReports.doubleClicked.connect(self.tvReportsDoubleClicked)
 
                 self.pbDatabaseClicked()
                 self.pbParameterResetClicked()
@@ -366,16 +366,17 @@ class EcoModel:
 
         sd.cbDatabase.clear()
 
-        for k in QgsProviderRegistry.instance().providerList():
-        
-            metadata = QgsProviderRegistry.instance().providerMetadata(k)
+# Kun postgres forbindelser...       for k in QgsProviderRegistry.instance().providerList():
 
-            try:
-                conn = metadata.connections(False)
-                for c,i in conn.items(): sd.cbDatabase.addItem('{}: {}'.format(k, c), [k, c])
+        k = 'postgres'
+        metadata = QgsProviderRegistry.instance().providerMetadata(k)
 
-            except Exception as e:
-                logC(self.tr('Error using connection type: {}').format(k))
+        try:
+            conn = metadata.connections(False)
+            for c,i in conn.items(): sd.cbDatabase.addItem('{}: {}'.format(k, c), [k, c])
+
+        except Exception as e:
+            logC(self.tr('Error using connection type: {}').format(k))
                 
         sd.cbDatabase.setCurrentIndex(sd.cbDatabase.findText(spd['Database']))
         sd.leParameterTable.setText(spd['Parametertable'])        
@@ -603,7 +604,7 @@ class EcoModel:
         insertCmd = insertTemplate.format(parametertable, colnames, placeholders)
         insertDataQuery = QSqlQuery()
         insertDataQuery.prepare(insertCmd)
-        for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels, sd.tvReports]:
+        for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels]: #, sd.tvReports]:
             for row in self.iterRowItems(tv.model().invisibleRootItem()): 
                 if row[0] == 'Group name template': row[2] = sd.leGroupName.text()
                 for i in range(len(row)): insertDataQuery.addBindValue(row[i])
@@ -721,9 +722,9 @@ class EcoModel:
                 sd.tvData.setModel(modD)
                 sd.tvQueries.setModel(modQ)
                 sd.tvModels.setModel(modM)
-                sd.tvReports.setModel(modR)
+                #sd.tvReports.setModel(modR)
     
-                for tv in [sd.tvGeneral, sd.tvData, sd.tvQueries, sd.tvModels, sd.tvReports]:
+                for tv in [sd.tvGeneral, sd.tvData, sd.tvQueries, sd.tvModels]: #, sd.tvReports]:
                     for i in range(modG.columnCount()): tv.hideColumn(i)
                     for i in [0,2]: tv.showColumn(i)
                     tv.header().setStretchLastSection(True);
@@ -735,7 +736,7 @@ class EcoModel:
                 sd.tvData.expandAll()
                 sd.tvQueries.expandAll()
                 sd.tvModels.expandAll()
-                sd.tvReports.expandAll()
+                #sd.tvReports.expandAll()
     
                 celllayer = self.parmDict['Cell layername']['value']
                 sd.leLayerName.setText(celllayer)
@@ -1018,8 +1019,8 @@ class EcoModel:
     def tvModelsDoubleClicked(self, index):
         self.tvAllDoubleClicked(self.dockwidget.tvModels, index)
 
-    def tvReportsDoubleClicked(self, index):
-        self.tvAllDoubleClicked(self.dockwidget.tvReports, index)
+    #def tvReportsDoubleClicked(self, index):
+    #    self.tvAllDoubleClicked(self.dockwidget.tvReports, index)
 
     def tvAllDoubleClicked(self, tree, index):
     
@@ -1130,20 +1131,28 @@ class EcoModel:
 
             elif func=='S': # Schema/table selector
 
-                input = DBTableSelector(self.connection)
-                input.setFullName(val[2])
+                if sd.cbDatabase.currentIndex() >= 0:
+                    setting = sd.cbDatabase.itemData(sd.cbDatabase.currentIndex())
+                    metadata = QgsProviderRegistry.instance().providerMetadata(setting[0])
+                    connection = metadata.findConnection(setting[1])
+                    input = DBTableSelector(connection)
+                    input.setFullName(val[2])
 
             elif func=='F': # Field selector
 
-                input = DBFieldSelector(self.connection)
-                input.setFieldName(val[len(val)-1],val[2])
+                if sd.cbDatabase.currentIndex() >= 0:
+                    setting = sd.cbDatabase.itemData(sd.cbDatabase.currentIndex())
+                    metadata = QgsProviderRegistry.instance().providerMetadata(setting[0])
+                    connection = metadata.findConnection(setting[1])
+                    input = DBFieldSelector(connection)
+                    input.setFieldName(val[len(val)-1],val[2])
 
             elif func=='Q': # Tab tree selector
 
                 input = TreeItemSelector(sd.tvData)
                 input.setFullName(val[2],'S','t_flood')
                 
-            layout.addWidget(input)
+            layout.addWidget(input,5)
 
             buttonBox = QDialogButtonBox()
             buttonBox.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -1246,8 +1255,8 @@ class DBTableSelector(QWidget):
             self.schemaNames.currentIndexChanged.connect (self.schemaNamesCurrentIndexChanged)
 
             hlayout = QHBoxLayout()
-            hlayout.addWidget(self.schemaLabel)
-            hlayout.addWidget(self.schemaNames)
+            hlayout.addWidget(self.schemaLabel,0)
+            hlayout.addWidget(self.schemaNames,5)
             layout.addLayout(hlayout)
 
         else:
@@ -1259,8 +1268,8 @@ class DBTableSelector(QWidget):
         self.tableNames.currentIndexChanged.connect (self.tableNamesCurrentIndexChanged)
 
         hlayout = QHBoxLayout()
-        hlayout.addWidget(self.tableLabel)
-        hlayout.addWidget(self.tableNames)
+        hlayout.addWidget(self.tableLabel,0)
+        hlayout.addWidget(self.tableNames,5)
         layout.addLayout(hlayout)
 
         self.setLayout(layout)
@@ -1322,8 +1331,8 @@ class DBFieldSelector(QWidget):
         self.fieldNames.currentIndexChanged.connect (self.fieldNamesCurrentIndexChanged)
 
         layout = QHBoxLayout()
-        layout.addWidget(self.fieldLabel)
-        layout.addWidget(self.fieldNames)
+        layout.addWidget(self.fieldLabel,0)
+        layout.addWidget(self.fieldNames,5)
         self.setLayout(layout)
 
 
@@ -1335,7 +1344,7 @@ class DBFieldSelector(QWidget):
     
     def setFieldName(self, fullName='', fieldName=''):
 
-        self.fName = fieldName
+        fieldName = fieldName.replace('"','')
         
         if fullName != '':
 
@@ -1356,7 +1365,8 @@ class DBFieldSelector(QWidget):
             for f in fields: self.fieldNames.addItem(f.name())
 
         self.fieldNames.setCurrentIndex(self.fieldNames.findText(fieldName))                
-
+        self.fName = self.fieldNames.currentText()
+        
 class TreeItemSelector(QWidget):
 
     """
@@ -1377,8 +1387,8 @@ class TreeItemSelector(QWidget):
         self.treeNames.currentIndexChanged.connect (self.treeNamesCurrentIndexChanged)
 
         layout = QHBoxLayout()
-        layout.addWidget(self.treeLabel)
-        layout.addWidget(self.treeNames)
+        layout.addWidget(self.treeLabel,0)
+        layout.addWidget(self.treeNames,5)
         self.setLayout(layout)
 
     def treeNamesCurrentIndexChanged(self, index):
