@@ -1150,7 +1150,7 @@ class EcoModel:
             elif func=='Q': # Tab tree selector
 
                 input = TreeItemSelector(sd.tvData)
-                input.setFullName(val[2],'S','t_flood')
+                input.setFullName(val[2],'S',val[7])
                 
             layout.addWidget(input,5)
 
@@ -1399,16 +1399,36 @@ class TreeItemSelector(QWidget):
         
         return self.fName, self.fVal
     
+    def iterRowItems(self, root):
+        if root is not None:
+            stack = [root]
+            while stack:
+                parent = stack.pop(0)
+                for row in range(parent.rowCount()):
+                    rowval = []
+                    for column in range(parent.columnCount()): rowval.append(parent.child(row, column).text())
+                    yield rowval
+                    child0 = parent.child(row, 0)
+                    if child0.hasChildren(): stack.append(child0)
+
     def setFullName(self, fullName, treeType='', treeSearch=''):
 
         self.treeNames.clear()
 
-        root = self.tree.model().invisibleRootItem().child(0,0)
+        root = self.tree.model().invisibleRootItem()
 
-        for row in range(root.rowCount()):
-            name  = root.child(row,0).text()
-            value = root.child(row,2).text()
-            type  = root.child(row,3).text()
-            if name.startswith(treeSearch) and type == treeType: self.treeNames.addItem(value, name)
+        for row in self.iterRowItems(root): 
+            name  = row[0]
+            value = row[2]
+            type  = row[3]
+            if name.startswith(treeSearch) and type == treeType and self.treeNames.findText(value) == -1: self.treeNames.addItem(value, name)
+
+#        root = self.tree.model().invisibleRootItem().child(0,0)
+
+#        for row in range(root.rowCount()):
+#            name  = root.child(row,0).text()
+#            value = root.child(row,2).text()
+#            type  = root.child(row,3).text()
+#            if name.startswith(treeSearch) and type == treeType: self.treeNames.addItem(value, name)
 
         self.treeNames.setCurrentIndex(self.treeNames.findText(fullName))     
