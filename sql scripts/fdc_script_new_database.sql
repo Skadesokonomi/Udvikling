@@ -271,17 +271,18 @@ INSERT INTO fdc_admin.kvm_pris (kom_kode, kom_navn, kvm_pris) VALUES (999, 'Danm
 
 TRUNCATE TABLE fdc_admin.parametre;
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('General', '', '', 'G', '', '', '', '', 'Hovedgrupper til administration af grundlæggende parametre for systemet', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Cell layername', 'General', 'celler', 'T', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Name of model value section', 'General', 'Generelle modelværdier', 'T', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Clear cell layer template', 'General', 'UPDATE "{schema}"."{table}" SET val_intersect = 0.0, num_intersect = 0
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Cell administration', 'General', '', 'G', '', '', '', '', 'Grupper til administration af celle generering', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Name templates', 'General', '', 'G', '', '', '', '', 'Grupper til administration af celle generering', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('SQL templates', 'General', '', 'G', '', '', '', '', 'Grupper til administration af celle generering', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Cell layername', 'Cell administration', 'celler', 'T', '', '', '', '', '', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Name of model value section', 'Name templates', 'Generelle modelværdier', 'T', '', '', '', '', '', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Clear cell layer template', 'Cell administration', 'UPDATE "{schema}"."{table}" SET val_intersect = 0.0, num_intersect = 0
 ', 'P', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Cell size', 'General', '100', 'I', '10', '1000', '50', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Delete parameter table', 'General', 'DELETE FROM {parametertable}', 'P', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('update cell layer', 'General', 'WITH cte AS (
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Cell size', 'Cell administration', '100', 'I', '10', '1000', '50', '', '', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Delete parameter table', 'SQL templates', 'DELETE FROM {parametertable}', 'P', '', '', '', '', '', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('update cell layer', 'Cell administration', 'WITH cte AS (
   SELECT
-    a.fid AS fid,
-    a.i AS i,
-    a.j AS j,
+    a.{pkey_cell} AS fid,
     sum(
       CASE 				  
         WHEN ST_GeometryType(b.{geom_value}) ILIKE ''%POINT%'' THEN b.{value_value} 				  
@@ -292,14 +293,14 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
     ) as sum_value,
     count(*) as count_number
   FROM {cell_table} a JOIN {value_table} b ON st_intersects (a.{geom_cell},b.{geom_value})
-  GROUP BY a.fid, a.i, a.j
+  GROUP BY a.{pkey_cell}
 )
 UPDATE {cell_table} SET 
   val_intersect = val_intersect + sum_value, 
   num_intersect = num_intersect + count_number 
 FROM cte
-WHERE {cell_table}.fid = cte.fid; ', 'P', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create cell layer template', 'General', 'CREATE TABLE IF NOT EXISTS {celltable} AS
+WHERE {cell_table}.{pkey_cell} = cte.fid; ', 'P', '', '', '', '', '', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create cell layer template', 'Cell administration', 'CREATE TABLE IF NOT EXISTS {celltable} AS
   WITH g AS (
     SELECT (
       st_squaregrid({cellsize}, st_geomfromewkt(''SRID={epsg}; POLYGON(({xmin} {ymin},{xmax} {ymin},{xmax} {ymax},{xmin} {ymax},{xmin} {ymin}))''))
@@ -307,23 +308,25 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
   )
   SELECT
     row_number() OVER () AS fid,
-    *,
+    i,
+	j,
     0.0::NUMERIC(12,2) AS val_intersect, 
-    0 AS num_intersect 
+    0 AS num_intersect,
+    st_force2d(geom)::Geometry(Polygon,25832) AS geom	
   FROM g;
 ALTER TABLE {celltable} ADD PRIMARY KEY(fid);
 CREATE INDEX ON {celltable} USING GIST(geom);', 'P', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Insert parameter table', 'General', 'INSERT INTO {parametertable} ({parametercolumns}) VALUES ({parametervalues}', 'P', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Fetch parameter table', 'General', 'WITH RECURSIVE tree_search AS (SELECT *, 0 AS "level" FROM {parametertable} WHERE "parent" = '''' AND name <> '''' UNION ALL SELECT t.*, ts."level"+1 AS "level" FROM {parametertable} t, tree_search ts WHERE t."parent" = ts."name") SELECT * FROM tree_search ORDER BY "level", "sort";', 'P', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Drop schema command', 'General', 'DROP SCHEMA {} /CASCADE', 'P', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create schema command', 'General', 'CREATE SCHEMA {}', 'P', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create_result_table', 'General', 'CREATE TABLE IF NOT EXISTS "{Result_schema}"."{tablename_ts}" AS {sqlquery}', 'P', '', '', '', '', 'SQL template for creating result tables', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Main groupname', 'General', 'Modeller', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Group name template', 'General', 'Kørsel: {time_stamp}', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create_result_pkey', 'General', 'ALTER TABLE "{Result_schema}"."{tablename_ts}" ADD PRIMARY KEY ({pkey_column});  ', 'P', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create_result_index', 'General', 'CREATE INDEX ON "{Result_schema}"."{tablename_ts}" USING GIST ({geom_column})', 'P', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Model_layergroup', 'General', 'Resultater fra modelkørsler', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create comment command', 'General', 'COMMENT ON {} {} IS {}', 'P', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Insert parameter table', 'SQL templates', 'INSERT INTO {parametertable} ({parametercolumns}) VALUES ({parametervalues}', 'P', '', '', '', '', '', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Fetch parameter table', 'SQL templates', 'WITH RECURSIVE tree_search AS (SELECT *, 0 AS "level" FROM {parametertable} WHERE "parent" = '''' AND name <> '''' UNION ALL SELECT t.*, ts."level"+1 AS "level" FROM {parametertable} t, tree_search ts WHERE t."parent" = ts."name") SELECT * FROM tree_search ORDER BY "level", "sort";', 'P', '', '', '', '', '', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Drop schema command', 'SQL templates', 'DROP SCHEMA {} /CASCADE', 'P', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create schema command', 'SQL templates', 'CREATE SCHEMA {}', 'P', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create_result_table', 'SQL templates', 'CREATE TABLE IF NOT EXISTS "{Result_schema}"."{tablename_ts}" AS {sqlquery}', 'P', '', '', '', '', 'SQL template for creating result tables', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Main groupname', 'Name templates', 'Modeller', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Group name template', 'Name templates', 'Kørsel: {time_stamp}', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create_result_pkey', 'SQL templates', 'ALTER TABLE "{Result_schema}"."{tablename_ts}" ADD PRIMARY KEY ({pkey_column});  ', 'P', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create_result_index', 'SQL templates', 'CREATE INDEX ON "{Result_schema}"."{tablename_ts}" USING GIST ({geom_column})', 'P', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Model_layergroup', 'Name templates', 'Resultater fra modelkørsler', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Create comment command', 'SQL templates', 'COMMENT ON {} {} IS {}', 'P', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Queries', '', '', 'G', '', '', '', '', 'Hovedgrupper til administration af Forespørgsler', 1, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_infrastructure', 'Queries', 'SELECT DISTINCT
   k.*
@@ -345,12 +348,13 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
         b.{f_cellar_area_t_building}::NUMERIC(12,2) AS areal_kaelder_m2,
         st_area(b.{f_geom_t_building})::NUMERIC(12,2) AS areal_byg_m2,
         {Værditab, skaderamte bygninger (%)}::NUMERIC(12,2) as tab_procent,
-        st_force2d(b.{f_geom_t_building}) AS {f_geom_q_building},
+        st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_building},
         COUNT (*) AS cnt_oversvoem,
         (SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS areal_oversvoem_m2,
         (MIN(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS min_vanddybde_cm,
         (MAX(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS max_vanddybde_cm,
-        (SUM(o.{f_depth_t_flood}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS avg_vanddybde_cm
+        (AVG(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS avg_vanddybde_cm
+        --(SUM(o.{f_depth_t_flood}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS avg_vanddybde_cm
     FROM {t_building} b
     INNER JOIN {t_flood} o on st_intersects(b.{f_geom_t_building},o.{f_geom_t_flood})
     WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)}
@@ -392,7 +396,7 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
   b.{f_pkey_t_bioscore} as pkey,
   b.{f_bioscore_t_bioscore} as bioscore,
   st_area(st_intersection(b.{f_geom_t_bioscore},o.{f_geom_t_flood}))::NUMERIC(12,2) AS areal_m2,
-  st_intersection(b.{f_geom_t_bioscore},o.{f_geom_t_flood}) as geom_clip,
+  st_multi(st_force2d(st_intersection(b.{f_geom_t_bioscore},o.{f_geom_t_flood})))::Geometry(MultiPolygon,25832) as geom_clip,
   o.{f_depth_t_flood} as depth
   FROM {t_bioscore} b
   INNER JOIN {t_flood} o on st_intersects(b.{f_geom_t_bioscore},o.{f_geom_t_flood})
@@ -400,12 +404,10 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
   ', 'P', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_comp_nobuild', 'Queries', 'SELECT 
   c.{f_pkey_t_company} AS {f_pkey_q_comp_nobuild}, 
-  c."Virk_cvrnr",
-  c.pnr,
-  c.modifikati,
-  c.ajourfoeri,
-  c."Virk_gyldi",
   c.{f_geom_t_company} AS {f_geom_q_comp_nobuild}, 
+  c.{f_comp_id_t_company},
+  c.{f_prod_id_t_company},
+  c.{f_empcount_t_company}, 
   o.{f_depth_t_flood} 
   FROM {t_company} c 
   LEFT JOIN {t_flood} o ON st_within(c.{f_geom_t_company},o.{f_geom_t_flood})
@@ -428,7 +430,7 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_surrounding_loss', 'Queries', 'WITH 
   vb AS (
     SELECT
-      st_union(b.{f_geom_t_building}) AS geom 
+      st_multi(st_force2d(st_union(b.{f_geom_t_building})))::Geometry(Multipolygon,25832) AS geom 
     FROM {t_building} b 
     JOIN {t_flood} o 
     ON st_intersects(o.{f_geom_t_flood}, b.{f_geom_t_building}) 
@@ -452,7 +454,7 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
       k.{f_sqmprice_t_sqmprice}::NUMERIC(12,2) AS kvm_pris_kr,
       ({Værditab, skaderamte bygninger (%)}*{Faktor for værditab})::NUMERIC(12,2) AS tab_procent,
       (k.{f_sqmprice_t_sqmprice} * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)} * {Faktor for værditab} / 100.0)::NUMERIC(12,2) AS vaerditab_kr,
-      st_force2d(b.{f_geom_t_building}) AS {f_geom_q_building}
+      st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_building}
         
     FROM {t_building} b
     LEFT JOIN ob ON ob.fid=b.{f_pkey_t_building} 
@@ -478,7 +480,7 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
     b.{f_muncode_t_building} AS kom_kode,
     b.{f_usage_code_t_building} AS bbr_anv_kode,
     b.{f_usage_text_t_building} AS bbr_anv_tekst,
-    st_force2d(b.{f_geom_t_building}) AS {f_geom_q_comp_build}
+    st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_comp_build}
   FROM {t_building} b
   INNER JOIN {t_flood} o on st_intersects(b.{f_geom_t_building},o.{f_geom_t_flood})
   WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)}
@@ -499,14 +501,15 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
 (
   SELECT 
     r.{f_pkey_t_recreative} as {f_pkey_q_recreative},
-    st_force2d(MIN(r.{f_geom_t_recreative})) AS {f_geom_q_recreative},
+    st_multi(st_force2d(MIN(r.{f_geom_t_recreative})))::Geometry(Multipolygon,25832) AS {f_geom_q_recreative},
     MIN(r.gridcode) AS gridcode, 
     MIN(r.valuationk) AS valuation_kr,
     st_area(MIN(r.{f_geom_t_recreative}))::NUMERIC(12,2)  AS areal_org_m2,
     (SUM(st_area(st_intersection(r.{f_geom_t_recreative},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS areal_oversvoem_m2,
     (MIN(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS min_vanddybde_cm,
     (MAX(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS max_vanddybde_cm,
-    (SUM(o.{f_depth_t_flood}*st_area(st_intersection(r.{f_geom_t_recreative},o.{f_geom_t_flood}))) * 100.0 / SUM(st_area(st_intersection(r.{f_geom_t_recreative},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS avg_vanddybde_cm
+    (AVG(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS avg_vanddybde_cm
+    --(SUM(o.{f_depth_t_flood}*st_area(st_intersection(r.{f_geom_t_recreative},o.{f_geom_t_flood}))) * 100.0 / SUM(st_area(st_intersection(r.{f_geom_t_recreative},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS avg_vanddybde_cm
   FROM {t_recreative} r
   INNER JOIN {t_flood} o on st_intersects(r.{f_geom_t_recreative},o.{f_geom_t_flood})
   WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)}
@@ -535,7 +538,7 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
     tr AS (
         SELECT
             v.{f_pkey_t_road_traffic} as {f_pkey_q_road_traffic},
-            st_force2d(v.{f_geom_t_road_traffic}) AS {f_geom_q_road_traffic},
+            st_multi(st_force2d(v.{f_geom_t_road_traffic}))::Geometry(MultiLineString,25832) AS {f_geom_q_road_traffic},
             st_length(v.{f_geom_t_road_traffic})::NUMERIC(12,2) AS laengde_org_m,
             v.{f_number_cars_t_road_traffic} AS gennemsnit_biler_pr_dag,
             COUNT(*) AS ant_oversvoem,
@@ -624,8 +627,9 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
     (SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS areal_oversvoem_m2,
     (MIN(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS min_vanddybde_cm,
     (MAX(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS max_vanddybde_cm,
-    (SUM(o.{f_depth_t_flood}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS avg_vanddybde_cm,
-    st_force2d(b.{f_geom_t_building}) AS {f_geom_q_human_health}
+    (AVG(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS avg_vanddybde_cm,
+    --(SUM(o.{f_depth_t_flood}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS avg_vanddybde_cm,
+    st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_human_health}
     FROM {t_building} b
     INNER JOIN {t_flood} o on st_intersects(b.{f_geom_t_building},o.{f_geom_t_flood})
     WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)}
@@ -648,9 +652,10 @@ om AS (
     COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 7 AND 17) AS mennesker_7_17,
     COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 18 AND 70) AS mennesker_18_70,
     COUNT(*) FILTER (WHERE m.{f_age_t_human_health} > 70) AS mennesker_71plus,
-    COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 18 AND 70) * (55 * 180 * 0.5)::integer AS rejsetid_kr,
-    COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 18 AND 70) * (17 * 7.4 * 180 * 0.5)::integer AS sygedage_kr, 
-    COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 18 AND 70) * (7 * 7.4 * 180 * 0.5)::integer AS feriedage_kr 
+    COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 18 AND 70) * (138 * 301)::integer AS arbejdstimer_kr,
+    COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 18 AND 70) * (23  * 301)::integer AS rejsetimer_kr,
+    COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 18 AND 70) * (64  * 301)::integer AS sygetimer_kr, 
+    COUNT(*) FILTER (WHERE m.{f_age_t_human_health} BETWEEN 18 AND 70) * (26  * 301)::integer AS ferietimer_kr 
   FROM ob 
   INNER JOIN {t_human_health} m ON st_intersects (ob.{f_geom_q_human_health}, m.{f_geom_t_human_health})
   GROUP BY ob.{f_pkey_q_human_health}, ob.kom_kode, ob.bbr_anv_kode, ob.bbr_anv_tekst, ob.areal_byg_m2, ob.areal_oversvoem_m2, ob.min_vanddybde_cm, ob.max_vanddybde_cm, ob.avg_vanddybde_cm, ob.{f_geom_q_human_health}
@@ -658,13 +663,13 @@ om AS (
 
 SELECT 
     om.*,
-    om.rejsetid_kr + om.sygedage_kr + om.feriedage_kr AS omkostning_kr,
+    om.arbejdstimer_kr + om.rejsetimer_kr + om.sygetimer_kr + om.ferietimer_kr AS omkostning_kr,
 	(
 	CASE
 	    WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
-	    WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN om.rejsetid_kr + om.sygedage_kr + om.feriedage_kr
+	    WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN om.arbejdstimer_kr + om.rejsetimer_kr + om.sygetimer_kr + om.ferietimer_kr
 	    WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN 0.0
-	    WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN 0.0 + om.rejsetid_kr + om.sygedage_kr + om.feriedage_kr 
+	    WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN om.arbejdstimer_kr + om.rejsetimer_kr + om.sygetimer_kr + om.ferietimer_kr 
 	END * (0.089925/{Returperiode for hændelse i fremtiden (år)} + 0.21905/{Returperiode for hændelse i dag (år)}))::NUMERIC(12,2) AS risiko_kr
 FROM om
 ', 'P', '', '', '', '', '', 10, ' ');
@@ -683,27 +688,29 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Data', '', '', 'G', '', '', '', '', 'Hovedgruppe for administration af Tabeller', 2, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_publicservice', 't_publicservice', 'objectid', 'T', '', '', '', '', '', 1, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_publicservice', 't_publicservice', 'geom', 'T', '', '', '', '', '', 1, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_number_cars_t_road_traffic', 't_road_traffic', 'trafik_tal', 'I', '0', '100000', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_number_cars_t_road_traffic', 't_road_traffic', 'trafik_tal', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_road_traffic', 't_road_traffic', 'geom', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_road_traffic', 't_road_traffic', 'objectid', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_company', 't_company', '"OBJECTID"', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_empcount_t_company', 't_company', 'aarsbes_an', 'I', '0', '20000', '10', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_company', 't_company', 'objectid', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_empcount_t_company', 't_company', 'aarsbes_ant', 'I', '0', '20000', '10', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_comp_id_t_company', 't_company', 'cvr_nr', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_prod_id_t_company', 't_company', 'p_nr', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_company', 't_company', 'geom', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_bioscore', 't_bioscore', 'id', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_bioscore', 't_bioscore', 'objectid', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_bioscore', 't_bioscore', 'geom', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_bioscore_t_bioscore', 't_bioscore', '"Bioscore"', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_bioscore_t_bioscore', 't_bioscore', 'bioscore', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_human_health', 't_human_health', 'objectid', 'T', '', '', '', '', 'Field name for keyfield in Human health table ', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_age_t_human_health', 't_human_health', 'alder_rand', 'T', '', '', '', '', 'Field name for age field in Human health table ', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_human_health', 't_human_health', 'geom', 'T', '', '', '', '', 'Field name for geometry field in Human health table ', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_recreative', 't_recreative', 'geom', 'T', '', '', '', '', '', 1, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_recreative', 't_recreative', 'objectid', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_flood', 't_flood', 'geom', 'T', '', '', '', '', 'Field name for geometry field in flood table', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_depth_t_flood', 't_flood', '"Vanddybde"', 'T', '', '', '', '', 'Field name for detph field in flood table ', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_depth_t_flood', 't_flood', 'vanddybde_m', 'T', '', '', '', '', 'Field name for detph field in flood table ', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_infrastructure', 't_infrastructure', 'objectid', 'T', '', '', '', '', '', 1, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_infrastructure', 't_infrastructure', 'geom', 'T', '', '', '', '', '', 1, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_muncode_t_building', 't_building', 'komkode', 'T', '', '', '', '', 'Fieldname for municipality code for building table', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_building', 't_building', 'geom', 'T', '', '', '', '', 'Field name for geometry field in building table', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_building', 't_building', '"OBJECTID"', 'T', '', '', '', '', 'Field name for keyfield in Building table ', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_building', 't_building', 'objectid', 'T', '', '', '', '', 'Field name for keyfield in Building table ', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Models', '', '', 'G', '', '', '', '', 'Hovedgruppe for administration og kørsel af  Modeller', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Generelle modelværdier', 'Models', '', 'G', '', '', '', '', 'Afsnit, hvor parametre, der bruges i mange forskellige modeller, kan værdisættes', 1, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Offentlig service', 'Models', '', 'G', '', '', '', '', 'Skademodeller for Offentlig service', 2, ' ');
@@ -722,16 +729,16 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmet offentlig service', 'Offentlig service', '', 'T', '', '', '', 'q_publicservice', 'Sæt hak såfremt modellen skal identificere offentlig service som bliver berørt i forbindelse med den pågældende oversvømmelseshændelse.', 10, 'T');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadeberegning, vej og trafik', 'Vej og trafik', '', 'T', '', '', '', 'q_road_traffic', 'Sæt hak såfremt der skal beregnes økonomiske tab for vej og trafik i forbindelse med den pågældende oversvømmelseshændelse.', 10, 'T');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmet infrastruktur', 'Kritisk infrastruktur', '', 'T', '', '', '', 'q_infrastructure', 'Sæt hak såfremt modellen skal identificere kritisk infrastruktur som bliver berørt i forbindelse med den pågældende oversvømmelseshændelse.', 10, 'T');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Værditab, skaderamte bygninger (%)', 'Bygninger', '10.0', 'R', '0.0', '100.0', '5.0', '', 'Her angives størrelsen på reduktionen i salgspris for de bygninger som bliver berørt af den pågældende oversvømmelse. Tabet beregnes som en procentsats, som angives af brugeren, af den gennemsnitlige kommunale m2 pris for solgte boliger i løbet af de seneste år. Det anbefales at anvende værdien 10% såfremt man ikke har bedre data.', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Værditab, skaderamte bygninger (%)', 'Bygninger', '4.0', 'R', '0.0', '100.0', '5.0', '', 'Her angives størrelsen på reduktionen i salgspris for de bygninger som bliver berørt af den pågældende oversvømmelse. Tabet beregnes som en procentsats, som angives af brugeren, af den gennemsnitlige kommunale m2 pris for solgte boliger i løbet af de seneste år. Det anbefales at anvende værdien 10% såfremt man ikke har bedre data.', 1, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Værditab nabobygninger', 'Bygninger', '', 'T', '', '', '', 'q_surrounding_loss', '', 10, 'T');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_tourism', 't_tourism', 'bbr_anv_kode', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_muncode_t_sqmprice', 't_sqmprice', 'kom_kode', 'T', '', '', '', '', 'Fieldname for municipalitycode', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_sqmprice_t_sqmprice', 't_sqmprice', 'kvm_pris', 'T', '', '', '', '', 'Fieldname for sqm price', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadeberegninger, Bygninger', 'Bygninger', '', 'T', '', '', '', 'q_building', 'Skadeberegning for bygninger, forskellige skademodeller, med eller uden kælderberegning', 10, 'T');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_cellar_area_t_building', 't_building', 'kaelder123', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_cellar_area_t_building', 't_building', 'kaelder_areal', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Biodiversitet, opsummering', 'Biodiversitet', '', 'T', '', '', '', 'q_bioscore_alphanumeric', 'Sæt hak såfremt modellen skal identificere særlige levesteder for rødlistede arter som bliver berørt i forbindelse med den pågældende oversvømmelseshændelse. Her opsummeres de berørte levesteder i en tabel.', 10, 'T');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Biodiversitet, kort', 'Biodiversitet', '', 'T', '', '', '', 'q_bioscore_spatial', 'Sæt hak såfremt modellen skal identificere særlige levesteder for rødlistede arter som bliver berørt i forbindelse med den pågældende oversvømmelseshændelse. Her vises levestederne geografisk på et kort.', 10, 'T');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Antal tabte døgn', 'Turisme', '20', 'I', '0', '365', '5', '', 'Her angives antallet af dage hvor bygningerne som bliver berørt af den pågældende oversvømmelse ikke kan anvendes til turistformål pga. skader eller oprydning efter oversvømmelsen.  ', 1, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Antal tabte døgn', 'Turisme', '60', 'I', '0', '365', '5', '', 'Her angives antallet af dage hvor bygningerne som bliver berørt af den pågældende oversvømmelse ikke kan anvendes til turistformål pga. skader eller oprydning efter oversvømmelsen.  ', 1, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Turisme, Opsummering', 'Turisme', '', 'T', '', '', '', 'q_tourism_alphanumeric', 'Sæt hak såfremt der skal beregnes økonomiske tab for overnatningssteder som anvendes til turistformål. De økonomiske tab opsummeres i en tabel.', 10, 'T');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Turisme, Kort', 'Turisme', '', 'T', '', '', '', 'q_tourism_spatial', 'Sæt hak såfremt der skal beregnes økonomiske tab for overnatningssteder som anvendes til turistformål. De berørte bygninger vises geografisk på et kort.  ', 10, 'T');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Faktor for værditab', 'Værditab nabobygninger', '0.50', 'R', '0.0', '1.0', '0.1', '', 'Faktor værdi til beregning af værditab for nabobygninger ud fra værditab for skaderamte bygninger', 10, ' ');
@@ -748,7 +755,7 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
     {Antal tabte døgn} AS tabte_dage,
     {Antal tabte døgn} * t.omkostning AS tabte_overnat,
     {Antal tabte døgn} * t.omkostning * t.kapacitet AS tot_kr,
-    st_force2d(b.{f_geom_t_building}) AS {f_geom_q_tourism_spatial}
+    st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_tourism_spatial}
     FROM {t_building} b
     INNER JOIN {t_flood} o on st_intersects(b.{f_geom_t_building},o.{f_geom_t_flood})
     INNER JOIN {t_tourism} t  ON t.{f_pkey_t_tourism} = b.{f_usage_code_t_building}  
@@ -765,7 +772,7 @@ SELECT
 	END * (0.089925/{Returperiode for hændelse i fremtiden (år)} + 0.21905/{Returperiode for hændelse i dag (år)}))::NUMERIC(12,2) AS risiko_kr
 FROM pn
 ', 'P', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_usage_code_t_building', 't_building', '"BYG_ANVEND"', 'T', '', '', '', '', 'Fieldname for usage code for building table', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_usage_code_t_building', 't_building', 'bbr_anv_kode', 'T', '', '', '', '', 'Fieldname for usage code for building table', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_build_usage', 't_build_usage', 'bbr_anv_kode', 'T', '', '', '', '', 'Field name for keyfield in Building table ', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_usage_text_t_build_usage', 't_build_usage', 'bbr_anv_tekst', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_t_damage', 't_damage', 'skade_type, skade_kategori', 'T', '', '', '', '', 'Field name for keyfield in damage function table ', 10, ' ');
@@ -775,7 +782,7 @@ INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, look
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_cellar_damage_q_building', 'q_building', 'skadebeloeb_kaelder_kr', 'T', '', '', '', '', '', 1, 'T');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadetype', 'Skadeberegninger, Bygninger', 'Stormflod', 'O', '', '', 'Stormflod¤Skybrud¤Vandløb', ' ', 'Valg af økonomisk skademodel', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadeberegning for kælder', 'Skadeberegninger, Bygninger', 'Medtages ikke', 'O', '', '', 'Medtages ikke¤Medtages', ' ', 'Bestemmer skadeberegning for kælder medtages i udregningen', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_usage_text_t_building', 't_building', '"BYG_ANVE_1"', 'T', '', '', '', '', 'Fieldname for usage code for building table', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_usage_text_t_building', 't_building', 'bbr_anv_tekst', 'T', '', '', '', '', 'Fieldname for usage code for building table', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_tourism_alphanumeric', 'Queries', 'WITH pn AS (
   SELECT
     row_number() over () as {f_pkey_q_tourism_alphanumeric},
@@ -805,7 +812,7 @@ SELECT
 	END * (0.089925/{Returperiode for hændelse i fremtiden (år)} + 0.21905/{Returperiode for hændelse i dag (år)}))::NUMERIC(12,2) AS risiko_mill_kr
 FROM pn
 ', 'P', '', '', '', '', '', 10, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Result_schema', 'General', 'fdc_results', 'T', '', '', '', '', 'Name of schema to place result tables in', 10, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Result_schema', 'Name templates', 'fdc_results', 'T', '', '', '', '', 'Name of schema to place result tables in', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('t_company', 'Data', 'fdc_data.industri', 'T', '', '', '', '', 'Parametergruppe til tabel "industri"', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('t_publicservice', 'Data', 'fdc_data.offentlig_service', 'T', '', '', '', '', '', 10, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('t_road_traffic', 'Data', 'fdc_data.vejnet', 'T', '', '', '', '', 'Parametergruppe til tabel "vejnet"', 10, ' ');
@@ -862,3 +869,817 @@ INSERT INTO fdc_admin.turisme (bbr_anv_kode, bbr_anv_tekst, kapacitet, omkostnin
 
 CREATE INDEX IF NOT EXISTS parametre_parent_idx ON fdc_admin.parametre USING btree (parent);
 
+
+CREATE TABLE IF NOT EXISTS fdc_data.biodiversitet (
+    objectid bigint NOT NULL,
+    geom public.geometry(MultiPolygon,25832),
+    bioscore integer,
+	PRIMARY KEY (objectid)
+);
+
+CREATE TABLE IF NOT EXISTS fdc_data.bygninger (
+    objectid bigint NOT NULL,
+    geom public.geometry(MultiPolygon,25832),
+    bbr_anv_kode integer,
+    bbr_anv_tekst character varying(172),
+    komkode integer,
+    kaelder_areal double precision,
+	PRIMARY KEY (objectid)	
+);
+
+CREATE TABLE IF NOT EXISTS fdc_data.industri (
+    objectid bigint NOT NULL,
+    geom public.geometry(Point,25832),
+    cvr_nr bigint,
+    p_nr bigint,
+    aarsbes_ant bigint,
+    ret_type character varying(50),
+    ret_dato date,
+    gyld_dato date,
+	PRIMARY KEY (objectid)
+);
+
+CREATE TABLE IF NOT EXISTS fdc_data.kritisk_infrastruktur (
+    objectid bigint NOT NULL,
+    geom public.geometry(MultiPolygon,25832),
+    vaerk_id bigint,
+    vaerk_navn character varying(254),
+    vrktypeid character varying(50),
+    vrktypenav character varying(254),
+	PRIMARY KEY (objectid)
+);
+
+CREATE TABLE IF NOT EXISTS fdc_data.mennesker (
+    objectid bigint NOT NULL,
+    geom public.geometry(Point,25832),
+    alder_rand integer,
+	PRIMARY KEY (objectid)
+);
+
+CREATE TABLE IF NOT EXISTS fdc_data.offentlig_service (
+    objectid integer NOT NULL,
+    geom public.geometry(MultiPolygon,25832),
+    inst_nr numeric,
+    inst_navn character varying(254),
+    cvr_nr numeric,
+	PRIMARY KEY (objectid)
+);
+
+CREATE TABLE IF NOT EXISTS fdc_data.oversvoem (
+    objectid integer NOT NULL,
+    geom public.geometry(MultiPolygon,25832),
+    vanddybde_m double precision
+);
+
+CREATE TABLE IF NOT EXISTS fdc_data.rekreative_omr (
+    objectid integer NOT NULL,
+    geom public.geometry(MultiPolygon,25832),
+    gridcode bigint,
+    valuationk bigint
+);
+
+CREATE TABLE IF NOT EXISTS fdc_data.vejnet (
+    objectid integer NOT NULL,
+    geom public.geometry(MultiLineString,25832),
+    trafik_tal integer NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS biodiversitet_geom_idx ON fdc_data.biodiversitet USING gist (geom);
+
+CREATE INDEX IF NOT EXISTS bygninger_geom_idx ON fdc_data.bygninger USING gist (geom);
+
+CREATE INDEX IF NOT EXISTS industri_geom_idx ON fdc_data.industri USING gist (geom);
+
+CREATE INDEX IF NOT EXISTS kritisk_infrastruktur_geom_idx ON fdc_data.kritisk_infrastruktur USING gist (geom);
+
+CREATE INDEX IF NOT EXISTS mennesker_geom_idx ON fdc_data.mennesker USING gist (geom);
+
+CREATE INDEX IF NOT EXISTS offentlig_service_geom_idx ON fdc_data.offentlig_service USING gist (geom);
+
+CREATE INDEX IF NOT EXISTS oversvoem_geom_idx ON fdc_data.oversvoem USING gist (geom);
+
+CREATE INDEX IF NOT EXISTS rekreative_omr_geom_idx ON fdc_data.rekreative_omr USING gist (geom);
+
+CREATE INDEX IF NOT EXISTS vejnet_geom_idx ON fdc_data.vejnet USING gist (geom);
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2021-12-11: Opdatering af Industri                          --
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+/* 
+   værdi for parameter 'f_pkey_q_comp_build' skal sættes til kolonnenavn for primærnøgle for industri/virksomheds - tabel
+   Den er som udgangspunkt sat til 'objectid'
+*/
+UPDATE parametre SET value = 'objectid' WHERE name = 'f_pkey_q_comp_build' AND parent = 'q_comp_build';
+--                            ********
+
+/* 
+   Værdi for parameter 'f_geom_q_comp_build' skal sættes til kolonnenavn for geometrifelt for industri/virksomheds - tabel
+   Den er som udgangspunkt sat til 'geom'
+*/
+UPDATE parametre SET value = 'geom' WHERE name = 'f_geom_q_comp_build' AND parent = 'q_comp_build';
+--                            ****
+
+
+-- NIX PILLE VED RESTEN....................................................................................................
+
+-- Slet model 'Industri, punkter fejlplaceret' og associerede parametre.
+DELETE FROM parametre WHERE name = 'f_mod_type_t_company' AND parent = 't_company';
+DELETE FROM parametre WHERE name = 'f_mod_date_t_company' AND parent = 't_company';
+DELETE FROM parametre WHERE name = 'f_comp_start_date_t_company' AND parent = 't_company';
+DELETE FROM parametre WHERE name = 'f_pkey_q_comp_nobuild' AND parent = 'q_comp_nobuild';
+DELETE FROM parametre WHERE name = 'f_geom_q_comp_nobuild' AND parent = 'q_comp_nobuild';
+DELETE FROM parametre WHERE name = 'q_comp_nobuild' AND parent = 'Queries';
+DELETE FROM parametre WHERE name = 'Industri, punkter fejlplaceret' AND parent = 'Industri';
+
+-- Opdatér query 'q_comp_build'
+UPDATE parametre SET value = 'WITH cte1 AS (
+  SELECT DISTINCT ON (c.{f_pkey_t_company})
+    c.*,
+    o.{f_depth_t_flood}*100.00 AS vanddybde_cm,
+    b.{f_pkey_t_building} AS byg_id,
+    b.{f_muncode_t_building} AS kom_kode,
+    b.{f_usage_code_t_building} AS bbr_kode,
+    b.{f_usage_text_t_building} AS bbr_tekst
+    FROM {t_company} c 
+    LEFT JOIN {t_building} b ON st_within(c.{f_geom_t_company},b.{f_geom_t_building})
+    LEFT JOIN {t_flood} o ON st_intersects(b.{f_geom_t_building},o.{f_geom_t_flood})
+    WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)} AND b.{f_pkey_t_building} IS NOT NULL 
+  ORDER BY c.{f_pkey_t_company} ASC, o.{f_depth_t_flood} DESC
+),
+cte2 AS (
+  SELECT DISTINCT
+    c.*,
+    o.{f_depth_t_flood}*100.00 AS vanddybde_cm,
+    b.{f_pkey_t_building} AS byg_id,
+    b.{f_muncode_t_building} AS kom_kode,
+    b.{f_usage_code_t_building} AS bbr_kode,
+    b.{f_usage_text_t_building} AS bbr_tekst
+    FROM {t_company} c 
+    LEFT JOIN {t_flood} o ON st_within(c.{f_geom_t_company},o.{f_geom_t_flood})
+    LEFT JOIN {t_building} b ON st_within(c.{f_geom_t_company},b.{f_geom_t_building})
+    WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)} AND b.{f_pkey_t_building} IS NULL 
+) 
+SELECT * FROM cte1 UNION ALL SELECT * FROM cte2
+'
+WHERE name = 'q_comp_build' AND parent = 'Queries';
+
+-- Patch 2021-12-11: Opdatering af Industri slut --
+
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2021-12-16: Opdatering af tabel skadefunktioner                          --
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+TRUNCATE TABLE skadefunktioner;
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Helårsbeboelse',     0.00, 1167.86,  -571.21, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Sommerhus'     ,     0.00, 1681.71, -2128.87, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Garage mm.'    , 30000.00,    0.00,     0.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Anneks'        , 30000.00,    0.00,     0.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Erhverv'       ,     0.00, 1387.94,  -881.80, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Kultur'        ,     0.00, 1387.94,  -881.80, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Forsyning'     ,     0.00, 1387.94,  -881.80, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Offentlig'     ,     0.00, 1387.94,  -881.80, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Ingen data'    ,     0.00,    0.00,  2000.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Stormflod', 'Andet'         ,     0.00,    0.00,  2000.00, 578.00);
+
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Helårsbeboelse',     0.00,    0.00,  1257.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Sommerhus'     ,     0.00,    0.00,  1249.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Garage mm.'    , 30000.00,    0.00,     0.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Anneks'        , 30000.00,    0.00,     0.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Erhverv'       ,     0.00,    0.00,  1407.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Kultur'        ,     0.00,    0.00,  1407.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Forsyning'     ,     0.00,    0.00,  1407.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Offentlig'     ,     0.00,    0.00,  1407.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Ingen data'    ,     0.00,    0.00,  1000.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Skybrud',   'Andet'         ,     0.00,    0.00,  1000.00, 578.00);
+
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Helårsbeboelse',     0.00,  389.29,  -190.40, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Sommerhus'     ,     0.00,  560.57,  -709.62, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Garage mm.'    , 30000.00,    0.00,     0.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Anneks'        , 30000.00,    0.00,     0.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Erhverv'       ,     0.00,  462.65,  -293.93, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Kultur'        ,     0.00,  462.65,  -293.93, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Forsyning'     ,     0.00,  462.65,  -293.93, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Offentlig'     ,     0.00,  462.65,  -293.93, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Ingen data'    ,     0.00,    0.00,  1000.00, 578.00);
+INSERT INTO skadefunktioner (skade_type, skade_kategori, b0, b1, b2, c0) VALUES ('Vandløb',   'Andet'         ,     0.00,    0.00,  1000.00, 578.00);
+
+-- Patch 2021-12-16: Opdatering af Industri slut --
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2021-12-22: Opdatering af Kritisk infrastruktur                          --
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+
+-- NIX PILLE VED RESTEN....................................................................................................
+
+-- Opdatér query 'q_infrastructure'
+UPDATE parametre SET value = 'WITH cte1 AS (
+  SELECT DISTINCT ON (c.{f_pkey_t_infrastructure})
+    c.*,
+    o.{f_depth_t_flood}*100.00 AS vanddybde_cm,
+    b.{f_pkey_t_building} AS byg_id,
+    b.{f_muncode_t_building} AS kom_kode,
+    b.{f_usage_code_t_building} AS bbr_kode,
+    b.{f_usage_text_t_building} AS bbr_tekst
+    FROM {t_infrastructure} c 
+    LEFT JOIN {t_building} b ON st_intersects(c.{f_geom_t_infrastructure},b.{f_geom_t_building})
+    LEFT JOIN {t_flood} o ON st_intersects(b.{f_geom_t_building},o.{f_geom_t_flood})
+    WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)} AND b.{f_pkey_t_building} IS NOT NULL 
+  ORDER BY c.{f_pkey_t_infrastructure} ASC, o.{f_depth_t_flood} DESC
+),
+cte2 AS (
+  SELECT DISTINCT ON (c.{f_pkey_t_infrastructure})
+    c.*,
+    o.{f_depth_t_flood}*100.00 AS vanddybde_cm,
+    b.{f_pkey_t_building} AS byg_id,
+    b.{f_muncode_t_building} AS kom_kode,
+    b.{f_usage_code_t_building} AS bbr_kode,
+    b.{f_usage_text_t_building} AS bbr_tekst
+    FROM {t_infrastructure} c 
+    LEFT JOIN {t_flood} o ON st_intersects(c.{f_geom_t_infrastructure},o.{f_geom_t_flood})
+    LEFT JOIN {t_building} b ON st_intersects(c.{f_geom_t_infrastructure},b.{f_geom_t_building})
+    WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)} AND b.{f_pkey_t_building} IS NULL 
+  ORDER BY c.{f_pkey_t_infrastructure} ASC, o.{f_depth_t_flood} DESC
+) 
+SELECT * FROM cte1 UNION ALL SELECT * FROM cte2
+'
+WHERE name = 'q_infrastructure' AND parent = 'Queries';
+
+-- Patch 2021-12-22: Opdatering af Kritisk infrastruktur slut --
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2022-02-03: Indføresle af tabel og felt selektor
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+-- NIX PILLE VED RESTEN....................................................................................................
+
+-- Opdatér rækker i faneblad "Data" hvor navn starter med 't_", dvs tabel entries
+update parametre set "type" = 'S' 
+  where "name" like 't_%' and parent = 'Data' and "type" = 'T';
+
+-- Opdatér rækker i faneblad "Data" hvor navn starter med 'f_", dvs f entries, og hvor parent er med i 1. opdatering
+update parametre set "type" = 'F' 
+  where "name" like 'f_%' and parent in (select name from fdc_admin.parametre where "name" like 't_%' and parent = 'Data' and "type" = 'S');
+
+-- Patch 2022-02-03: Opdatering af Kritisk infrastruktur slut --
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2022-02-09: Model q_building_new
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+-- NIX PILLE VED RESTEN....................................................................................................
+
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_building_new', 'q_building_new', 'risiko_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_building_new', 'q_building_new', 'skadebeloeb_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_q_building_new', 'q_building_new', 'vaerditab_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_cellar_damage_present_q_building_new', 'q_building_new', 'skadebeloeb_kaelder_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_building_new', 'q_building_new', 'skadebeloeb_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_cellar_damage_future_q_building_new', 'q_building_new', 'skadebeloeb_kaelder_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_building_new', 'q_building_new', 'fid', 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_building_new', 'q_building_new', 'geom_byg', 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmelsesmodel, fremtid', 'Generelle modelværdier', 'fdc_data.oversvoem', 'Q', '', '', 't_flood', 't_flood', '(Bruges til ny modelberegning for bygninger) 
+Valg oversvømmelsestabel for fremtidshændelse', 12, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmelsesmodel, nutid', 'Generelle modelværdier', 'fdc_data.oversvoem', 'Q', '', '', 't_flood', 't_flood', '(Bruges til ny modelberegning for bygninger) 
+Valg oversvømmelsestabel for nutidshændelse', 13, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_building_new', 'Queries', 'WITH obn AS (
+    SELECT
+        b.{f_pkey_t_building},
+        COUNT (*) AS cnt_oversvoem,
+        (SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, nutid}))))::NUMERIC(12,2) AS areal_oversvoem_m2,
+        (MIN(o.{f_depth_Oversvømmelsesmodel, nutid}) * 100.00)::NUMERIC(12,2) AS min_vanddybde_cm,
+        (MAX(o.{f_depth_Oversvømmelsesmodel, nutid}) * 100.00)::NUMERIC(12,2) AS max_vanddybde_cm,
+        (AVG(o.{f_depth_Oversvømmelsesmodel, nutid}) * 100.00)::NUMERIC(12,2) AS avg_vanddybde_cm
+        --(SUM(o.{f_depth_Oversvømmelsesmodel, nutid}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, nutid}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, nutid}))))::NUMERIC(12,2) AS avg_vanddybde_cm
+    FROM {t_building} b
+    INNER JOIN {Oversvømmelsesmodel, nutid} o on st_intersects(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, nutid})
+    WHERE o.{f_depth_Oversvømmelsesmodel, nutid} >= {Minimum vanddybde (meter)}
+    GROUP BY b.{f_pkey_t_building}
+),
+obf AS (
+    SELECT
+        b.{f_pkey_t_building},
+        COUNT (*) AS cnt_oversvoem_fremtid,
+        (SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, fremtid}))))::NUMERIC(12,2) AS areal_oversvoem_fremtid_m2,
+        (MIN(o.{f_depth_Oversvømmelsesmodel, fremtid}) * 100.00)::NUMERIC(12,2) AS min_vanddybde_fremtid_cm,
+        (MAX(o.{f_depth_Oversvømmelsesmodel, fremtid}) * 100.00)::NUMERIC(12,2) AS max_vanddybde_fremtid_cm,
+        (AVG(o.{f_depth_Oversvømmelsesmodel, fremtid}) * 100.00)::NUMERIC(12,2) AS avg_vanddybde_fremtid_cm
+        --(SUM(o.{f_depth_Oversvømmelsesmodel, fremtid}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, fremtid}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, fremtid}))))::NUMERIC(12,2) AS avg_vanddybde_cm
+    FROM {t_building} b
+    INNER JOIN {Oversvømmelsesmodel, fremtid} o on st_intersects(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, fremtid})
+    WHERE o.{f_depth_Oversvømmelsesmodel, nutid} >= {Minimum vanddybde (meter)}
+    GROUP BY b.{f_pkey_t_building}
+),
+os AS (
+    SELECT
+        b.{f_pkey_t_building} as {f_pkey_q_building_new},
+        b.{f_muncode_t_building} AS kom_kode,
+		b.{f_usage_code_t_building} AS bbr_anv_kode,
+        u.{f_usage_text_t_build_usage} AS bbr_anv_tekst,
+        b.{f_cellar_area_t_building}::NUMERIC(12,2) AS areal_kaelder_m2,
+        st_area(b.{f_geom_t_building})::NUMERIC(12,2) AS areal_byg_m2,
+        d.{f_category_t_damage} AS skade_kategori,
+        d.{f_type_t_damage} AS skade_type,
+        st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_building_new},
+        {Værditab, skaderamte bygninger (%)}::NUMERIC(12,2) as tab_procent,
+        k.{f_sqmprice_t_sqmprice}::NUMERIC(12,2) as kvm_pris_kr,
+		(k.{f_sqmprice_t_sqmprice} * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}/100.0)::NUMERIC(12,2) as {f_loss_q_building_new},
+		CASE
+	        WHEN obn.max_vanddybde_cm IS NULL THEN 0.0
+            ELSE d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(obn.max_vanddybde_cm, 1.0)) + d.b2)
+		END::NUMERIC(12,2) AS {f_damage_present_q_building_new},
+		CASE
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages ikke'' THEN 0.0
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages'' THEN b.{f_cellar_area_t_building} * d.c0 
+        END::NUMERIC(12,2) as {f_cellar_damage_present_q_building_new},
+        COALESCE(obn.cnt_oversvoem,0) AS cnt_oversvoem,
+        COALESCE(obn.areal_oversvoem_m2,0.0) AS areal_oversvoem_m2,
+        COALESCE(obn.min_vanddybde_cm,0.0) AS min_vanddybde_cm,
+        COALESCE(obn.max_vanddybde_cm,0.0) AS max_vanddybde_cm,
+        COALESCE(obn.avg_vanddybde_cm,0.0) avg_vanddybde_cm,
+		CASE
+	        WHEN obf.max_vanddybde_fremtid_cm IS NULL THEN 0.0
+            ELSE d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(obf.max_vanddybde_fremtid_cm, 1.0)) + d.b2)
+		END::NUMERIC(12,2) AS {f_damage_future_q_building_new},
+        CASE
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages ikke'' THEN 0.0
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages'' THEN b.{f_cellar_area_t_building} * d.c0 
+        END::NUMERIC(12,2) as {f_cellar_damage_future_q_building_new},
+        COALESCE(obf.cnt_oversvoem_fremtid,0) AS cnt_oversvoem_fremtid,
+        COALESCE(obf.areal_oversvoem_fremtid_m2,0.0) AS areal_oversvoem_fremtid_m2,
+        COALESCE(obf.min_vanddybde_fremtid_cm,0.0) AS min_vanddybde_fremtid_cm,
+        COALESCE(obf.max_vanddybde_fremtid_cm,0.0) AS max_vanddybde_fremtid_cm,
+        COALESCE(obf.avg_vanddybde_fremtid_cm,0.0) AS avg_vanddybde_fremtid_cm
+    FROM {t_building} b
+    LEFT JOIN obn on  b.{f_pkey_t_building} = obn.{f_pkey_t_building}
+    LEFT JOIN obf on  b.{f_pkey_t_building} = obf.{f_pkey_t_building}
+    LEFT JOIN {t_build_usage} u on b.{f_usage_code_t_building} = u.{f_pkey_t_build_usage}
+    LEFT JOIN {t_damage} d on u.{f_category_t_build_usage} = d.{f_category_t_damage} AND d.{f_type_t_damage} = ''{Skadetype}''   
+    LEFT JOIN {t_sqmprice} k on (b.{f_muncode_t_building} = k.{f_muncode_t_sqmprice})
+    WHERE obn.{f_pkey_t_building} IS NOT NULL OR obf.{f_pkey_t_building}  IS NOT NULL 
+)
+SELECT 
+    os.*,
+	((0.219058829 * CASE
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN os.{f_damage_present_q_building_new} + os.{f_cellar_damage_present_q_building_new}
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN os.{f_loss_q_building_new}
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN os.{f_damage_present_q_building_new} + os.{f_cellar_damage_present_q_building_new} + os.{f_loss_q_building_new} 
+                   END + 
+    0.089925625 *  CASE
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN os.{f_damage_future_q_building_new} + os.{f_cellar_damage_future_q_building_new}
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN os.{f_loss_q_building_new}
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN os.{f_damage_future_q_building_new} + os.{f_cellar_damage_future_q_building_new} + os.{f_loss_q_building_new} 
+                   END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_building_new}
+FROM os
+', 'P', '', '', '', '', 'SQL template for buildings new model ', 8, ' ');
+
+
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Returperiode, antal år', 'Generelle modelværdier', '20', 'I', '0', '1000', '10', '', '(Bruges til ny modelberegning for bygninger) 
+Indtast returperioden i hele år, dvs. forventet antal år mellem nutidshændelse og fremtidshændelse', 14, ' ');
+
+UPDATE parametre set parent = 'Bygninger' WHERE name = 'Skadeberegning for kælder';
+UPDATE parametre set parent = 'Bygninger' WHERE name = 'Skadetype';
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadeberegninger, Bygninger, ny model', 'Bygninger', '', 'T', '', '', '', 'q_building_new', 'Skadeberegning for bygninger, forskellige skademodeller, med eller uden kælderberegning, ny metode', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('t_flood_2', 'Data', '"fdc_data"."hav_20_2100"', 'S', '', '', '', '', 'Parametergruppe til tabel "oversvømmelser"', 8, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('t_flood_3', 'Data', '"fdc_data"."hav_100_2020"', 'S', '', '', '', '', 'Parametergruppe til tabel "oversvømmelser"', 9, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('t_flood_4', 'Data', '"fdc_data"."hav_100_2020"', 'S', '', '', '', '', 'Parametergruppe til tabel "oversvømmelser"', 9, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_depth_t_flood_2', 't_flood_2', '"vandstand_m"', 'F', '', '', '', '', 'Field name for detph field in flood table ', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_flood_2', 't_flood_2', '"geom"', 'F', '', '', '', '', 'Field name for geometry field in flood table', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_depth_t_flood_3', 't_flood_3', 'vandstand_m', 'F', '', '', '', '', 'Field name for detph field in flood table ', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_flood_3', 't_flood_3', 'geom', 'F', '', '', '', '', 'Field name for geometry field in flood table', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_depth_t_flood_4', 't_flood_4', 'vandstand_m', 'F', '', '', '', '', 'Field name for detph field in flood table ', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_t_flood_4', 't_flood_4', 'geom', 'F', '', '', '', '', 'Field name for geometry field in flood table', 10, ' ');
+
+
+-- Patch 2022-02-09: Model q_building_new slut --
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2022-02-14: Model q_building_new
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+-- NIX PILLE VED RESTEN....................................................................................................
+
+UPDATE parametre SET value = 'WITH obn AS (
+    SELECT
+        b.{f_pkey_t_building},
+        COUNT (*) AS cnt_oversvoem,
+        (SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, nutid}))))::NUMERIC(12,2) AS areal_oversvoem_m2,
+        (MIN(o.{f_depth_Oversvømmelsesmodel, nutid}) * 100.00)::NUMERIC(12,2) AS min_vanddybde_cm,
+        (MAX(o.{f_depth_Oversvømmelsesmodel, nutid}) * 100.00)::NUMERIC(12,2) AS max_vanddybde_cm,
+        (AVG(o.{f_depth_Oversvømmelsesmodel, nutid}) * 100.00)::NUMERIC(12,2) AS avg_vanddybde_cm
+        --(SUM(o.{f_depth_Oversvømmelsesmodel, nutid}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, nutid}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, nutid}))))::NUMERIC(12,2) AS avg_vanddybde_cm
+    FROM {t_building} b
+    INNER JOIN {Oversvømmelsesmodel, nutid} o on st_intersects(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, nutid})
+    WHERE o.{f_depth_Oversvømmelsesmodel, nutid} >= {Minimum vanddybde (meter)}
+    GROUP BY b.{f_pkey_t_building}
+),
+obf AS (
+    SELECT
+        b.{f_pkey_t_building},
+        COUNT (*) AS cnt_oversvoem_fremtid,
+        (SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, fremtid}))))::NUMERIC(12,2) AS areal_oversvoem_fremtid_m2,
+        (MIN(o.{f_depth_Oversvømmelsesmodel, fremtid}) * 100.00)::NUMERIC(12,2) AS min_vanddybde_fremtid_cm,
+        (MAX(o.{f_depth_Oversvømmelsesmodel, fremtid}) * 100.00)::NUMERIC(12,2) AS max_vanddybde_fremtid_cm,
+        (AVG(o.{f_depth_Oversvømmelsesmodel, fremtid}) * 100.00)::NUMERIC(12,2) AS avg_vanddybde_fremtid_cm
+        --(SUM(o.{f_depth_Oversvømmelsesmodel, fremtid}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, fremtid}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, fremtid}))))::NUMERIC(12,2) AS avg_vanddybde_cm
+    FROM {t_building} b
+    INNER JOIN {Oversvømmelsesmodel, fremtid} o on st_intersects(b.{f_geom_t_building},o.{f_geom_Oversvømmelsesmodel, fremtid})
+    WHERE o.{f_depth_Oversvømmelsesmodel, nutid} >= {Minimum vanddybde (meter)}
+    GROUP BY b.{f_pkey_t_building}
+),
+os AS (
+    SELECT
+        b.{f_pkey_t_building} as {f_pkey_q_building_new},
+        b.{f_muncode_t_building} AS kom_kode,
+		b.{f_usage_code_t_building} AS bbr_anv_kode,
+        u.{f_usage_text_t_build_usage} AS bbr_anv_tekst,
+        COALESCE(b.{f_cellar_area_t_building},0.0)::NUMERIC(12,2) AS areal_kaelder_m2,
+        st_area(b.{f_geom_t_building})::NUMERIC(12,2) AS areal_byg_m2,
+        d.{f_category_t_damage} AS skade_kategori,
+        d.{f_type_t_damage} AS skade_type,
+        st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_building_new},
+        {Værditab, skaderamte bygninger (%)}::NUMERIC(12,2) as tab_procent,
+        k.{f_sqmprice_t_sqmprice}::NUMERIC(12,2) as kvm_pris_kr,
+		(k.{f_sqmprice_t_sqmprice} * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}/100.0)::NUMERIC(12,2) as {f_loss_q_building_new},
+		CASE
+	        WHEN obn.max_vanddybde_cm IS NULL THEN 0.0
+            ELSE d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(obn.max_vanddybde_cm, 1.0)) + d.b2)
+		END::NUMERIC(12,2) AS {f_damage_present_q_building_new},
+		CASE
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages ikke'' THEN 0.0
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages'' THEN COALESCE(b.{f_cellar_area_t_building},0.0) * d.c0 
+        END::NUMERIC(12,2) as {f_cellar_damage_present_q_building_new},
+        COALESCE(obn.cnt_oversvoem,0) AS cnt_oversvoem,
+        COALESCE(obn.areal_oversvoem_m2,0.0) AS areal_oversvoem_m2,
+        COALESCE(obn.min_vanddybde_cm,0.0) AS min_vanddybde_cm,
+        COALESCE(obn.max_vanddybde_cm,0.0) AS max_vanddybde_cm,
+        COALESCE(obn.avg_vanddybde_cm,0.0) avg_vanddybde_cm,
+		CASE
+	        WHEN obf.max_vanddybde_fremtid_cm IS NULL THEN 0.0
+            ELSE d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(obf.max_vanddybde_fremtid_cm, 1.0)) + d.b2)
+		END::NUMERIC(12,2) AS {f_damage_future_q_building_new},
+        CASE
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages ikke'' THEN 0.0
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages'' THEN COALESCE(b.{f_cellar_area_t_building},0.0) * d.c0 
+        END::NUMERIC(12,2) as {f_cellar_damage_future_q_building_new},
+        COALESCE(obf.cnt_oversvoem_fremtid,0) AS cnt_oversvoem_fremtid,
+        COALESCE(obf.areal_oversvoem_fremtid_m2,0.0) AS areal_oversvoem_fremtid_m2,
+        COALESCE(obf.min_vanddybde_fremtid_cm,0.0) AS min_vanddybde_fremtid_cm,
+        COALESCE(obf.max_vanddybde_fremtid_cm,0.0) AS max_vanddybde_fremtid_cm,
+        COALESCE(obf.avg_vanddybde_fremtid_cm,0.0) AS avg_vanddybde_fremtid_cm
+    FROM {t_building} b
+    LEFT JOIN obn on  b.{f_pkey_t_building} = obn.{f_pkey_t_building}
+    LEFT JOIN obf on  b.{f_pkey_t_building} = obf.{f_pkey_t_building}
+    LEFT JOIN {t_build_usage} u on b.{f_usage_code_t_building} = u.{f_pkey_t_build_usage}
+    LEFT JOIN {t_damage} d on u.{f_category_t_build_usage} = d.{f_category_t_damage} AND d.{f_type_t_damage} = ''{Skadetype}''   
+    LEFT JOIN {t_sqmprice} k on (b.{f_muncode_t_building} = k.{f_muncode_t_sqmprice})
+    WHERE obn.{f_pkey_t_building} IS NOT NULL OR obf.{f_pkey_t_building}  IS NOT NULL 
+)
+SELECT 
+    os.*,
+	((0.219058829 * CASE
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN os.{f_damage_present_q_building_new} + os.{f_cellar_damage_present_q_building_new}
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN os.{f_loss_q_building_new}
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN os.{f_damage_present_q_building_new} + os.{f_cellar_damage_present_q_building_new} + os.{f_loss_q_building_new} 
+                   END + 
+    0.089925625 *  CASE
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN os.{f_damage_future_q_building_new} + os.{f_cellar_damage_future_q_building_new}
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN os.{f_loss_q_building_new}
+                       WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN os.{f_damage_future_q_building_new} + os.{f_cellar_damage_future_q_building_new} + os.{f_loss_q_building_new} 
+                   END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_building_new},
+    {Returperiode, antal år} AS retur_periode,
+    '''' AS omraade
+FROM os
+'
+WHERE name = 'q_building_new';
+
+UPDATE parametre SET value = 'WITH ob AS
+(
+    SELECT
+        b.{f_pkey_t_building} as {f_pkey_q_building},
+        b.{f_muncode_t_building} AS kom_kode,
+		b.{f_usage_code_t_building} AS bbr_kode,
+        b.{f_cellar_area_t_building}::NUMERIC(12,2) AS areal_kaelder_m2,
+        st_area(b.{f_geom_t_building})::NUMERIC(12,2) AS areal_byg_m2,
+        {Værditab, skaderamte bygninger (%)}::NUMERIC(12,2) as tab_procent,
+        st_force2d(b.{f_geom_t_building}) AS {f_geom_q_building},
+        COUNT (*) AS cnt_oversvoem,
+        (SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS areal_oversvoem_m2,
+        (MIN(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS min_vanddybde_cm,
+        (MAX(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS max_vanddybde_cm,
+        (AVG(o.{f_depth_t_flood}) * 100.00)::NUMERIC(12,2) AS avg_vanddybde_cm
+        --(SUM(o.{f_depth_t_flood}*st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))) * 100.0 / SUM(st_area(st_intersection(b.{f_geom_t_building},o.{f_geom_t_flood}))))::NUMERIC(12,2) AS avg_vanddybde_cm
+    FROM {t_building} b
+    INNER JOIN {t_flood} o on st_intersects(b.{f_geom_t_building},o.{f_geom_t_flood})
+    WHERE o.{f_depth_t_flood} >= {Minimum vanddybde (meter)}
+    GROUP BY b.{f_pkey_t_building}, b.{f_muncode_t_building}, b.{f_usage_code_t_building}, b.{f_cellar_area_t_building}, b.{f_geom_t_building}
+),
+os AS
+(
+    SELECT ob.*, 
+        u.{f_pkey_t_build_usage} AS bbr_anv_kode,
+        u.{f_usage_text_t_build_usage} AS bbr_anv_tekst,
+        d.{f_category_t_damage} AS skade_kategori,
+        d.{f_type_t_damage} AS skade_type,
+        k.{f_sqmprice_t_sqmprice}::NUMERIC(12,2) as kvm_pris_kr,
+        (k.{f_sqmprice_t_sqmprice} * ob.areal_byg_m2 * {Værditab, skaderamte bygninger (%)}/100.0)::NUMERIC(12,2) as {f_loss_q_building},
+        (d.b0 + st_area(ob.{f_geom_q_building}) * (d.b1 * ln(ob.max_vanddybde_cm) + d.b2))::NUMERIC(12,2) AS {f_damage_q_building},
+        CASE
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages ikke'' THEN 0.0
+	        WHEN ''{Skadeberegning for kælder}'' = ''Medtages'' THEN ob.areal_kaelder_m2 * d.c0 
+        END::NUMERIC(12,2) as {f_cellar_damage_q_building}
+
+    FROM ob
+    LEFT JOIN {t_build_usage} u on ob.bbr_kode = u.{f_pkey_t_build_usage}
+    LEFT JOIN {t_damage} d on u.{f_category_t_build_usage} = d.{f_category_t_damage} AND d.{f_type_t_damage} = ''{Skadetype}''   
+    LEFT JOIN {t_sqmprice} k on (ob.kom_kode = k.{f_muncode_t_sqmprice})
+
+)
+SELECT 
+    os.*,
+	(
+	CASE
+	    WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
+	    WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN os.{f_damage_q_building} + os.{f_cellar_damage_q_building}
+	    WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN os.{f_loss_q_building}
+	    WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN os.{f_damage_q_building} + os.{f_cellar_damage_q_building} + os.{f_loss_q_building} 
+	END * (0.089925/{Returperiode for hændelse i fremtiden (år)} + 0.21905/{Returperiode for hændelse i dag (år)}))::NUMERIC(12,2) AS {f_risk_q_building}
+FROM os
+'
+WHERE name = 'q_building';
+
+UPDATE parametre SET "sort" = '1'  WHERE "name" = 'Skadetype';
+UPDATE parametre SET "sort" = '2'  WHERE "name" = 'Skadeberegning for kælder';
+UPDATE parametre SET "sort" = '3'  WHERE "name" = 'Værditab, skaderamte bygninger (%)';
+UPDATE parametre SET "sort" = '10' WHERE "name" = 'Skadeberegninger, Bygninger';
+UPDATE parametre SET "sort" = '11' WHERE "name" = 'Skadeberegninger, Bygninger, ny model';
+UPDATE parametre SET "sort" = '12' WHERE "name" = 'Værditab nabobygninger';
+
+-- Patch 2022-02-14: Model q_building_new slut --
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2022-02-26: Model q_building_new (2. time)
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+-- NIX PILLE VED RESTEN....................................................................................................
+
+DELETE FROM parametre WHERE parent = 'q_building_new' OR name = 'q_building_new';
+
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_building_new'                  , 'q_building_new', 'fid'                           , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_building_new'                  , 'q_building_new', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_building_new'        , 'q_building_new', 'skadebeloeb_nutid_kr'          , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_building_new'         , 'q_building_new', 'skadebeloeb_fremtid_kr'        , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_cellar_damage_present_q_building_new' , 'q_building_new', 'skadebeloeb_kaelder_nutid_kr'  , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_cellar_damage_future_q_building_new'  , 'q_building_new', 'skadebeloeb_kaelder_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_present_q_building_new'          , 'q_building_new', 'vaerditab_nutid_kr'            , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_future_q_building_new'           , 'q_building_new', 'vaerditab_fremtid_kr'          , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_building_new'                  , 'q_building_new', 'risiko_kr'                     , 'T', '', '', '', '', '', 1, 'T');
+
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_building_new', 'Queries', 
+'SELECT
+    b.*,
+    d.{f_category_t_damage} AS skade_kategori,
+    d.{f_type_t_damage} AS skade_type,
+	''{Skadeberegning for kælder}'' AS kaelder_beregning,
+    {Værditab, skaderamte bygninger (%)}::NUMERIC(12,2) as tab_procent,
+    k.{f_sqmprice_t_sqmprice}::NUMERIC(12,2) as kvm_pris_kr,
+    st_area(b.{f_geom_t_building})::NUMERIC(12,2) AS areal_byg_m2,
+    n.*,
+    f.*,
+    r.*
+    FROM {t_building} b
+    LEFT JOIN {t_build_usage} u on b.{f_usage_code_t_building} = u.{f_pkey_t_build_usage}
+    LEFT JOIN {t_damage} d on u.{f_category_t_build_usage} = d.{f_category_t_damage} AND d.{f_type_t_damage} = ''{Skadetype}''   
+    LEFT JOIN {t_sqmprice} k on (b.{f_muncode_t_building} = k.{f_muncode_t_sqmprice}),
+    LATERAL (
+        SELECT
+            COUNT (*) AS cnt_oversvoem_nutid,
+            COALESCE((SUM(st_area(st_intersection(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, nutid})))),0)::NUMERIC(12,2) AS areal_oversvoem_nutid_m2,
+            COALESCE((MIN({f_depth_Oversvømmelsesmodel, nutid}) * 100.00),0)::NUMERIC(12,2) AS min_vanddybde_nutid_cm,
+            COALESCE((MAX({f_depth_Oversvømmelsesmodel, nutid}) * 100.00),0)::NUMERIC(12,2) AS max_vanddybde_nutid_cm,
+            COALESCE((AVG({f_depth_Oversvømmelsesmodel, nutid}) * 100.00),0)::NUMERIC(12,2) AS avg_vanddybde_nutid_cm,
+            CASE WHEN COUNT (*) > 0 THEN d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(MAX({f_depth_Oversvømmelsesmodel, nutid})*100.00, 1.0)) + d.b2) ELSE 0 END::NUMERIC(12,2) AS {f_damage_present_q_building_new},
+            CASE WHEN COUNT (*) > 0 AND ''{Skadeberegning for kælder}'' = ''Medtages'' THEN COALESCE(b.{f_cellar_area_t_building},0.0) * d.c0 ELSE 0 END::NUMERIC(12,2) as {f_cellar_damage_present_q_building_new},
+            CASE WHEN COUNT (*) > 0 THEN k.kvm_pris * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}/100.0 ELSE 0 END::NUMERIC(12,2) as {f_loss_present_q_building_new}             
+        FROM {Oversvømmelsesmodel, nutid} WHERE st_intersects(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, nutid}) AND {f_depth_Oversvømmelsesmodel, nutid} >= {Minimum vanddybde (meter)}
+    ) n,
+    LATERAL (
+        SELECT
+            COUNT (*) AS cnt_oversvoem_fremtid,
+            COALESCE((SUM(st_area(st_intersection(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, fremtid})))),0)::NUMERIC(12,2) AS areal_oversvoem_fremtid_m2,
+            COALESCE((MIN({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00),0)::NUMERIC(12,2) AS min_vanddybde_fremtid_cm,
+            COALESCE((MAX({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00),0)::NUMERIC(12,2) AS max_vanddybde_fremtid_cm,
+            COALESCE((AVG({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00),0)::NUMERIC(12,2) AS avg_vanddybde_fremtid_cm,
+            CASE WHEN COUNT (*) > 0 THEN d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(MAX({f_depth_Oversvømmelsesmodel, fremtid})*100.00, 1.0)) + d.b2) ELSE 0 END::NUMERIC(12,2) AS {f_damage_future_q_building_new},
+            CASE WHEN COUNT (*) > 0 AND ''{Skadeberegning for kælder}'' = ''Medtages'' THEN COALESCE(b.{f_cellar_area_t_building},0.0) * d.c0 ELSE 0 END::NUMERIC(12,2) as {f_cellar_damage_future_q_building_new},
+            CASE WHEN COUNT (*) > 0 THEN k.kvm_pris * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}/100.0 ELSE 0 END::NUMERIC(12,2) as {f_loss_future_q_building_new}                
+        FROM {Oversvømmelsesmodel, fremtid} WHERE st_intersects(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, fremtid}) AND {f_depth_Oversvømmelsesmodel, fremtid} >= {Minimum vanddybde (meter)}
+    ) f,
+    LATERAL (
+        SELECT
+          ''{Medtag i risikoberegninger}'' AS risiko_beregning,
+		  {Returperiode, antal år} AS retur_periode,
+          ((0.219058829 * CASE
+          WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
+          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN n.{f_damage_present_q_building_new} + n.{f_cellar_damage_present_q_building_new}
+          WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN n.{f_loss_present_q_building_new}
+          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN n.{f_damage_present_q_building_new} + n.{f_cellar_damage_present_q_building_new} + n.{f_loss_present_q_building_new} 
+          END + 
+          0.089925625 * CASE
+          WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
+          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN f.{f_damage_future_q_building_new} + f.{f_cellar_damage_future_q_building_new}
+          WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN f.{f_loss_future_q_building_new}
+          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN f.{f_damage_future_q_building_new} + f.{f_cellar_damage_future_q_building_new} + f.{f_loss_future_q_building_new} 
+          END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_building_new},
+          '''' AS omraade
+    ) r
+    WHERE f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0', 'P', '', '', '', '', 'SQL template for buildings new model ', 8, ' ');
+
+-- Patch  2022-02-26: Model q_building_new slut --
+
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2022-02-27: Model q_tourism_spatial_new (2. time)
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+-- NIX PILLE VED RESTEN....................................................................................................
+
+DELETE FROM parametre WHERE parent = 'q_tourism_spatial_new' OR name = 'q_tourism_spatial_new' OR "default" = 'q_tourism_spatial_new';
+
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Turisme, Kort - ny model', 'Turisme', '', 'T', '', '', '', 'q_tourism_spatial_new', 'Sæt hak såfremt der skal beregnes økonomiske tab for overnatningssteder som anvendes til turistformål. De berørte bygninger vises geografisk på et kort.  ', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_tourism_spatial_new'          , 'q_tourism_spatial_new', 'fid'                   , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_tourism_spatial_new'          , 'q_tourism_spatial_new', 'geom'                  , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_tourism_spatial_new', 'q_tourism_spatial_new', 'skadebeloeb_nutid_kr'  , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_tourism_spatial_new' , 'q_tourism_spatial_new', 'skadebeloeb_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_tourism_spatial_new'          , 'q_tourism_spatial_new', 'risiko_kr'             , 'T', '', '', '', '', '', 1, 'T');
+
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_tourism_spatial_new', 'Queries',
+'
+SELECT
+    b.{f_pkey_t_building} as {f_pkey_q_tourism_spatial_new},
+    b.{f_muncode_t_building} AS kom_kode,
+    b.{f_usage_code_t_building} AS bbr_anv_kode,
+    t.bbr_anv_tekst AS bbr_anv_tekst,
+    t.kapacitet AS kapacitet,
+    t.omkostning AS omkostninger,
+    {Antal tabte døgn} AS tabte_dage,
+    {Antal tabte døgn} * t.kapacitet AS tabte_overnatninger,
+    st_force2d(b.{f_geom_t_building}) AS {f_geom_q_tourism_spatial_new},
+    n.*,
+    f.*,
+    r.*
+    FROM {t_building} b
+    INNER JOIN {t_tourism} t  ON t.{f_pkey_t_tourism} = b.{f_usage_code_t_building},  
+    LATERAL (
+        SELECT
+            COUNT (*) AS cnt_oversvoem_nutid,
+            COALESCE((SUM(st_area(st_intersection(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, nutid})))),0)::NUMERIC(12,2) AS areal_oversvoem_nutid_m2,
+            COALESCE((MIN({f_depth_Oversvømmelsesmodel, nutid}) * 100.00),0)::NUMERIC(12,2) AS min_vanddybde_nutid_cm,
+            COALESCE((MAX({f_depth_Oversvømmelsesmodel, nutid}) * 100.00),0)::NUMERIC(12,2) AS max_vanddybde_nutid_cm,
+            COALESCE((AVG({f_depth_Oversvømmelsesmodel, nutid}) * 100.00),0)::NUMERIC(12,2) AS avg_vanddybde_nutid_cm,
+            CASE WHEN COUNT (*) > 0 THEN {Antal tabte døgn} * t.omkostning * t.kapacitet ELSE 0 END::NUMERIC(12,2) AS {f_damage_present_q_tourism_spatial_new}
+        FROM {Oversvømmelsesmodel, nutid} WHERE st_intersects(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, nutid}) AND {f_depth_Oversvømmelsesmodel, nutid} >= {Minimum vanddybde (meter)}
+    ) n,
+    LATERAL (
+        SELECT
+            COUNT (*) AS cnt_oversvoem_fremtid,
+            COALESCE((SUM(st_area(st_intersection(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, fremtid})))),0)::NUMERIC(12,2) AS areal_oversvoem_fremtid_m2,
+            COALESCE((MIN({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00),0)::NUMERIC(12,2) AS min_vanddybde_fremtid_cm,
+            COALESCE((MAX({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00),0)::NUMERIC(12,2) AS max_vanddybde_fremtid_cm,
+            COALESCE((AVG({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00),0)::NUMERIC(12,2) AS avg_vanddybde_fremtid_cm,
+            CASE WHEN COUNT (*) > 0 THEN {Antal tabte døgn} * t.omkostning * t.kapacitet ELSE 0 END::NUMERIC(12,2) AS {f_damage_future_q_tourism_spatial_new}
+        FROM {Oversvømmelsesmodel, fremtid} WHERE st_intersects(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, fremtid}) AND {f_depth_Oversvømmelsesmodel, fremtid} >= {Minimum vanddybde (meter)}
+    ) f,
+    LATERAL (
+        SELECT
+          ''{Medtag i risikoberegninger}'' AS risiko_beregning,
+		  {Returperiode, antal år} AS retur_periode,
+          ((0.219058829 * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN n.{f_damage_present_q_tourism_spatial_new} ELSE 0.0 END + 
+          0.089925625   * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN f.{f_damage_future_q_tourism_spatial_new} ELSE 0.0 END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_tourism_spatial_new},
+          '''' AS omraade
+    ) r
+	WHERE f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0
+', 'P', '', '', '', '', 'SQL template for buildings new model ', 8, ' ');
+
+-- Patch  2022-02-27: Model q_tourism_spatial_new slut --
+
+
+
+
+
+/* 
+-----------------------------------------------------------------------
+--   Patch 2022-03-04: Template "Create cell layer template" modification 
+-----------------------------------------------------------------------
+
+     search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
+     Hvis der ikke er ændret på standard navn for administrationsskema "fdc_admin"
+     skal der ikke rettes i linjen
+
+*/
+SET search_path = fdc_admin, public;
+--                *********
+
+-- NIX PILLE VED RESTEN....................................................................................................
+
+UPDATE parametre SET value = 
+'CREATE TABLE IF NOT EXISTS {celltable} AS
+  WITH g AS (
+    SELECT (
+      st_squaregrid({cellsize}, st_geomfromewkt(''SRID={epsg}; POLYGON(({xmin} {ymin},{xmax} {ymin},{xmax} {ymax},{xmin} {ymax},{xmin} {ymin}))''))
+	).*
+  )
+  SELECT
+    row_number() OVER () AS fid,
+    i,
+    j,
+    {cellsize} AS  cellsize, 
+    CASE WHEN {cellsize} < 1000 THEN {cellsize}::INTEGER::TEXT || ''m_'' ELSE ({cellsize}/1000)::INTEGER::TEXT || ''km_'' END || 
+	    j::TEXT || ''_'' || i::TEXT AS cellname,
+    0.0::NUMERIC(12,2) AS val_intersect, 
+    0 AS num_intersect,
+    st_force2d(geom)::Geometry(Polygon,25832) AS geom	
+  FROM g;
+ALTER TABLE {celltable} ADD PRIMARY KEY(fid);
+CREATE INDEX ON {celltable} USING GIST(geom);'
+
+WHERE name = 'Create cell layer template';
+
+-- Patch 2022-03-04 slut --
