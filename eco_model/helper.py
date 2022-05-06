@@ -413,7 +413,7 @@ def mapperExtent(epsg=None):
 
 def createDateTimeName(name):
     """TBD"""
-    return '{}_{}'.format(xstr(name), QDateTime.currentDateTime().toString('yyyy_MM_dd_hh_mm_ss_zzz'))
+    return '{}_{}'.format(xstr(name), QDateTime.currentDateTime().toString('yyyyMMddhhmmss'))
 
 
 def createDmpLayer(uristr, contype, dicta, temanr, epsg):
