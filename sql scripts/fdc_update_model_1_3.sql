@@ -24,6 +24,10 @@ update parametre set "type" = 'F'
 -- Patch 2022-02-03: Opdatering af Kritisk infrastruktur slut --
 
 
+--DELETE FROM parametre WHERE name='Returperiode for hændelse i fremtiden (år)';
+--DELETE FROM parametre WHERE name='Returperiode for hændelse i dag (år)';
+
+
 /* 
 -----------------------------------------------------------------------
 --   Patch 2022-02-26: Model q_building_new (2. time)
@@ -46,9 +50,9 @@ DELETE FROM parametre WHERE name='Returperiode, antal år';
 INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmelsesmodel, fremtid', 'Generelle modelværdier', 'fdc_data.oversvoem', 'Q', '', '', 't_flood', 't_flood', '(Bruges til ny modelberegning for bygninger) 
 Vælg oversvømmelsestabel for fremtidshændelse', 12, ' ');
 INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmelsesmodel, nutid', 'Generelle modelværdier', 'fdc_data.oversvoem', 'Q', '', '', 't_flood', 't_flood', '(Bruges til ny modelberegning for bygninger) 
-Vælg oversvømmelsestabel for nutidshændelse', 13, ' ');
+Vælg oversvømmelsestabel for nutidshændelse', 14, ' ');
 INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Returperiode, antal år', 'Generelle modelværdier', '100', 'I', '0', '1000', '10', '', '(Bruges til ny modelberegning for bygninger) 
-Indtast returperioden i hele år, dvs. forventet antal år mellem nutidshændelse og fremtidshændelse', 14, ' ');
+Indtast returperioden i hele år, dvs. forventet antal år mellem nutidshændelse og fremtidshændelse', 13, ' ');
 
 UPDATE parametre SET parent = 'Bygninger' WHERE name = 'Skadeberegning for kælder';
 UPDATE parametre SET parent = 'Bygninger' WHERE name = 'Skadetype';
@@ -994,3 +998,6 @@ UPDATE parametre SET parent = 'Flood data' WHERE name= 't_flood_49';
 UPDATE parametre SET parent = 'Flood data' WHERE name= 't_flood_50';
 
 -- Patch  2022-04-14: Ny struktiur i faneblad Data slut --
+
+UPDATE parametre SET "value" = '4' WHERE name= 'Værditab, skaderamte bygninger (%)';
+
