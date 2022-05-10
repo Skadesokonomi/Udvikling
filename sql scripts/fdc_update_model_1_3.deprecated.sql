@@ -24,12 +24,8 @@ update parametre set "type" = 'F'
 -- Patch 2022-02-03: Opdatering af Kritisk infrastruktur slut --
 
 
-DELETE FROM parametre WHERE name='Returperiode for hændelse i fremtiden (år)';
-DELETE FROM parametre WHERE name='Returperiode for hændelse i dag (år)';
-
-DELETE FROM parametre WHERE parent = 'q_tourism_alphanumeric' OR name = 'q_tourism_alphanumeric' OR "default" = 'q_tourism_alphanumeric';
-DELETE FROM parametre WHERE parent = 'q_bioscore_alphanumeric' OR name = 'q_bioscore_alphanumeric' OR "default" = 'q_bioscore_alphanumeric';
-
+--DELETE FROM parametre WHERE name='Returperiode for hændelse i fremtiden (år)';
+--DELETE FROM parametre WHERE name='Returperiode for hændelse i dag (år)';
 
 
 /* 
@@ -51,9 +47,12 @@ DELETE FROM parametre WHERE name='Oversvømmelsesmodel, fremtid';
 DELETE FROM parametre WHERE name='Oversvømmelsesmodel, nutid';
 DELETE FROM parametre WHERE name='Returperiode, antal år';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmelsesmodel, nutid', 'Generelle modelværdier', 'fdc_data.oversvoem', 'Q', '', '', 't_flood', 't_flood', 'Vælg oversvømmelsestabel for nutidshændelse', 12, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmelsesmodel, fremtid', 'Generelle modelværdier', 'fdc_data.oversvoem', 'Q', '', '', 't_flood', 't_flood', 'Vælg oversvømmelsestabel for fremtidshændelse', 13, ' ');
-INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Returperiode, antal år', 'Generelle modelværdier', '100', 'I', '0', '1000', '10', '', 'Indtast returperioden i hele år, dvs. gennemsnitligt antal år mellem hændelser (Nutidshændelse og fremtidshændelse skal have samme returperiode)', 14, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmelsesmodel, fremtid', 'Generelle modelværdier', 'fdc_data.oversvoem', 'Q', '', '', 't_flood', 't_flood', '(Bruges til ny modelberegning for bygninger) 
+Vælg oversvømmelsestabel for fremtidshændelse', 12, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmelsesmodel, nutid', 'Generelle modelværdier', 'fdc_data.oversvoem', 'Q', '', '', 't_flood', 't_flood', '(Bruges til ny modelberegning for bygninger) 
+Vælg oversvømmelsestabel for nutidshændelse', 14, ' ');
+INSERT INTO fdc_admin.parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Returperiode, antal år', 'Generelle modelværdier', '100', 'I', '0', '1000', '10', '', '(Bruges til ny modelberegning for bygninger) 
+Indtast returperioden i hele år, dvs. forventet antal år mellem nutidshændelse og fremtidshændelse', 13, ' ');
 
 UPDATE parametre SET parent = 'Bygninger' WHERE name = 'Skadeberegning for kælder';
 UPDATE parametre SET parent = 'Bygninger' WHERE name = 'Skadetype';
@@ -75,19 +74,18 @@ SET search_path = fdc_admin, public;
 -- NIX PILLE VED RESTEN....................................................................................................
 
 DELETE FROM parametre WHERE parent = 'q_building_new' OR name = 'q_building_new' OR "default" = 'q_building_new';
-DELETE FROM parametre WHERE parent = 'q_building' OR name = 'q_building' OR "default" = 'q_building';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadeberegninger, Bygninger', 'Bygninger', '', 'T', '', '', '', 'q_building', 'Skadeberegning for bygninger, forskellige skademodeller, med eller uden kælderberegning, ny metode', 11, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_building'                  , 'q_building', 'objectid'                      , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_building'                  , 'q_building', 'geom'                          , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_building'        , 'q_building', 'skadebeloeb_nutid_kr'          , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_building'         , 'q_building', 'skadebeloeb_fremtid_kr'        , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_cellar_present_q_building' , 'q_building', 'skadebeloeb_kaelder_nutid_kr'  , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_cellar_future_q_building'  , 'q_building', 'skadebeloeb_kaelder_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_present_q_building'          , 'q_building', 'vaerditab_nutid_kr'            , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_future_q_building'           , 'q_building', 'vaerditab_fremtid_kr'          , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_building'                  , 'q_building', 'risiko_kr'                     , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_building', 'Queries', 
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadeberegninger, Bygninger, ny model', 'Bygninger', '', 'T', '', '', '', 'q_building_new', 'Skadeberegning for bygninger, forskellige skademodeller, med eller uden kælderberegning, ny metode', 11, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_building_new'                  , 'q_building_new', 'objectid'                      , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_building_new'                  , 'q_building_new', 'geom'                          , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_building_new'        , 'q_building_new', 'skadebeloeb_nutid_kr'          , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_building_new'         , 'q_building_new', 'skadebeloeb_fremtid_kr'        , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_cellar_present_q_building_new' , 'q_building_new', 'skadebeloeb_kaelder_nutid_kr'  , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_cellar_future_q_building_new'  , 'q_building_new', 'skadebeloeb_kaelder_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_present_q_building_new'          , 'q_building_new', 'vaerditab_nutid_kr'            , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_future_q_building_new'           , 'q_building_new', 'vaerditab_fremtid_kr'          , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_building_new'                  , 'q_building_new', 'risiko_kr'                     , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_building_new', 'Queries', 
 '
 SELECT
     b.*,
@@ -111,9 +109,9 @@ SELECT
             COALESCE(MIN({f_depth_Oversvømmelsesmodel, nutid}) * 100.00,0)::NUMERIC(12,2) AS min_vanddybde_nutid_cm,
             COALESCE(MAX({f_depth_Oversvømmelsesmodel, nutid}) * 100.00,0)::NUMERIC(12,2) AS max_vanddybde_nutid_cm,
             COALESCE(AVG({f_depth_Oversvømmelsesmodel, nutid}) * 100.00,0)::NUMERIC(12,2) AS avg_vanddybde_nutid_cm,
-            CASE WHEN COUNT (*) > 0 THEN d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(MAX({f_depth_Oversvømmelsesmodel, nutid})*100.00, 1.0)) + d.b2) ELSE 0 END::NUMERIC(12,2) AS {f_damage_present_q_building},
-            CASE WHEN COUNT (*) > 0 AND ''{Skadeberegning for kælder}'' = ''Medtages'' THEN COALESCE(b.{f_cellar_area_t_building},0.0) * d.c0 ELSE 0 END::NUMERIC(12,2) as {f_damage_cellar_present_q_building},
-            CASE WHEN COUNT (*) > 0 THEN k.kvm_pris * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}/100.0 ELSE 0 END::NUMERIC(12,2) as {f_loss_present_q_building}             
+            CASE WHEN COUNT (*) > 0 THEN d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(MAX({f_depth_Oversvømmelsesmodel, nutid})*100.00, 1.0)) + d.b2) ELSE 0 END::NUMERIC(12,2) AS {f_damage_present_q_building_new},
+            CASE WHEN COUNT (*) > 0 AND ''{Skadeberegning for kælder}'' = ''Medtages'' THEN COALESCE(b.{f_cellar_area_t_building},0.0) * d.c0 ELSE 0 END::NUMERIC(12,2) as {f_damage_cellar_present_q_building_new},
+            CASE WHEN COUNT (*) > 0 THEN k.kvm_pris * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}/100.0 ELSE 0 END::NUMERIC(12,2) as {f_loss_present_q_building_new}             
         FROM {Oversvømmelsesmodel, nutid} WHERE st_intersects(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, nutid}) AND {f_depth_Oversvømmelsesmodel, nutid} >= {Minimum vanddybde (meter)}
     ) n,
     LATERAL (
@@ -123,9 +121,9 @@ SELECT
             COALESCE(MIN({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00,0)::NUMERIC(12,2) AS min_vanddybde_fremtid_cm,
             COALESCE(MAX({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00,0)::NUMERIC(12,2) AS max_vanddybde_fremtid_cm,
             COALESCE(AVG({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00,0)::NUMERIC(12,2) AS avg_vanddybde_fremtid_cm,
-            CASE WHEN COUNT (*) > 0 THEN d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(MAX({f_depth_Oversvømmelsesmodel, fremtid})*100.00, 1.0)) + d.b2) ELSE 0 END::NUMERIC(12,2) AS {f_damage_future_q_building},
-            CASE WHEN COUNT (*) > 0 AND ''{Skadeberegning for kælder}'' = ''Medtages'' THEN COALESCE(b.{f_cellar_area_t_building},0.0) * d.c0 ELSE 0 END::NUMERIC(12,2) as {f_damage_cellar_future_q_building},
-            CASE WHEN COUNT (*) > 0 THEN k.kvm_pris * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}/100.0 ELSE 0 END::NUMERIC(12,2) as {f_loss_future_q_building}                
+            CASE WHEN COUNT (*) > 0 THEN d.b0 + st_area(b.{f_geom_t_building}) * (d.b1 * ln(GREATEST(MAX({f_depth_Oversvømmelsesmodel, fremtid})*100.00, 1.0)) + d.b2) ELSE 0 END::NUMERIC(12,2) AS {f_damage_future_q_building_new},
+            CASE WHEN COUNT (*) > 0 AND ''{Skadeberegning for kælder}'' = ''Medtages'' THEN COALESCE(b.{f_cellar_area_t_building},0.0) * d.c0 ELSE 0 END::NUMERIC(12,2) as {f_damage_cellar_future_q_building_new},
+            CASE WHEN COUNT (*) > 0 THEN k.kvm_pris * st_area(b.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}/100.0 ELSE 0 END::NUMERIC(12,2) as {f_loss_future_q_building_new}                
         FROM {Oversvømmelsesmodel, fremtid} WHERE st_intersects(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, fremtid}) AND {f_depth_Oversvømmelsesmodel, fremtid} >= {Minimum vanddybde (meter)}
     ) f,
     LATERAL (
@@ -134,16 +132,16 @@ SELECT
 		  {Returperiode, antal år} AS retur_periode,
           ((0.219058829 * CASE
           WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
-          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN n.{f_damage_present_q_building} + n.{f_damage_cellar_present_q_building}
-          WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN n.{f_loss_present_q_building}
-          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN n.{f_damage_present_q_building} + n.{f_damage_cellar_present_q_building} + n.{f_loss_present_q_building} 
+          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN n.{f_damage_present_q_building_new} + n.{f_damage_cellar_present_q_building_new}
+          WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN n.{f_loss_present_q_building_new}
+          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN n.{f_damage_present_q_building_new} + n.{f_damage_cellar_present_q_building_new} + n.{f_loss_present_q_building_new} 
           END + 
           0.089925625 * CASE
           WHEN ''{Medtag i risikoberegninger}'' = ''Intet (0 kr.)'' THEN 0.0
-          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN f.{f_damage_future_q_building} + f.{f_damage_cellar_future_q_building}
-          WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN f.{f_loss_future_q_building}
-          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN f.{f_damage_future_q_building} + f.{f_damage_cellar_future_q_building} + f.{f_loss_future_q_building} 
-          END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_building},
+          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb'' THEN f.{f_damage_future_q_building_new} + f.{f_damage_cellar_future_q_building_new}
+          WHEN ''{Medtag i risikoberegninger}'' = ''Værditab'' THEN f.{f_loss_future_q_building_new}
+          WHEN ''{Medtag i risikoberegninger}'' = ''Skadebeløb og værditab'' THEN f.{f_damage_future_q_building_new} + f.{f_damage_cellar_future_q_building_new} + f.{f_loss_future_q_building_new} 
+          END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_building_new},
           '''' AS omraade
     ) r
     WHERE f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0', 'P', '', '', '', '', 'SQL template for buildings new model ', 8, ' ');
@@ -167,18 +165,17 @@ SET search_path = fdc_admin, public;
 -- NIX PILLE VED RESTEN....................................................................................................
 
 DELETE FROM parametre WHERE parent = 'q_tourism_spatial_new' OR name = 'q_tourism_spatial_new' OR "default" = 'q_tourism_spatial_new';
-DELETE FROM parametre WHERE parent = 'q_tourism_spatial' OR name = 'q_tourism_spatial' OR "default" = 'q_tourism_spatial';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Turisme, Kort'              , 'Turisme'              , ''                      , 'T', '', '', '', 'q_tourism_spatial', 'Sæt hak såfremt der skal beregnes økonomiske tab for overnatningssteder som anvendes til turistformål. De berørte bygninger vises geografisk på et kort.  ', 10, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_tourism_spatial'          , 'q_tourism_spatial', 'fid'                   , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_tourism_spatial'          , 'q_tourism_spatial', 'geom'                  , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_tourism_spatial', 'q_tourism_spatial', 'skadebeloeb_nutid_kr'  , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_tourism_spatial' , 'q_tourism_spatial', 'skadebeloeb_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_tourism_spatial'          , 'q_tourism_spatial', 'risiko_kr'             , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_tourism_spatial'                 , 'Queries',
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Turisme, Kort - ny model'              , 'Turisme'              , ''                      , 'T', '', '', '', 'q_tourism_spatial_new', 'Sæt hak såfremt der skal beregnes økonomiske tab for overnatningssteder som anvendes til turistformål. De berørte bygninger vises geografisk på et kort.  ', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_tourism_spatial_new'          , 'q_tourism_spatial_new', 'fid'                   , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_tourism_spatial_new'          , 'q_tourism_spatial_new', 'geom'                  , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_tourism_spatial_new', 'q_tourism_spatial_new', 'skadebeloeb_nutid_kr'  , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_tourism_spatial_new' , 'q_tourism_spatial_new', 'skadebeloeb_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_tourism_spatial_new'          , 'q_tourism_spatial_new', 'risiko_kr'             , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_tourism_spatial_new'                 , 'Queries',
 '
 SELECT
-    b.{f_pkey_t_building} as {f_pkey_q_tourism_spatial},
+    b.{f_pkey_t_building} as {f_pkey_q_tourism_spatial_new},
     b.{f_muncode_t_building} AS kom_kode,
     b.{f_usage_code_t_building} AS bbr_anv_kode,
     t.bbr_anv_tekst AS bbr_anv_tekst,
@@ -186,7 +183,7 @@ SELECT
     t.omkostning AS omkostninger,
     {Antal tabte døgn} AS tabte_dage,
     {Antal tabte døgn} * t.kapacitet AS tabte_overnatninger,
-    st_force2d(b.{f_geom_t_building}) AS {f_geom_q_tourism_spatial},
+    st_force2d(b.{f_geom_t_building}) AS {f_geom_q_tourism_spatial_new},
     n.*,
     f.*,
     r.*
@@ -199,7 +196,7 @@ SELECT
             COALESCE(MIN({f_depth_Oversvømmelsesmodel, nutid}) * 100.00,0)::NUMERIC(12,2) AS min_vanddybde_nutid_cm,
             COALESCE(MAX({f_depth_Oversvømmelsesmodel, nutid}) * 100.00,0)::NUMERIC(12,2) AS max_vanddybde_nutid_cm,
             COALESCE(AVG({f_depth_Oversvømmelsesmodel, nutid}) * 100.00,0)::NUMERIC(12,2) AS avg_vanddybde_nutid_cm,
-            CASE WHEN COUNT (*) > 0 THEN {Antal tabte døgn} * t.omkostning * t.kapacitet ELSE 0 END::NUMERIC(12,2) AS {f_damage_present_q_tourism_spatial}
+            CASE WHEN COUNT (*) > 0 THEN {Antal tabte døgn} * t.omkostning * t.kapacitet ELSE 0 END::NUMERIC(12,2) AS {f_damage_present_q_tourism_spatial_new}
         FROM {Oversvømmelsesmodel, nutid} WHERE st_intersects(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, nutid}) AND {f_depth_Oversvømmelsesmodel, nutid} >= {Minimum vanddybde (meter)}
     ) n,
     LATERAL (
@@ -209,7 +206,7 @@ SELECT
             COALESCE(MIN({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00,0)::NUMERIC(12,2) AS min_vanddybde_fremtid_cm,
             COALESCE(MAX({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00,0)::NUMERIC(12,2) AS max_vanddybde_fremtid_cm,
             COALESCE(AVG({f_depth_Oversvømmelsesmodel, fremtid}) * 100.00,0)::NUMERIC(12,2) AS avg_vanddybde_fremtid_cm,
-            CASE WHEN COUNT (*) > 0 THEN {Antal tabte døgn} * t.omkostning * t.kapacitet ELSE 0 END::NUMERIC(12,2) AS {f_damage_future_q_tourism_spatial}
+            CASE WHEN COUNT (*) > 0 THEN {Antal tabte døgn} * t.omkostning * t.kapacitet ELSE 0 END::NUMERIC(12,2) AS {f_damage_future_q_tourism_spatial_new}
         FROM {Oversvømmelsesmodel, fremtid} WHERE st_intersects(b.{f_geom_t_building},{f_geom_Oversvømmelsesmodel, fremtid}) AND {f_depth_Oversvømmelsesmodel, fremtid} >= {Minimum vanddybde (meter)}
     ) f,
     LATERAL (
@@ -217,9 +214,9 @@ SELECT
           ''{Medtag i risikoberegninger}'' AS risiko_beregning,
 		  {Returperiode, antal år} AS retur_periode,
           ((
-		      0.219058829 * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN n.{f_damage_present_q_tourism_spatial} ELSE 0.0 END + 
-              0.089925625   * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN f.{f_damage_future_q_tourism_spatial} ELSE 0.0 END
-          )/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_tourism_spatial},
+		      0.219058829 * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN n.{f_damage_present_q_tourism_spatial_new} ELSE 0.0 END + 
+              0.089925625   * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN f.{f_damage_future_q_tourism_spatial_new} ELSE 0.0 END
+          )/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_tourism_spatial_new},
           '''' AS omraade
     ) r
 	WHERE f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0
@@ -243,12 +240,10 @@ SET search_path = fdc_admin, public;
 -- NIX PILLE VED RESTEN....................................................................................................
 
 DELETE FROM parametre WHERE parent = 'q_infrastructure_new' OR name = 'q_infrastructure_new' OR "default" = 'q_infrastructure_new';
-DELETE FROM parametre WHERE parent = 'q_infrastructure' OR name = 'q_infrastructure' OR "default" = 'q_infrastructure';
-
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmet infrastruktur'  , 'Kritisk infrastruktur', ''        , 'T', '', '', '', 'q_infrastructure', 'Udpegning af oversvømmet kritisk infrastruktur. Den berørte infrastruktur vises geografisk på et kort.  ', 10, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_infrastructure'          , 'q_infrastructure' , 'objectid', 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_infrastructure'          , 'q_infrastructure' , 'geom'    , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_infrastructure', 'Queries',
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmet infrastruktur, ny model'  , 'Kritisk infrastruktur', ''        , 'T', '', '', '', 'q_infrastructure_new', 'Udpegning af oversvømmet kritisk infrastruktur. Den berørte infrastruktur vises geografisk på et kort.  ', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_infrastructure_new'          , 'q_infrastructure_new' , 'objectid', 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_infrastructure_new'          , 'q_infrastructure_new' , 'geom'    , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_infrastructure_new', 'Queries',
 '
 SELECT DISTINCT ON (o.{f_pkey_t_infrastructure}) 
     o.*,
@@ -284,12 +279,10 @@ SELECT DISTINCT ON (o.{f_pkey_t_infrastructure})
 	
 
 DELETE FROM parametre WHERE parent = 'q_publicservice_new' OR name = 'q_publicservice_new' OR "default" = 'q_publicservice_new';
-DELETE FROM parametre WHERE parent = 'q_publicservice' OR name = 'q_publicservice' OR "default" = 'q_publicservice';
-
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmet offentlig service'  , 'Offentlig service', ''      , 'T', '', '', '', 'q_publicservice', 'Udpegning af oversvømmet kritisk infrastruktur. Den berørte infrastruktur vises geografisk på et kort.  ', 10, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_publicservice'          , 'q_publicservice' , 'objectid', 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_publicservice'          , 'q_publicservice' , 'geom'    , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_publicservice', 'Queries',
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Oversvømmet offentlig service, ny model'  , 'Offentlig service', ''      , 'T', '', '', '', 'q_publicservice_new', 'Udpegning af oversvømmet kritisk infrastruktur. Den berørte infrastruktur vises geografisk på et kort.  ', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_publicservice_new'          , 'q_publicservice_new' , 'objectid', 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_publicservice_new'          , 'q_publicservice_new' , 'geom'    , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_publicservice_new', 'Queries',
 '
 SELECT DISTINCT ON (o.{f_pkey_t_publicservice}) 
     o.*,
@@ -339,23 +332,22 @@ SET search_path = fdc_admin, public;
 --                *********
 
 DELETE FROM parametre WHERE parent = 'q_human_health_new' OR name = 'q_human_health_new' OR "default" = 'q_human_health_new';
-DELETE FROM parametre WHERE parent = 'q_human_health' OR name = 'q_human_health' OR "default" = 'q_human_health';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Humane omkostninger', 'Mennesker og helbred', '', 'T', '', '', '', 'q_human_health', 'Sæt hak såfremt der skal beregnes humane omkostninger', 10, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_human_health'              , 'q_human_health', 'fid'                       , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_human_health'              , 'q_human_health', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_human_health'    , 'q_human_health', 'skadebeloeb_nutid_kr'      , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_human_health'     , 'q_human_health', 'skadebeloeb_fremtid_kr'    , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_human_health'              , 'q_human_health', 'risiko_kr'                 , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_human_health', 'Queries', 
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Humane omkostninger - ny model', 'Mennesker og helbred', '', 'T', '', '', '', 'q_human_health_new', 'Sæt hak såfremt der skal beregnes humane omkostninger', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_human_health_new'              , 'q_human_health_new', 'fid'                       , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_human_health_new'              , 'q_human_health_new', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_human_health_new'    , 'q_human_health_new', 'skadebeloeb_nutid_kr'      , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_human_health_new'     , 'q_human_health_new', 'skadebeloeb_fremtid_kr'    , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_human_health_new'              , 'q_human_health_new', 'risiko_kr'                 , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_human_health_new', 'Queries', 
 '
 SELECT 
-    b.{f_pkey_t_building} as {f_pkey_q_human_health},
+    b.{f_pkey_t_building} as {f_pkey_q_human_health_new},
     b.{f_muncode_t_building} AS kom_kode,
     b.{f_usage_code_t_building} AS bbr_anv_kode,
     b.{f_usage_text_t_building} AS bbr_anv_tekst,
     st_area(b.{f_geom_t_building})::NUMERIC(12,2) AS areal_byg_m2,
-    st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_human_health},
+    st_multi(st_force2d(b.{f_geom_t_building}))::Geometry(Multipolygon,25832) AS {f_geom_q_human_health_new},
     n.*,
     f.*,
     h.*,
@@ -401,11 +393,11 @@ SELECT
 		    h.arbejdstid_nutid_kr + 
 			h.rejsetid_nutid_kr + 
 			h.sygetimer_nutid_kr + 
-			h.ferietimer_nutid_kr AS {f_damage_present_q_human_health},
+			h.ferietimer_nutid_kr AS {f_damage_present_q_human_health_new},
             h.arbejdstid_fremtid_kr + 
 			h.rejsetid_fremtid_kr + 
 			h.sygetimer_fremtid_kr + 
-			h.ferietimer_fremtid_kr AS {f_damage_future_q_human_health},
+			h.ferietimer_fremtid_kr AS {f_damage_future_q_human_health_new},
             ''{Medtag i risikoberegninger}'' AS risiko_beregning,
 		    {Returperiode, antal år} AS retur_periode,
             ((
@@ -420,7 +412,7 @@ SELECT
 					h.rejsetid_fremtid_kr + 
 					h.sygetimer_fremtid_kr + 
 					h.ferietimer_fremtid_kr ELSE 0 END
-				)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_human_health},
+				)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_human_health_new},
             '''' AS omraade
     ) r
     WHERE (f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0) AND h.mennesker_total > 0
@@ -442,15 +434,14 @@ SET search_path = fdc_admin, public;
 --                *********
 
 DELETE FROM parametre WHERE parent = 'q_recreative_new' OR name = 'q_recreative_new' OR "default" = 'q_recreative_new';
-DELETE FROM parametre WHERE parent = 'q_recreative' OR name = 'q_recreative' OR "default" = 'q_recreative';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadesberegning, Rekreative områder', 'Rekreative områder', '', 'T', '', '', '', 'q_recreative', 'Sæt hak såfremt der skal beregnes økonomiske tab for overnatningssteder som anvendes til turistformål. De berørte bygninger vises geografisk på et kort.  ', 10, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_recreative'              , 'q_recreative', 'id'                       , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_recreative'              , 'q_recreative', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_recreative'    , 'q_recreative', 'skadebeloeb_nutid_kr'      , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_recreative'     , 'q_recreative', 'skadebeloeb_fremtid_kr'    , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_recreative'              , 'q_recreative', 'risiko_kr'                 , 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_recreative', 'Queries', 
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadesberegning, Rekreative områder - ny model', 'Rekreative områder', '', 'T', '', '', '', 'q_recreative_new', 'Sæt hak såfremt der skal beregnes økonomiske tab for overnatningssteder som anvendes til turistformål. De berørte bygninger vises geografisk på et kort.  ', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_recreative_new'              , 'q_recreative_new', 'id'                       , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_recreative_new'              , 'q_recreative_new', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_recreative_new'    , 'q_recreative_new', 'skadebeloeb_nutid_kr'      , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_recreative_new'     , 'q_recreative_new', 'skadebeloeb_fremtid_kr'    , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_recreative_new'              , 'q_recreative_new', 'risiko_kr'                 , 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_recreative_new', 'Queries', 
 '
 SELECT 
     b.*,
@@ -483,17 +474,17 @@ SELECT
         SELECT
             (100.0 * n.areal_oversvoem_nutid_m2/st_area(b.{f_geom_t_recreative}))::NUMERIC(12,2) AS oversvoem_nutid_pct,
             (100.0 * f.areal_oversvoem_fremtid_m2/st_area(b.{f_geom_t_recreative}))::NUMERIC(12,2) AS oversvoem_fremtid_pct,
-            (({Antal dage med oversvømmelse}/365.0) * (n.areal_oversvoem_nutid_m2/st_area(b.{f_geom_t_recreative})) * b.valuationk)::NUMERIC(12,2)  AS {f_damage_present_q_recreative},		    
-            (({Antal dage med oversvømmelse}/365.0) * (f.areal_oversvoem_fremtid_m2/st_area(b.{f_geom_t_recreative})) * b.valuationk)::NUMERIC(12,2)  AS {f_damage_future_q_recreative}		    
+            (({Antal dage med oversvømmelse}/365.0) * (n.areal_oversvoem_nutid_m2/st_area(b.{f_geom_t_recreative})) * b.valuationk)::NUMERIC(12,2)  AS {f_damage_present_q_recreative_new},		    
+            (({Antal dage med oversvømmelse}/365.0) * (f.areal_oversvoem_fremtid_m2/st_area(b.{f_geom_t_recreative})) * b.valuationk)::NUMERIC(12,2)  AS {f_damage_future_q_recreative_new}		    
     ) h,
     LATERAL (
         SELECT
             ''{Medtag i risikoberegninger}'' AS risiko_beregning,
 		    {Returperiode, antal år} AS retur_periode,
             ((0.219058829 * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN 
-			    h.{f_damage_present_q_recreative} ELSE 0 END +
+			    h.{f_damage_present_q_recreative_new} ELSE 0 END +
 			0.089925625 * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN
-			    h.{f_damage_future_q_recreative} ELSE 0 END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_recreative},
+			    h.{f_damage_future_q_recreative_new} ELSE 0 END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_recreative_new},
             '''' AS omraade
     ) r
     WHERE f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0
@@ -517,12 +508,11 @@ SET search_path = fdc_admin, public;
 --                *********
 
 DELETE FROM parametre WHERE parent = 'q_comp_build_new' OR name = 'q_comp_build_new' OR "default" = 'q_comp_build_new';
-DELETE FROM parametre WHERE parent = 'q_comp_build' OR name = 'q_comp_build' OR "default" = 'q_comp_build';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Industri, personale i bygninger', 'Industri', ' ', 'T', '', '', '', 'q_comp_build', 'Sæt hak såfremt modellen skal identificere de virksomheder som bliver berørt af den pågældende oversvømmelse, og angive antallet af medarbejdere per virksomhed.', 10, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_comp_build'              , 'q_comp_build', 'id'                       , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_comp_build'              , 'q_comp_build', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_comp_build', 'Queries', 
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Industri, personale i bygninger - ny model', 'Industri', ' ', 'T', '', '', '', 'q_comp_build_new', 'Sæt hak såfremt modellen skal identificere de virksomheder som bliver berørt af den pågældende oversvømmelse, og angive antallet af medarbejdere per virksomhed.', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_comp_build_new'              , 'q_comp_build_new', 'id'                       , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_comp_build_new'              , 'q_comp_build_new', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_comp_build_new', 'Queries', 
 '
 SELECT
     c.*,
@@ -574,12 +564,11 @@ SET search_path = fdc_admin, public;
 --                *********
 
 DELETE FROM parametre WHERE parent = 'q_bioscore_spatial_new' OR name = 'q_bioscore_spatial_new' OR "default" = 'q_bioscore_spatial_new';
-DELETE FROM parametre WHERE parent = 'q_bioscore_spatial' OR name = 'q_bioscore_spatial' OR "default" = 'q_bioscore_spatial';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Biodiversitet, kort', 'Biodiversitet', '', 'T', '', '', '', 'q_bioscore_spatial', 'Sæt hak såfremt modellen skal identificere særlige levesteder for rødlistede arter som bliver berørt i forbindelse med den pågældende oversvømmelseshændelse. Her vises levestederne geografisk på et kort.', 10, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_bioscore_spatial'              , 'q_bioscore_spatial', 'id'                       , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_bioscore_spatial'              , 'q_bioscore_spatial', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_bioscore_spatial', 'Queries', 
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Biodiversitet, kort - ny model', 'Biodiversitet', '', 'T', '', '', '', 'q_bioscore_spatial_new', 'Sæt hak såfremt modellen skal identificere særlige levesteder for rødlistede arter som bliver berørt i forbindelse med den pågældende oversvømmelseshændelse. Her vises levestederne geografisk på et kort.', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_bioscore_spatial_new'              , 'q_bioscore_spatial_new', 'id'                       , 'T', '', '', '', '', 'Name of primary keyfield for query', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_bioscore_spatial_new'              , 'q_bioscore_spatial_new', 'geom'                      , 'T', '', '', '', '', 'Field name for geometry column', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_bioscore_spatial_new', 'Queries', 
 '
 SELECT
     c.*,
@@ -626,19 +615,18 @@ SET search_path = fdc_admin, public;
 --                *********
 
 DELETE FROM parametre WHERE parent = 'q_road_traffic_new' OR name = 'q_road_traffic_new' OR "default" = 'q_road_traffic_new';
-DELETE FROM parametre WHERE parent = 'q_road_traffic' OR name = 'q_road_traffic' OR "default" = 'q_road_traffic';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_road_traffic', 'q_road_traffic', 'risiko_kr', 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_road_traffic', 'q_road_traffic', 'pris_total_nutid_kr', 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_road_traffic', 'q_road_traffic', 'pris_total_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_road_traffic', 'q_road_traffic', 'id', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_road_traffic', 'q_road_traffic', 'geom', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadeberegning, vej og trafik', 'Vej og trafik', '', 'T', '', '', '', 'q_road_traffic', 'Sæt hak såfremt der skal beregnes økonomiske tab for vej og trafik i forbindelse med den pågældende oversvømmelseshændelse.', 10, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_road_traffic_new', 'q_road_traffic_new', 'risiko_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_present_q_road_traffic_new', 'q_road_traffic_new', 'pris_total_nutid_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_damage_future_q_road_traffic_new', 'q_road_traffic_new', 'pris_total_fremtid_kr', 'T', '', '', '', '', '', 1, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_road_traffic_new', 'q_road_traffic_new', 'id', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_road_traffic_new', 'q_road_traffic_new', 'geom', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Skadeberegning, vej og trafik - ny model', 'Vej og trafik', '', 'T', '', '', '', 'q_road_traffic_new', 'Sæt hak såfremt der skal beregnes økonomiske tab for vej og trafik i forbindelse med den pågældende oversvømmelseshændelse.', 10, 'T');
 
 UPDATE parametre SET parent = 'Vej og trafik' WHERE name = 'Oversvømmelsesperiode (timer)';
 UPDATE parametre SET parent = 'Vej og trafik' WHERE name = 'Renovationspris pr meter vej (DKK)';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_road_traffic', 'Queries', 
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_road_traffic_new', 'Queries', 
 '
 SELECT 
     b.*,
@@ -685,14 +673,14 @@ SELECT
     ) i,
     LATERAL (
         SELECT
-		    h.skade_renovation_nutid_kr + i.skade_transport_nutid_kr AS {f_damage_present_q_road_traffic},
-		    h.skade_renovation_fremtid_kr + i.skade_transport_fremtid_kr AS {f_damage_future_q_road_traffic},
+		    h.skade_renovation_nutid_kr + i.skade_transport_nutid_kr AS {f_damage_present_q_road_traffic_new},
+		    h.skade_renovation_fremtid_kr + i.skade_transport_fremtid_kr AS {f_damage_future_q_road_traffic_new},
             ''{Medtag i risikoberegninger}'' AS risiko_beregning,
 		    {Returperiode, antal år} AS retur_periode,
             ((0.219058829 * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN 
 			    h.skade_renovation_nutid_kr + i.skade_transport_nutid_kr ELSE 0 END +
 			0.089925625 * CASE WHEN ''{Medtag i risikoberegninger}'' IN (''Skadebeløb'',''Skadebeløb og værditab'') THEN
-			    h.skade_renovation_fremtid_kr + i.skade_transport_fremtid_kr ELSE 0 END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_road_traffic},
+			    h.skade_renovation_fremtid_kr + i.skade_transport_fremtid_kr ELSE 0 END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_road_traffic_new},
             '''' AS omraade
     ) r
     WHERE f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0
@@ -714,14 +702,13 @@ SET search_path = fdc_admin, public;
 --                *********
 
 DELETE FROM parametre WHERE parent = 'q_surrounding_loss_new' OR name = 'q_surrounding_loss_new' OR "default" = 'q_surrounding_loss_new';
-DELETE FROM parametre WHERE parent = 'q_surrounding_loss' OR name = 'q_surrounding_loss' OR "default" = 'q_surrounding_loss';
 
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_surrounding_loss', 'q_surrounding_loss', 'objectid', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_surrounding_loss', 'q_surrounding_loss', 'geom', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_surrounding_loss', 'q_surrounding_loss', 'risiko_kr', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_future_q_surrounding_loss', 'q_surrounding_loss', 'vaerditab_fremtid_kr', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_present_q_surrounding_loss', 'q_surrounding_loss', 'vaerditab_nutid_kr', 'T', '', '', '', '', '', 10, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_surrounding_loss', 'Queries',
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_pkey_q_surrounding_loss_new', 'q_surrounding_loss_new', 'objectid', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_geom_q_surrounding_loss_new', 'q_surrounding_loss_new', 'geom', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_surrounding_loss_new', 'q_surrounding_loss_new', 'risiko_kr', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_future_q_surrounding_loss_new', 'q_surrounding_loss_new', 'vaerditab_fremtid_kr', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_loss_present_q_surrounding_loss_new', 'q_surrounding_loss_new', 'vaerditab_nutid_kr', 'T', '', '', '', '', '', 10, ' ');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_surrounding_loss_new', 'Queries',
 '
 WITH 
     of AS (SELECT b.{f_pkey_t_building}, b.{f_geom_t_building} FROM {t_building} b WHERE EXISTS ( SELECT 1 FROM {Oversvømmelsesmodel, fremtid} f WHERE st_intersects (f.{f_geom_Oversvømmelsesmodel, fremtid}, b.{f_geom_t_building}) AND  f.{f_depth_Oversvømmelsesmodel, fremtid} >= {Minimum vanddybde (meter)})),
@@ -732,8 +719,8 @@ SELECT
     st_area(x.{f_geom_t_building})::NUMERIC(12,2) AS areal_byg_m2,
     k.{f_sqmprice_t_sqmprice}::NUMERIC(12,2) AS kvm_pris_kr,
     ({Værditab, skaderamte bygninger (%)}*{Faktor for værditab})::NUMERIC(12,2) AS tab_procent,
-    CASE WHEN y.{f_pkey_t_building} IS NULL THEN 0.0 ELSE k.{f_sqmprice_t_sqmprice} * st_area(x.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}*{Faktor for værditab} / 100.0 END::NUMERIC(12,2) AS {f_loss_future_q_surrounding_loss},
-    CASE WHEN z.{f_pkey_t_building} IS NULL THEN 0.0 ELSE k.{f_sqmprice_t_sqmprice} * st_area(x.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}*{Faktor for værditab} / 100.0 END::NUMERIC(12,2) AS {f_loss_present_q_surrounding_loss},
+    CASE WHEN y.{f_pkey_t_building} IS NULL THEN 0.0 ELSE k.{f_sqmprice_t_sqmprice} * st_area(x.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}*{Faktor for værditab} / 100.0 END::NUMERIC(12,2) AS {f_loss_future_q_surrounding_loss_new},
+    CASE WHEN z.{f_pkey_t_building} IS NULL THEN 0.0 ELSE k.{f_sqmprice_t_sqmprice} * st_area(x.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}*{Faktor for værditab} / 100.0 END::NUMERIC(12,2) AS {f_loss_present_q_surrounding_loss_new},
     ''{Medtag i risikoberegninger}'' AS risiko_beregning,
     {Returperiode, antal år} AS retur_periode,
     ((
@@ -754,7 +741,7 @@ SELECT
 					ELSE k.{f_sqmprice_t_sqmprice} * st_area(x.{f_geom_t_building}) * {Værditab, skaderamte bygninger (%)}*{Faktor for værditab} / 100.0 
 				END
 	        ELSE 0 
-        END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_surrounding_loss},
+        END)/{Returperiode, antal år})::NUMERIC(12,2) AS {f_risk_q_surrounding_loss_new},
     '''' AS omraade
 FROM {t_building} x 
 LEFT JOIN (SELECT DISTINCT c.{f_pkey_t_building} FROM {t_building} c, of WHERE c.{f_pkey_t_building} NOT IN (SELECT {f_pkey_t_building} from of) and st_dwithin(of.{f_geom_t_building},c.{f_geom_t_building},300.)) y ON x.{f_pkey_t_building} = y.{f_pkey_t_building} 
@@ -762,7 +749,7 @@ LEFT JOIN (SELECT DISTINCT c.{f_pkey_t_building} FROM {t_building} c, op WHERE c
 LEFT JOIN {t_sqmprice} k ON k.kom_kode = x.komkode 
 WHERE y.{f_pkey_t_building} IS NOT NULL OR z.{f_pkey_t_building} IS NOT NULL
 ', 'P', '', '', '', '', 'SQL template for surrounding loss - new model ', 8, ' ');
-INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Værditab nabobygninger', 'Bygninger', '', 'T', '', '', '', 'q_surrounding_loss', '', 12, 'T');
+INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('Værditab nabobygninger - ny model', 'Bygninger', '', 'T', '', '', '', 'q_surrounding_loss_new', '', 12, 'T');
 
 UPDATE parametre SET parent = 'Bygninger', sort = 3 WHERE name = 'Bredde af nabozone (meter)';
 UPDATE parametre SET parent = 'Bygninger', sort = 4 WHERE name = 'Faktor for værditab';
