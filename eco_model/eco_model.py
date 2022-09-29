@@ -100,8 +100,8 @@ from .helper import (#tr,
                      isInt,
                      isFloat,
                      mapperExtent,
-                    findLayerVariableList,
-                    executeSQL)
+                     findLayerVariableList,
+                     executeSQL)
 
 from .eco_model_dockwidget import EcoModelDockWidget
 
@@ -931,7 +931,7 @@ class EcoModel:
 
                            
 
-        txt = 'SELECT {0} FROM {1} WHERE {2}=\'{3}\''.format( pvfield, ptable, pkfield, pkvalue)
+        txt = 'SELECT "{0}" FROM "{1}" WHERE "{2}"=\'{3}\''.format( pvfield, ptable, pkfield, pkvalue)
 
 #        query.exec(txt)
         query = executeSQL(txt) 
