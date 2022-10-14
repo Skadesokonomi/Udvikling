@@ -31,12 +31,6 @@ INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, 
 INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('f_risk_q_build_peri'                  , 'q_build_peri', 'risiko_kr'                     , 'T', '', '', '', '', '', 1, 'T');
 INSERT INTO parametre (name, parent, value, type, minval, maxval, lookupvalues, "default", explanation, sort, checkable) VALUES ('q_build_peri', 'Queries', 
 '
-WITH v AS (
-    SELECT 
-        ST_perimeter({f_geom_Oversvømmelsesmodel, nutid}) / 4.0 AS side_length_w
-    FROM {Oversvømmelsesmodel, nutid} OFFSET 100 LIMIT 1
-)    
-
 SELECT
     b.*,
     d.{f_category_t_damage} AS skade_kategori,
@@ -105,5 +99,5 @@ SELECT
     ) r
     WHERE f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0', 'P', '', '', '', '', 'SQL template for buildings new model ', 8, ' ');
 
--- Patch  2022-02-26: Model q_build_peri_new slut --
+--   Patch 2022-09-20: Model q_building_peri slut
 
