@@ -34,7 +34,7 @@ SELECT
     {Antal tabte døgn} AS tabte_dage,
     {Antal tabte døgn} * t.kapacitet AS tabte_overnatninger,
     st_force2d(b.{f_geom_t_building}) AS {f_geom_q_tourism_spatial},
-	v.*,
+    v.*,
     n.*,
     f.*,
     r.*
