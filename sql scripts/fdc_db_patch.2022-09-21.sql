@@ -1,6 +1,6 @@
 /* 
 -----------------------------------------------------------------------
---   Patch 2022-09-20: Model q_building_perimeter
+--   Patch 2022-09-21: Model q_building_perimeter 2
 -----------------------------------------------------------------------
 
      search_path skal værdisættes, således at navnet på administrations schema er første parameter. 
@@ -103,5 +103,5 @@ SELECT
     ) r
     WHERE f.cnt_oversvoem_fremtid > 0 OR n.cnt_oversvoem_nutid > 0', 'P', '', '', '', '', 'SQL template for buildings new model ', 8, ' ');
 
--- Patch  2022-02-26: Model q_build_peri2_new slut --
+-- Patch  2022-09-21: Model q_build_peri2_new slut --
 
