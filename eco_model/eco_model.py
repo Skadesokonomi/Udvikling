@@ -928,27 +928,23 @@ class EcoModel:
 
     def createParmDict(self, ptable, pkfield, pkvalue, pvfield):
 
-
-                           
-
-        txt = 'SELECT "{0}" FROM "{1}" WHERE "{2}"=\'{3}\''.format( pvfield, ptable, pkfield, pkvalue)
-
-#        query.exec(txt)
+        txt = 'SELECT "{0}" FROM {1} WHERE "{2}"=\'{3}\''.format( pvfield, ptable, pkfield, pkvalue)
         query = executeSQL(txt) 
+         
         if query:
             while query.next(): txt = query.value(0)
-                                
-
-
             txt = txt.format(parametertable=ptable)
 
             query = executeSQL(txt) 
             if query:
+                logI('createparmDict, sql udført')
                 pdict = {}    
                 while query.next():
                     ldict = {}
                     rec = query.record()
-                    for i in range(rec.count()-1): ldict[rec.fieldName(i)] = query.value(i)
+                    for i in range(rec.count()-1): 
+                        logI('createparmDict, value ' + str(rec.fieldName(i)) + ' = ' + str(query.value(i)))
+                        ldict[rec.fieldName(i)] = query.value(i)
                     pdict[query.value(pkfield)] = ldict
         
                 return pdict, [rec.fieldName(i) for i in range(rec.count()-1)]

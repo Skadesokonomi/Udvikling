@@ -156,6 +156,8 @@ def executeSQL(cmd, tab=None):
     global trClassName
     tab = tab or trClassName
 
+    logC('executeSQL - SQL to excute: '+ cmd,tab)            
+
     query = QSqlQuery()
     query.exec(cmd)    
     error = query.lastError().text()
