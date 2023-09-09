@@ -69,7 +69,9 @@ from qgis.core import (QgsProject,
                        QgsDataSourceUri,
                        QgsExpressionContextUtils,
                        QgsVectorLayer,
-                       QgsAbstractDatabaseProviderConnection)
+                       QgsAbstractDatabaseProviderConnection,
+                       QgsAuthMethodConfig,
+                       QgsApplication)
 
 from qgis.gui import QgsFileWidget, QgsCheckableComboBox
 
@@ -642,8 +644,9 @@ class EcoModel:
                 db.setHostName(uri.host())
                 db.setDatabaseName(uri.database())
                 db.setPort(int(uri.port()))
-                db.setUserName(uri.username())
-                db.setPassword(uri.password())
+                myname, mypass = self.get_postgres_conn_info(connectionName)
+                db.setUserName(myname)
+                db.setPassword(mypass)
 
             elif dbQtType ==  'QODBC':
 
@@ -653,7 +656,9 @@ class EcoModel:
 
                 db.setDatabaseName(uri.uri())    
 
-            db.open()
+            if not db.open():
+                logC('dbConnection2Db: Open error: {}'.format(db.lastError().databaseText()))
+                messC('Database open error: {}'.format(db.lastError().databaseText()))
 
         else:
  
@@ -662,6 +667,34 @@ class EcoModel:
 
         return uri    
 
+    def get_postgres_conn_info(self, selected):
+        """ Read PostgreSQL connection details from QSettings stored by QGIS
+        """
+        settings = QSettings()
+        settings.beginGroup(u"/PostgreSQL/connections/" + selected)
+        if not settings.contains("database"): # non-existent entry?
+            return {}
+    
+        conn_info = dict()
+        conn_info["host"] = settings.value("host", "", type=str)
+    
+        # password and username
+        username = ''
+        password = ''
+        authconf = settings.value('authcfg', '')
+        if authconf :
+            # password encrypted in AuthManager
+            auth_manager = QgsApplication.authManager()
+            conf = QgsAuthMethodConfig()
+            auth_manager.loadAuthenticationConfig(authconf, conf, True)
+            if conf.id():
+                username = conf.config('username', '')
+                password = conf.config('password', '')
+        else:
+            # basic (plain-text) settings
+            username = settings.value('username', '', type=str)
+            password = settings.value('password', '', type=str)
+        return username, password
 
     def pbParameterShowClicked(self):
 
