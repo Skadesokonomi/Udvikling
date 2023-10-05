@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/plugins/eco_model" >
-        <file>icon.png</file>
+        <file>skadesokonomi.png</file>
     </qresource>
 </RCC>
