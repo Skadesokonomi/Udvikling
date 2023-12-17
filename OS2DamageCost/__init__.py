@@ -32,5 +32,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .flood_damage_cost import FloodDamageCost
+    from .OS2DamageCost import FloodDamageCost
     return FloodDamageCost(iface)

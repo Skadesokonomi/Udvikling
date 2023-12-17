@@ -1,6 +1,6 @@
 {
     "Data": {
-        "Database": "postgres: xflood_damage_costs on localhost",
+        "Database": "",
         "Parametertable": "fdc_admin.parametre",
 		"Parameterkeyfield" : "name",
 		"Parametervaluefield" : "value",

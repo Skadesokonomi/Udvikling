@@ -105,7 +105,7 @@ from .helper import (#tr,
                      findLayerVariableList,
                      executeSQL)
 
-from .flood_damage_cost_dockwidget import FloodDamageCostDockWidget
+from .OS2DamageCost_dockwidget import FloodDamageCostDockWidget
 
 import os.path
 
@@ -133,7 +133,7 @@ class FloodDamageCost:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'flood_damage_cost_{}.qm'.format(locale))
+            'OS2DamageCost_{}.qm'.format(locale))
         logI(locale_path)
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -250,8 +250,8 @@ class FloodDamageCost:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/flood_damage_cost/skadesokonomi.png'
-#        icon_path = ':/plugins/flood_damage_cost/icon.png'
+        icon_path = ':/plugins/OS2DamageCost/skadesokonomi.png'
+#        icon_path = ':/plugins/OS2DamageCost/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Open OS2 Flood Damage Cost'),

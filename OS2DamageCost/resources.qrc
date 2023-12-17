@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/flood_damage_cost" >
+    <qresource prefix="/plugins/OS2DamageCost" >
         <file>skadesokonomi.png</file>
     </qresource>
 </RCC>

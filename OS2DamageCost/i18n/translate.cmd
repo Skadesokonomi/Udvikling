@@ -5,5 +5,5 @@ call "%qprogdir%\bin\o4w_env.bat"
 call "%qprogdir%\bin\qt5_env.bat"
 call "%qprogdir%\bin\py3_env.bat"
 @echo on
-"%qprogdir%\apps\Python39\Scripts\pylupdate5.exe" -noobsolete flood_damage_cost.pro
+"%qprogdir%\apps\Python39\Scripts\pylupdate5.exe" -noobsolete OS2DamageCost.pro
 pause
