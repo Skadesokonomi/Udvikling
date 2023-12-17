@@ -1,7 +1,7 @@
 Plugin Builder Results
 
 Your plugin EcoModel was created in:
-    D:/GitHub/climateecomodel\eco_model
+    D:/GitHub/climateecomodel\flood_damage_cost
 
 Your QGIS plugin directory is located at:
     C:/Users/Bo Victor Thomsen/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins
@@ -17,7 +17,7 @@ What's Next:
 
   * Test the plugin by enabling it in the QGIS plugin manager
 
-  * Customize it by editing the implementation file: ``eco_model.py``
+  * Customize it by editing the implementation file: ``flood_damage_cost.py``
 
   * Create your own custom icon, replacing the default icon.png
 

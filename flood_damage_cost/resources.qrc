@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/eco_model" >
+    <qresource prefix="/plugins/flood_damage_cost" >
         <file>skadesokonomi.png</file>
     </qresource>
 </RCC>

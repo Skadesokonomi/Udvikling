@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	eco_model.py eco_model_dockwidget.py
+	flood_damage_cost.py flood_damage_cost_dockwidget.py
 
-PLUGINNAME = eco_model
+PLUGINNAME = flood_damage_cost
 
 PY_FILES = \
 	__init__.py \
-	eco_model.py eco_model_dockwidget.py
+	flood_damage_cost.py flood_damage_cost_dockwidget.py
 
-UI_FILES = eco_model_dockwidget_base.ui
+UI_FILES = flood_damage_cost_dockwidget_base.ui
 
 EXTRAS = metadata.txt icon.png
 

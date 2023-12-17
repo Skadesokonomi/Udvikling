@@ -156,7 +156,7 @@ def executeSQL(cmd, tab=None):
     global trClassName
     tab = tab or trClassName
 
-    logC('executeSQL - SQL to excute: '+ cmd,tab)            
+    #logI('executeSQL - SQL to excute: '+ cmd,tab)            
 
     query = QSqlQuery()
     query.exec(cmd)    
@@ -562,7 +562,7 @@ def loadLayer(layer, dicto):
     """Converts an object dictionary to a list of features"""
     j = 0
     for fi in layer.fields():
-        # logI(' Field no: {} : {}'.format(j, fi.name()))
+        #logI(' Field no: {} : {}'.format(j, fi.name()))
         j += 1
 
     # Iterate object and create features
@@ -682,7 +682,7 @@ def addLayer2TreeV1(tree, layer, tb, vname=None, vvalue=None, style=None, tname=
         QgsProject.instance().addMapLayer(layer, False)
 
         if style:
-            logI('Style = {}'.format(style))
+            #logI('Style = {}'.format(style))
             layer.loadNamedStyle(style)
 
         if tname:
@@ -710,12 +710,12 @@ def copyLayer2Layer(lyr, udict, owrite):
             options['driverName'] = ext.replace('.','')
             options['layerName'] = udict['tname']
             uristr = udict['path']
-            logI('gpkg/spatialite: ' + uristr)
+            #logI('gpkg/spatialite: ' + uristr)
             err = QgsVectorLayerExporter.exportLayer(lyr, uristr, "ogr", lyr.crs(), False, options)
             uristr += '|layername={}'.format(udict['tname'])
         elif ext in ['.tab','.shp']:
             uristr = os.path.join(udict['path'],udict['tname']+ext)
-            logI('tab/shape: ' + uristr)
+            #logI('tab/shape: ' + uristr)
             options['driverName'] = 'MapInfo File' if ext == '.tab' else 'ESRI Shapefile'
             err = QgsVectorLayerExporter.exportLayer(lyr, uristr, "ogr", lyr.crs(), False, options)
 
@@ -728,7 +728,7 @@ def copyLayer2Layer(lyr, udict, owrite):
         #if udict['pkname'] != '': uri.setKeyColumn(udict['pkname'])
 
         uristr = uri.uri()
-        logI(uristr)
+        #logI(uristr)
 
         err = QgsVectorLayerExporter.exportLayer(lyr, uristr, contype, lyr.crs(), False, options)
 
@@ -737,7 +737,7 @@ def copyLayer2Layer(lyr, udict, owrite):
         logW('Import layer {} failed with error {}'.format(lyr.name(), err))
         return None
     else:
-        logI('Layer {} : {} : import ok'.format(lyr.name(),uristr))
+        #logI('Layer {} : {} : import ok'.format(lyr.name(),uristr))
         return QgsVectorLayer(uristr, lyr.name(),contype)
         
 

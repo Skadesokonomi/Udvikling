@@ -3,7 +3,7 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=Climate modeliing
+name=OS2 Damage Cost
 qgisMinimumVersion=3.0
 description=Plugin to model economic consequences of climate changes
 version=0.1
@@ -12,8 +12,8 @@ email=bvt@aestas.dk
 
 about=Plugin for calculating economic models regarding floods, rainfall and other events caused by climate changes
 
-tracker=https://github.com/bvthomsen/climateecomodel/issues
-repository=https://github.com/bvthomsen/climateecomodel
+tracker=https://github.com/Skadesokonomi/udvikling/issues
+repository=https://github.com/Skadesokonomi/udvikling
 # End of mandatory metadata
 
 # Recommended items:
@@ -25,11 +25,11 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python
 
-homepage=https://github.com/bvthomsen/climateecomodel
+homepage=https://github.com/Skadesokonomi/Installation
 category=Plugins
-icon=icon.png
+icon=skadesokonomi.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False

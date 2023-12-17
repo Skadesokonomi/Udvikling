@@ -16,7 +16,7 @@ import unittest
 
 from qgis.PyQt.QtGui import QDockWidget
 
-from eco_model_dockwidget import EcoModelDockWidget
+from flood_damage_cost_dockwidget import EcoModelDockWidget
 
 from utilities import get_qgis_app
 

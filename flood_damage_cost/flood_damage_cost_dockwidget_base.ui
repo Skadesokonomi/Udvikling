@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EcoModelDockWidgetBase</class>
- <widget class="QDockWidget" name="EcoModelDockWidgetBase">
+ <class>FloodDamageCostDockWidgetBase</class>
+ <widget class="QDockWidget" name="FloodDamageCostDockWidgetBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
-     <widget class="QTabWidget" name="twEcoModel">
+     <widget class="QTabWidget" name="twFloodDamageCost">
       <property name="currentIndex">
        <number>3</number>
       </property>
