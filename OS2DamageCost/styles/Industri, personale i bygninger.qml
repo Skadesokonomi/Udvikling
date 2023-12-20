@@ -1,528 +1,528 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis symbologyReferenceScale="-1" minScale="100000000" readOnly="0" simplifyDrawingTol="1" simplifyMaxScale="1" simplifyAlgorithm="0" simplifyDrawingHints="0" maxScale="0" version="3.32.1-Lima" styleCategories="AllStyleCategories" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" labelsEnabled="0">
+<qgis readOnly="0" simplifyDrawingHints="0" maxScale="0" symbologyReferenceScale="-1" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" version="3.32.3-Lima" labelsEnabled="0" simplifyAlgorithm="0" simplifyDrawingTol="1" simplifyLocal="1" simplifyMaxScale="1" minScale="100000000">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <temporal endExpression="" durationField="" startField="" limitMode="0" fixedDuration="0" mode="0" startExpression="" durationUnit="min" enabled="0" endField="" accumulate="0">
+  <temporal endExpression="" startExpression="" accumulate="0" enabled="0" limitMode="0" startField="" fixedDuration="0" mode="0" endField="" durationField="" durationUnit="min">
     <fixedRange>
       <start></start>
       <end></end>
     </fixedRange>
   </temporal>
-  <elevation symbology="Line" respectLayerSymbol="1" binding="Centroid" extrusion="0" zscale="1" zoffset="0" extrusionEnabled="0" clamping="Terrain" type="IndividualFeatures" showMarkerSymbolInSurfacePlots="0">
+  <elevation extrusionEnabled="0" type="IndividualFeatures" clamping="Terrain" zoffset="0" zscale="1" symbology="Line" extrusion="0" showMarkerSymbolInSurfacePlots="0" respectLayerSymbol="1" binding="Centroid">
     <data-defined-properties>
       <Option type="Map">
-        <Option name="name" value="" type="QString"/>
+        <Option type="QString" value="" name="name"/>
         <Option name="properties"/>
-        <Option name="type" value="collection" type="QString"/>
+        <Option type="QString" value="collection" name="type"/>
       </Option>
     </data-defined-properties>
     <profileLineSymbol>
-      <symbol alpha="1" force_rhr="0" name="" is_animated="0" clip_to_extent="1" frame_rate="10" type="line">
+      <symbol type="line" alpha="1" is_animated="0" frame_rate="10" name="" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleLine" locked="0" id="{9403a7fa-52bf-4706-80cd-76b3bb4f0d90}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleLine" pass="0" id="{9403a7fa-52bf-4706-80cd-76b3bb4f0d90}">
           <Option type="Map">
-            <Option name="align_dash_pattern" value="0" type="QString"/>
-            <Option name="capstyle" value="square" type="QString"/>
-            <Option name="customdash" value="5;2" type="QString"/>
-            <Option name="customdash_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="customdash_unit" value="MM" type="QString"/>
-            <Option name="dash_pattern_offset" value="0" type="QString"/>
-            <Option name="dash_pattern_offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="dash_pattern_offset_unit" value="MM" type="QString"/>
-            <Option name="draw_inside_polygon" value="0" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="line_color" value="225,89,137,255" type="QString"/>
-            <Option name="line_style" value="solid" type="QString"/>
-            <Option name="line_width" value="0.6" type="QString"/>
-            <Option name="line_width_unit" value="MM" type="QString"/>
-            <Option name="offset" value="0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="ring_filter" value="0" type="QString"/>
-            <Option name="trim_distance_end" value="0" type="QString"/>
-            <Option name="trim_distance_end_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="trim_distance_end_unit" value="MM" type="QString"/>
-            <Option name="trim_distance_start" value="0" type="QString"/>
-            <Option name="trim_distance_start_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="trim_distance_start_unit" value="MM" type="QString"/>
-            <Option name="tweak_dash_pattern_on_corners" value="0" type="QString"/>
-            <Option name="use_custom_dash" value="0" type="QString"/>
-            <Option name="width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
+            <Option type="QString" value="0" name="align_dash_pattern"/>
+            <Option type="QString" value="square" name="capstyle"/>
+            <Option type="QString" value="5;2" name="customdash"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="customdash_map_unit_scale"/>
+            <Option type="QString" value="MM" name="customdash_unit"/>
+            <Option type="QString" value="0" name="dash_pattern_offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="dash_pattern_offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="dash_pattern_offset_unit"/>
+            <Option type="QString" value="0" name="draw_inside_polygon"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="225,89,137,255" name="line_color"/>
+            <Option type="QString" value="solid" name="line_style"/>
+            <Option type="QString" value="0.6" name="line_width"/>
+            <Option type="QString" value="MM" name="line_width_unit"/>
+            <Option type="QString" value="0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0" name="ring_filter"/>
+            <Option type="QString" value="0" name="trim_distance_end"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="trim_distance_end_map_unit_scale"/>
+            <Option type="QString" value="MM" name="trim_distance_end_unit"/>
+            <Option type="QString" value="0" name="trim_distance_start"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="trim_distance_start_map_unit_scale"/>
+            <Option type="QString" value="MM" name="trim_distance_start_unit"/>
+            <Option type="QString" value="0" name="tweak_dash_pattern_on_corners"/>
+            <Option type="QString" value="0" name="use_custom_dash"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="width_map_unit_scale"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </profileLineSymbol>
     <profileFillSymbol>
-      <symbol alpha="1" force_rhr="0" name="" is_animated="0" clip_to_extent="1" frame_rate="10" type="fill">
+      <symbol type="fill" alpha="1" is_animated="0" frame_rate="10" name="" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleFill" locked="0" id="{35eadf91-814e-4044-9d96-10eded777b2e}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleFill" pass="0" id="{35eadf91-814e-4044-9d96-10eded777b2e}">
           <Option type="Map">
-            <Option name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="color" value="225,89,137,255" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="161,64,98,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0.2" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="style" value="solid" type="QString"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale"/>
+            <Option type="QString" value="225,89,137,255" name="color"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="161,64,98,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0.2" name="outline_width"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="solid" name="style"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </profileFillSymbol>
     <profileMarkerSymbol>
-      <symbol alpha="1" force_rhr="0" name="" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{82d019ad-ef27-44ed-89b4-33e26c575a5f}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{82d019ad-ef27-44ed-89b4-33e26c575a5f}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="225,89,137,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="diamond" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="161,64,98,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0.2" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="3" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="225,89,137,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="diamond" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="161,64,98,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0.2" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="3" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </profileMarkerSymbol>
   </elevation>
-  <renderer-v2 symbollevels="0" attr="aarsbes_ant" referencescale="-1" enableorderby="0" forceraster="0" graduatedMethod="GraduatedColor" type="graduatedSymbol">
+  <renderer-v2 type="graduatedSymbol" forceraster="0" attr="aarsbes_antalansatte" symbollevels="0" enableorderby="0" referencescale="-1" graduatedMethod="GraduatedColor">
     <ranges>
-      <range symbol="0" upper="5.000000000000000" render="true" label="&lt; 5 ansatte" lower="1.000000000000000"/>
-      <range symbol="1" upper="10.000000000000000" render="true" label="5 - 10 ansatte" lower="5.000000000000000"/>
-      <range symbol="2" upper="25.000000000000000" render="true" label="10 - 25 ansatte" lower="10.000000000000000"/>
-      <range symbol="3" upper="50.000000000000000" render="true" label="25 - 50 ansatte" lower="25.000000000000000"/>
-      <range symbol="4" upper="100.000000000000000" render="true" label="50 - 100 ansatte" lower="50.000000000000000"/>
-      <range symbol="5" upper="250.000000000000000" render="true" label="100 - 250 ansatte" lower="100.000000000000000"/>
-      <range symbol="6" upper="500.000000000000000" render="true" label="250 - 500 ansatte" lower="250.000000000000000"/>
-      <range symbol="7" upper="10000000.000000000000000" render="true" label="> 500 ansatte" lower="500.000000000000000"/>
+      <range lower="1.000000000000000" render="true" upper="5.000000000000000" symbol="0" label="&lt; 5 ansatte"/>
+      <range lower="5.000000000000000" render="true" upper="10.000000000000000" symbol="1" label="5 - 10 ansatte"/>
+      <range lower="10.000000000000000" render="true" upper="25.000000000000000" symbol="2" label="10 - 25 ansatte"/>
+      <range lower="25.000000000000000" render="true" upper="50.000000000000000" symbol="3" label="25 - 50 ansatte"/>
+      <range lower="50.000000000000000" render="true" upper="100.000000000000000" symbol="4" label="50 - 100 ansatte"/>
+      <range lower="100.000000000000000" render="true" upper="250.000000000000000" symbol="5" label="100 - 250 ansatte"/>
+      <range lower="250.000000000000000" render="true" upper="500.000000000000000" symbol="6" label="250 - 500 ansatte"/>
+      <range lower="500.000000000000000" render="true" upper="10000000.000000000000000" symbol="7" label="> 500 ansatte"/>
     </ranges>
     <symbols>
-      <symbol alpha="1" force_rhr="0" name="0" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="0" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="255,255,255,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="255,255,255,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol alpha="1" force_rhr="0" name="1" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="1" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="246,223,223,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="246,223,223,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol alpha="1" force_rhr="0" name="2" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="2" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="237,190,190,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="237,190,190,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol alpha="1" force_rhr="0" name="3" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="3" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="228,158,158,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="228,158,158,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol alpha="1" force_rhr="0" name="4" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="4" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="220,126,126,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="220,126,126,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol alpha="1" force_rhr="0" name="5" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="5" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="211,93,93,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="211,93,93,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol alpha="1" force_rhr="0" name="6" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="6" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="202,61,61,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="202,61,61,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol alpha="1" force_rhr="0" name="7" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="7" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="193,29,29,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="193,29,29,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </symbols>
     <source-symbol>
-      <symbol alpha="1" force_rhr="0" name="0" is_animated="0" clip_to_extent="1" frame_rate="10" type="marker">
+      <symbol type="marker" alpha="1" is_animated="0" frame_rate="10" name="0" clip_to_extent="1" force_rhr="0">
         <data_defined_properties>
           <Option type="Map">
-            <Option name="name" value="" type="QString"/>
+            <Option type="QString" value="" name="name"/>
             <Option name="properties"/>
-            <Option name="type" value="collection" type="QString"/>
+            <Option type="QString" value="collection" name="type"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleMarker" locked="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}" enabled="1" pass="0">
+        <layer locked="0" enabled="1" class="SimpleMarker" pass="0" id="{9fbb7583-1ca2-4b53-b373-2db944ae941d}">
           <Option type="Map">
-            <Option name="angle" value="0" type="QString"/>
-            <Option name="cap_style" value="square" type="QString"/>
-            <Option name="color" value="190,207,80,255" type="QString"/>
-            <Option name="horizontal_anchor_point" value="1" type="QString"/>
-            <Option name="joinstyle" value="bevel" type="QString"/>
-            <Option name="name" value="circle" type="QString"/>
-            <Option name="offset" value="0,0" type="QString"/>
-            <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="offset_unit" value="MM" type="QString"/>
-            <Option name="outline_color" value="0,0,0,255" type="QString"/>
-            <Option name="outline_style" value="solid" type="QString"/>
-            <Option name="outline_width" value="0" type="QString"/>
-            <Option name="outline_width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="outline_width_unit" value="MM" type="QString"/>
-            <Option name="scale_method" value="diameter" type="QString"/>
-            <Option name="size" value="2.6" type="QString"/>
-            <Option name="size_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-            <Option name="size_unit" value="MM" type="QString"/>
-            <Option name="vertical_anchor_point" value="1" type="QString"/>
+            <Option type="QString" value="0" name="angle"/>
+            <Option type="QString" value="square" name="cap_style"/>
+            <Option type="QString" value="190,207,80,255" name="color"/>
+            <Option type="QString" value="1" name="horizontal_anchor_point"/>
+            <Option type="QString" value="bevel" name="joinstyle"/>
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,0" name="offset"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+            <Option type="QString" value="MM" name="offset_unit"/>
+            <Option type="QString" value="0,0,0,255" name="outline_color"/>
+            <Option type="QString" value="solid" name="outline_style"/>
+            <Option type="QString" value="0" name="outline_width"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
+            <Option type="QString" value="MM" name="outline_width_unit"/>
+            <Option type="QString" value="diameter" name="scale_method"/>
+            <Option type="QString" value="2.6" name="size"/>
+            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
+            <Option type="QString" value="MM" name="size_unit"/>
+            <Option type="QString" value="1" name="vertical_anchor_point"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </source-symbol>
-    <colorramp name="[source]" type="gradient">
+    <colorramp type="gradient" name="[source]">
       <Option type="Map">
-        <Option name="color1" value="255,255,255,255" type="QString"/>
-        <Option name="color2" value="193,29,29,255" type="QString"/>
-        <Option name="direction" value="ccw" type="QString"/>
-        <Option name="discrete" value="0" type="QString"/>
-        <Option name="rampType" value="gradient" type="QString"/>
-        <Option name="spec" value="rgb" type="QString"/>
+        <Option type="QString" value="255,255,255,255" name="color1"/>
+        <Option type="QString" value="193,29,29,255" name="color2"/>
+        <Option type="QString" value="ccw" name="direction"/>
+        <Option type="QString" value="0" name="discrete"/>
+        <Option type="QString" value="gradient" name="rampType"/>
+        <Option type="QString" value="rgb" name="spec"/>
       </Option>
     </colorramp>
     <classificationMethod id="Jenks">
-      <symmetricMode astride="0" symmetrypoint="0" enabled="0"/>
-      <labelFormat format="%1 - %2" labelprecision="1" trimtrailingzeroes="1"/>
+      <symmetricMode enabled="0" astride="0" symmetrypoint="0"/>
+      <labelFormat trimtrailingzeroes="0" labelprecision="1" format="%1 - %2"/>
       <parameters>
         <Option/>
       </parameters>
@@ -533,65 +533,69 @@
   </renderer-v2>
   <customproperties>
     <Option type="Map">
-      <Option name="embeddedWidgets/count" value="0" type="int"/>
-      <Option name="variableNames" type="StringList">
-        <Option value="eco_resultlayer" type="QString"/>
+      <Option type="List" name="dualview/previewExpressions">
+        <Option type="QString" value="&quot;navn&quot;"/>
       </Option>
-      <Option name="variableValues" type="StringList">
-        <Option value="q_comp_build" type="QString"/>
+      <Option type="int" value="0" name="embeddedWidgets/count"/>
+      <Option type="StringList" name="variableNames">
+        <Option type="QString" value="eco_resultlayer"/>
+      </Option>
+      <Option type="StringList" name="variableValues">
+        <Option type="QString" value="q_comp_build"/>
       </Option>
     </Option>
   </customproperties>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerOpacity>1</layerOpacity>
-  <SingleCategoryDiagramRenderer attributeLegend="1" diagramType="Histogram">
-    <DiagramCategory scaleDependency="Area" lineSizeScale="3x:0,0,0,0,0,0" diagramOrientation="Up" showAxis="1" opacity="1" rotationOffset="270" enabled="0" penWidth="0" spacingUnit="MM" maxScaleDenominator="1e+08" barWidth="5" penColor="#000000" sizeType="MM" backgroundColor="#ffffff" penAlpha="255" minimumSize="0" width="15" scaleBasedVisibility="0" backgroundAlpha="255" spacingUnitScale="3x:0,0,0,0,0,0" lineSizeType="MM" direction="0" height="15" spacing="5" sizeScale="3x:0,0,0,0,0,0" minScaleDenominator="0" labelPlacementMethod="XHeight">
-      <fontProperties italic="0" bold="0" style="" strikethrough="0" underline="0" description="MS Shell Dlg 2,8.3,-1,5,50,0,0,0,0,0"/>
+  <SingleCategoryDiagramRenderer diagramType="Histogram" attributeLegend="1">
+    <DiagramCategory backgroundColor="#ffffff" scaleDependency="Area" enabled="0" penWidth="0" minimumSize="0" showAxis="1" spacingUnitScale="3x:0,0,0,0,0,0" labelPlacementMethod="XHeight" sizeType="MM" maxScaleDenominator="1e+08" backgroundAlpha="255" opacity="1" minScaleDenominator="0" direction="0" spacing="5" barWidth="5" spacingUnit="MM" sizeScale="3x:0,0,0,0,0,0" rotationOffset="270" penAlpha="255" lineSizeScale="3x:0,0,0,0,0,0" height="15" scaleBasedVisibility="0" lineSizeType="MM" diagramOrientation="Up" penColor="#000000" width="15">
+      <fontProperties italic="0" strikethrough="0" style="" bold="0" description="MS Shell Dlg 2,8.3,-1,5,50,0,0,0,0,0" underline="0"/>
+      <attribute color="#000000" field="" colorOpacity="1" label=""/>
       <axisSymbol>
-        <symbol alpha="1" force_rhr="0" name="" is_animated="0" clip_to_extent="1" frame_rate="10" type="line">
+        <symbol type="line" alpha="1" is_animated="0" frame_rate="10" name="" clip_to_extent="1" force_rhr="0">
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
-          <layer class="SimpleLine" locked="0" id="{23f6a03d-75d3-45ca-8105-5f4b6bce41ee}" enabled="1" pass="0">
+          <layer locked="0" enabled="1" class="SimpleLine" pass="0" id="{23f6a03d-75d3-45ca-8105-5f4b6bce41ee}">
             <Option type="Map">
-              <Option name="align_dash_pattern" value="0" type="QString"/>
-              <Option name="capstyle" value="square" type="QString"/>
-              <Option name="customdash" value="5;2" type="QString"/>
-              <Option name="customdash_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-              <Option name="customdash_unit" value="MM" type="QString"/>
-              <Option name="dash_pattern_offset" value="0" type="QString"/>
-              <Option name="dash_pattern_offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-              <Option name="dash_pattern_offset_unit" value="MM" type="QString"/>
-              <Option name="draw_inside_polygon" value="0" type="QString"/>
-              <Option name="joinstyle" value="bevel" type="QString"/>
-              <Option name="line_color" value="35,35,35,255" type="QString"/>
-              <Option name="line_style" value="solid" type="QString"/>
-              <Option name="line_width" value="0.26" type="QString"/>
-              <Option name="line_width_unit" value="MM" type="QString"/>
-              <Option name="offset" value="0" type="QString"/>
-              <Option name="offset_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-              <Option name="offset_unit" value="MM" type="QString"/>
-              <Option name="ring_filter" value="0" type="QString"/>
-              <Option name="trim_distance_end" value="0" type="QString"/>
-              <Option name="trim_distance_end_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-              <Option name="trim_distance_end_unit" value="MM" type="QString"/>
-              <Option name="trim_distance_start" value="0" type="QString"/>
-              <Option name="trim_distance_start_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
-              <Option name="trim_distance_start_unit" value="MM" type="QString"/>
-              <Option name="tweak_dash_pattern_on_corners" value="0" type="QString"/>
-              <Option name="use_custom_dash" value="0" type="QString"/>
-              <Option name="width_map_unit_scale" value="3x:0,0,0,0,0,0" type="QString"/>
+              <Option type="QString" value="0" name="align_dash_pattern"/>
+              <Option type="QString" value="square" name="capstyle"/>
+              <Option type="QString" value="5;2" name="customdash"/>
+              <Option type="QString" value="3x:0,0,0,0,0,0" name="customdash_map_unit_scale"/>
+              <Option type="QString" value="MM" name="customdash_unit"/>
+              <Option type="QString" value="0" name="dash_pattern_offset"/>
+              <Option type="QString" value="3x:0,0,0,0,0,0" name="dash_pattern_offset_map_unit_scale"/>
+              <Option type="QString" value="MM" name="dash_pattern_offset_unit"/>
+              <Option type="QString" value="0" name="draw_inside_polygon"/>
+              <Option type="QString" value="bevel" name="joinstyle"/>
+              <Option type="QString" value="35,35,35,255" name="line_color"/>
+              <Option type="QString" value="solid" name="line_style"/>
+              <Option type="QString" value="0.26" name="line_width"/>
+              <Option type="QString" value="MM" name="line_width_unit"/>
+              <Option type="QString" value="0" name="offset"/>
+              <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
+              <Option type="QString" value="MM" name="offset_unit"/>
+              <Option type="QString" value="0" name="ring_filter"/>
+              <Option type="QString" value="0" name="trim_distance_end"/>
+              <Option type="QString" value="3x:0,0,0,0,0,0" name="trim_distance_end_map_unit_scale"/>
+              <Option type="QString" value="MM" name="trim_distance_end_unit"/>
+              <Option type="QString" value="0" name="trim_distance_start"/>
+              <Option type="QString" value="3x:0,0,0,0,0,0" name="trim_distance_start_map_unit_scale"/>
+              <Option type="QString" value="MM" name="trim_distance_start_unit"/>
+              <Option type="QString" value="0" name="tweak_dash_pattern_on_corners"/>
+              <Option type="QString" value="0" name="use_custom_dash"/>
+              <Option type="QString" value="3x:0,0,0,0,0,0" name="width_map_unit_scale"/>
             </Option>
             <data_defined_properties>
               <Option type="Map">
-                <Option name="name" value="" type="QString"/>
+                <Option type="QString" value="" name="name"/>
                 <Option name="properties"/>
-                <Option name="type" value="collection" type="QString"/>
+                <Option type="QString" value="collection" name="type"/>
               </Option>
             </data_defined_properties>
           </layer>
@@ -599,58 +603,30 @@
       </axisSymbol>
     </DiagramCategory>
   </SingleCategoryDiagramRenderer>
-  <DiagramLayerSettings dist="0" obstacle="0" placement="0" priority="0" zIndex="0" linePlacementFlags="18" showAll="1">
+  <DiagramLayerSettings placement="0" dist="0" linePlacementFlags="18" zIndex="0" priority="0" obstacle="0" showAll="1">
     <properties>
       <Option type="Map">
-        <Option name="name" value="" type="QString"/>
+        <Option type="QString" value="" name="name"/>
         <Option name="properties"/>
-        <Option name="type" value="collection" type="QString"/>
+        <Option type="QString" value="collection" name="type"/>
       </Option>
     </properties>
   </DiagramLayerSettings>
-  <geometryOptions geometryPrecision="0" removeDuplicateNodes="0">
+  <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
     <activeChecks/>
     <checkConfiguration/>
   </geometryOptions>
-  <legend showLabelLegend="0" type="default-vector"/>
+  <legend type="default-vector" showLabelLegend="0"/>
   <referencedLayers/>
   <fieldConfiguration>
-    <field configurationFlags="None" name="objectid">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="kommunenummer">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="p_nr">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="cvr_nr">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="navn">
+    <field configurationFlags="None" name="fid">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="branchekode">
+    <field configurationFlags="None" name="cvr">
       <editWidget type="Range">
         <config>
           <Option/>
@@ -664,112 +640,91 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="bibranchekode_1">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="bibranche_1">
+    <field configurationFlags="None" name="brancheTxt">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="bibranchekode_2">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="bibranche_2">
+    <field configurationFlags="None" name="navn">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="bibranchekode_3">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="bibranche_3">
+    <field configurationFlags="None" name="antal_interval">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="aarsbesk_aar">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="aarsbesk_antalansatteinterval">
+    <field configurationFlags="None" name="antal_raa">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="aarsbes_ant">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="kvarbesk_aar">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="kvarbesk_kvartal">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="kvarbesk_antalansatteinterval">
+    <field configurationFlags="None" name="vejnavn">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="kvarbesk_antalansatte">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="hovedafdelingkode">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field configurationFlags="None" name="hovedafdeling">
+    <field configurationFlags="None" name="husnummer">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="antalansvarligdeltager">
+    <field configurationFlags="None" name="etage">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="postnummer">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="postdistrikt">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="X">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="Y">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="aarsbes_antalansatte">
+      <editWidget type="Range">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field configurationFlags="None" name="p_nr_fiktiv">
       <editWidget type="Range">
         <config>
           <Option/>
@@ -876,68 +831,54 @@
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias index="0" name="" field="objectid"/>
-    <alias index="1" name="" field="kommunenummer"/>
-    <alias index="2" name="" field="p_nr"/>
-    <alias index="3" name="" field="cvr_nr"/>
-    <alias index="4" name="" field="navn"/>
-    <alias index="5" name="" field="branchekode"/>
-    <alias index="6" name="" field="branche"/>
-    <alias index="7" name="" field="bibranchekode_1"/>
-    <alias index="8" name="" field="bibranche_1"/>
-    <alias index="9" name="" field="bibranchekode_2"/>
-    <alias index="10" name="" field="bibranche_2"/>
-    <alias index="11" name="" field="bibranchekode_3"/>
-    <alias index="12" name="" field="bibranche_3"/>
-    <alias index="13" name="" field="aarsbesk_aar"/>
-    <alias index="14" name="" field="aarsbesk_antalansatteinterval"/>
-    <alias index="15" name="" field="aarsbes_ant"/>
-    <alias index="16" name="" field="kvarbesk_aar"/>
-    <alias index="17" name="" field="kvarbesk_kvartal"/>
-    <alias index="18" name="" field="kvarbesk_antalansatteinterval"/>
-    <alias index="19" name="" field="kvarbesk_antalansatte"/>
-    <alias index="20" name="" field="hovedafdelingkode"/>
-    <alias index="21" name="" field="hovedafdeling"/>
-    <alias index="22" name="" field="antalansvarligdeltager"/>
-    <alias index="23" name="" field="byg_id"/>
-    <alias index="24" name="" field="kom_kode"/>
-    <alias index="25" name="" field="bbr_anv_kode"/>
-    <alias index="26" name="" field="bbr_anv_tekst"/>
-    <alias index="27" name="" field="cnt_oversvoem_nutid"/>
-    <alias index="28" name="" field="min_vanddybde_nutid_cm"/>
-    <alias index="29" name="" field="max_vanddybde_nutid_cm"/>
-    <alias index="30" name="" field="avg_vanddybde_nutid_cm"/>
-    <alias index="31" name="" field="cnt_oversvoem_fremtid"/>
-    <alias index="32" name="" field="min_vanddybde_fremtid_cm"/>
-    <alias index="33" name="" field="max_vanddybde_fremtid_cm"/>
-    <alias index="34" name="" field="avg_vanddybde_fremtid_cm"/>
-    <alias index="35" name="" field="retur_periode"/>
-    <alias index="36" name="" field="omraade"/>
+    <alias field="fid" index="0" name=""/>
+    <alias field="cvr" index="1" name=""/>
+    <alias field="branche" index="2" name=""/>
+    <alias field="brancheTxt" index="3" name=""/>
+    <alias field="navn" index="4" name=""/>
+    <alias field="antal_interval" index="5" name=""/>
+    <alias field="antal_raa" index="6" name=""/>
+    <alias field="vejnavn" index="7" name=""/>
+    <alias field="husnummer" index="8" name=""/>
+    <alias field="etage" index="9" name=""/>
+    <alias field="postnummer" index="10" name=""/>
+    <alias field="postdistrikt" index="11" name=""/>
+    <alias field="X" index="12" name=""/>
+    <alias field="Y" index="13" name=""/>
+    <alias field="aarsbes_antalansatte" index="14" name=""/>
+    <alias field="p_nr_fiktiv" index="15" name=""/>
+    <alias field="byg_id" index="16" name=""/>
+    <alias field="kom_kode" index="17" name=""/>
+    <alias field="bbr_anv_kode" index="18" name=""/>
+    <alias field="bbr_anv_tekst" index="19" name=""/>
+    <alias field="cnt_oversvoem_nutid" index="20" name=""/>
+    <alias field="min_vanddybde_nutid_cm" index="21" name=""/>
+    <alias field="max_vanddybde_nutid_cm" index="22" name=""/>
+    <alias field="avg_vanddybde_nutid_cm" index="23" name=""/>
+    <alias field="cnt_oversvoem_fremtid" index="24" name=""/>
+    <alias field="min_vanddybde_fremtid_cm" index="25" name=""/>
+    <alias field="max_vanddybde_fremtid_cm" index="26" name=""/>
+    <alias field="avg_vanddybde_fremtid_cm" index="27" name=""/>
+    <alias field="retur_periode" index="28" name=""/>
+    <alias field="omraade" index="29" name=""/>
   </aliases>
   <splitPolicies>
-    <policy policy="Duplicate" field="objectid"/>
-    <policy policy="Duplicate" field="kommunenummer"/>
-    <policy policy="Duplicate" field="p_nr"/>
-    <policy policy="Duplicate" field="cvr_nr"/>
-    <policy policy="Duplicate" field="navn"/>
-    <policy policy="Duplicate" field="branchekode"/>
+    <policy policy="Duplicate" field="fid"/>
+    <policy policy="Duplicate" field="cvr"/>
     <policy policy="Duplicate" field="branche"/>
-    <policy policy="Duplicate" field="bibranchekode_1"/>
-    <policy policy="Duplicate" field="bibranche_1"/>
-    <policy policy="Duplicate" field="bibranchekode_2"/>
-    <policy policy="Duplicate" field="bibranche_2"/>
-    <policy policy="Duplicate" field="bibranchekode_3"/>
-    <policy policy="Duplicate" field="bibranche_3"/>
-    <policy policy="Duplicate" field="aarsbesk_aar"/>
-    <policy policy="Duplicate" field="aarsbesk_antalansatteinterval"/>
-    <policy policy="Duplicate" field="aarsbes_ant"/>
-    <policy policy="Duplicate" field="kvarbesk_aar"/>
-    <policy policy="Duplicate" field="kvarbesk_kvartal"/>
-    <policy policy="Duplicate" field="kvarbesk_antalansatteinterval"/>
-    <policy policy="Duplicate" field="kvarbesk_antalansatte"/>
-    <policy policy="Duplicate" field="hovedafdelingkode"/>
-    <policy policy="Duplicate" field="hovedafdeling"/>
-    <policy policy="Duplicate" field="antalansvarligdeltager"/>
+    <policy policy="Duplicate" field="brancheTxt"/>
+    <policy policy="Duplicate" field="navn"/>
+    <policy policy="Duplicate" field="antal_interval"/>
+    <policy policy="Duplicate" field="antal_raa"/>
+    <policy policy="Duplicate" field="vejnavn"/>
+    <policy policy="Duplicate" field="husnummer"/>
+    <policy policy="Duplicate" field="etage"/>
+    <policy policy="Duplicate" field="postnummer"/>
+    <policy policy="Duplicate" field="postdistrikt"/>
+    <policy policy="Duplicate" field="X"/>
+    <policy policy="Duplicate" field="Y"/>
+    <policy policy="Duplicate" field="aarsbes_antalansatte"/>
+    <policy policy="Duplicate" field="p_nr_fiktiv"/>
     <policy policy="Duplicate" field="byg_id"/>
     <policy policy="Duplicate" field="kom_kode"/>
     <policy policy="Duplicate" field="bbr_anv_kode"/>
@@ -954,29 +895,22 @@
     <policy policy="Duplicate" field="omraade"/>
   </splitPolicies>
   <defaults>
-    <default applyOnUpdate="0" expression="" field="objectid"/>
-    <default applyOnUpdate="0" expression="" field="kommunenummer"/>
-    <default applyOnUpdate="0" expression="" field="p_nr"/>
-    <default applyOnUpdate="0" expression="" field="cvr_nr"/>
-    <default applyOnUpdate="0" expression="" field="navn"/>
-    <default applyOnUpdate="0" expression="" field="branchekode"/>
+    <default applyOnUpdate="0" expression="" field="fid"/>
+    <default applyOnUpdate="0" expression="" field="cvr"/>
     <default applyOnUpdate="0" expression="" field="branche"/>
-    <default applyOnUpdate="0" expression="" field="bibranchekode_1"/>
-    <default applyOnUpdate="0" expression="" field="bibranche_1"/>
-    <default applyOnUpdate="0" expression="" field="bibranchekode_2"/>
-    <default applyOnUpdate="0" expression="" field="bibranche_2"/>
-    <default applyOnUpdate="0" expression="" field="bibranchekode_3"/>
-    <default applyOnUpdate="0" expression="" field="bibranche_3"/>
-    <default applyOnUpdate="0" expression="" field="aarsbesk_aar"/>
-    <default applyOnUpdate="0" expression="" field="aarsbesk_antalansatteinterval"/>
-    <default applyOnUpdate="0" expression="" field="aarsbes_ant"/>
-    <default applyOnUpdate="0" expression="" field="kvarbesk_aar"/>
-    <default applyOnUpdate="0" expression="" field="kvarbesk_kvartal"/>
-    <default applyOnUpdate="0" expression="" field="kvarbesk_antalansatteinterval"/>
-    <default applyOnUpdate="0" expression="" field="kvarbesk_antalansatte"/>
-    <default applyOnUpdate="0" expression="" field="hovedafdelingkode"/>
-    <default applyOnUpdate="0" expression="" field="hovedafdeling"/>
-    <default applyOnUpdate="0" expression="" field="antalansvarligdeltager"/>
+    <default applyOnUpdate="0" expression="" field="brancheTxt"/>
+    <default applyOnUpdate="0" expression="" field="navn"/>
+    <default applyOnUpdate="0" expression="" field="antal_interval"/>
+    <default applyOnUpdate="0" expression="" field="antal_raa"/>
+    <default applyOnUpdate="0" expression="" field="vejnavn"/>
+    <default applyOnUpdate="0" expression="" field="husnummer"/>
+    <default applyOnUpdate="0" expression="" field="etage"/>
+    <default applyOnUpdate="0" expression="" field="postnummer"/>
+    <default applyOnUpdate="0" expression="" field="postdistrikt"/>
+    <default applyOnUpdate="0" expression="" field="X"/>
+    <default applyOnUpdate="0" expression="" field="Y"/>
+    <default applyOnUpdate="0" expression="" field="aarsbes_antalansatte"/>
+    <default applyOnUpdate="0" expression="" field="p_nr_fiktiv"/>
     <default applyOnUpdate="0" expression="" field="byg_id"/>
     <default applyOnUpdate="0" expression="" field="kom_kode"/>
     <default applyOnUpdate="0" expression="" field="bbr_anv_kode"/>
@@ -993,127 +927,106 @@
     <default applyOnUpdate="0" expression="" field="omraade"/>
   </defaults>
   <constraints>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="objectid"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="kommunenummer"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="p_nr"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="cvr_nr"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="navn"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="branchekode"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="branche"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="bibranchekode_1"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="bibranche_1"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="bibranchekode_2"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="bibranche_2"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="bibranchekode_3"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="bibranche_3"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="aarsbesk_aar"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="aarsbesk_antalansatteinterval"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="aarsbes_ant"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="kvarbesk_aar"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="kvarbesk_kvartal"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="kvarbesk_antalansatteinterval"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="kvarbesk_antalansatte"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="hovedafdelingkode"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="hovedafdeling"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="antalansvarligdeltager"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="byg_id"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="kom_kode"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="bbr_anv_kode"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="bbr_anv_tekst"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="cnt_oversvoem_nutid"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="min_vanddybde_nutid_cm"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="max_vanddybde_nutid_cm"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="avg_vanddybde_nutid_cm"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="cnt_oversvoem_fremtid"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="min_vanddybde_fremtid_cm"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="max_vanddybde_fremtid_cm"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="avg_vanddybde_fremtid_cm"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="retur_periode"/>
-    <constraint constraints="0" notnull_strength="0" unique_strength="0" exp_strength="0" field="omraade"/>
+    <constraint constraints="3" exp_strength="0" unique_strength="1" field="fid" notnull_strength="1"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="cvr" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="branche" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="brancheTxt" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="navn" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="antal_interval" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="antal_raa" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="vejnavn" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="husnummer" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="etage" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="postnummer" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="postdistrikt" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="X" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="Y" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="aarsbes_antalansatte" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="p_nr_fiktiv" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="byg_id" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="kom_kode" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="bbr_anv_kode" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="bbr_anv_tekst" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="cnt_oversvoem_nutid" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="min_vanddybde_nutid_cm" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="max_vanddybde_nutid_cm" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="avg_vanddybde_nutid_cm" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="cnt_oversvoem_fremtid" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="min_vanddybde_fremtid_cm" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="max_vanddybde_fremtid_cm" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="avg_vanddybde_fremtid_cm" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="retur_periode" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" unique_strength="0" field="omraade" notnull_strength="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint exp="" desc="" field="objectid"/>
-    <constraint exp="" desc="" field="kommunenummer"/>
-    <constraint exp="" desc="" field="p_nr"/>
-    <constraint exp="" desc="" field="cvr_nr"/>
-    <constraint exp="" desc="" field="navn"/>
-    <constraint exp="" desc="" field="branchekode"/>
-    <constraint exp="" desc="" field="branche"/>
-    <constraint exp="" desc="" field="bibranchekode_1"/>
-    <constraint exp="" desc="" field="bibranche_1"/>
-    <constraint exp="" desc="" field="bibranchekode_2"/>
-    <constraint exp="" desc="" field="bibranche_2"/>
-    <constraint exp="" desc="" field="bibranchekode_3"/>
-    <constraint exp="" desc="" field="bibranche_3"/>
-    <constraint exp="" desc="" field="aarsbesk_aar"/>
-    <constraint exp="" desc="" field="aarsbesk_antalansatteinterval"/>
-    <constraint exp="" desc="" field="aarsbes_ant"/>
-    <constraint exp="" desc="" field="kvarbesk_aar"/>
-    <constraint exp="" desc="" field="kvarbesk_kvartal"/>
-    <constraint exp="" desc="" field="kvarbesk_antalansatteinterval"/>
-    <constraint exp="" desc="" field="kvarbesk_antalansatte"/>
-    <constraint exp="" desc="" field="hovedafdelingkode"/>
-    <constraint exp="" desc="" field="hovedafdeling"/>
-    <constraint exp="" desc="" field="antalansvarligdeltager"/>
-    <constraint exp="" desc="" field="byg_id"/>
-    <constraint exp="" desc="" field="kom_kode"/>
-    <constraint exp="" desc="" field="bbr_anv_kode"/>
-    <constraint exp="" desc="" field="bbr_anv_tekst"/>
-    <constraint exp="" desc="" field="cnt_oversvoem_nutid"/>
-    <constraint exp="" desc="" field="min_vanddybde_nutid_cm"/>
-    <constraint exp="" desc="" field="max_vanddybde_nutid_cm"/>
-    <constraint exp="" desc="" field="avg_vanddybde_nutid_cm"/>
-    <constraint exp="" desc="" field="cnt_oversvoem_fremtid"/>
-    <constraint exp="" desc="" field="min_vanddybde_fremtid_cm"/>
-    <constraint exp="" desc="" field="max_vanddybde_fremtid_cm"/>
-    <constraint exp="" desc="" field="avg_vanddybde_fremtid_cm"/>
-    <constraint exp="" desc="" field="retur_periode"/>
-    <constraint exp="" desc="" field="omraade"/>
+    <constraint desc="" field="fid" exp=""/>
+    <constraint desc="" field="cvr" exp=""/>
+    <constraint desc="" field="branche" exp=""/>
+    <constraint desc="" field="brancheTxt" exp=""/>
+    <constraint desc="" field="navn" exp=""/>
+    <constraint desc="" field="antal_interval" exp=""/>
+    <constraint desc="" field="antal_raa" exp=""/>
+    <constraint desc="" field="vejnavn" exp=""/>
+    <constraint desc="" field="husnummer" exp=""/>
+    <constraint desc="" field="etage" exp=""/>
+    <constraint desc="" field="postnummer" exp=""/>
+    <constraint desc="" field="postdistrikt" exp=""/>
+    <constraint desc="" field="X" exp=""/>
+    <constraint desc="" field="Y" exp=""/>
+    <constraint desc="" field="aarsbes_antalansatte" exp=""/>
+    <constraint desc="" field="p_nr_fiktiv" exp=""/>
+    <constraint desc="" field="byg_id" exp=""/>
+    <constraint desc="" field="kom_kode" exp=""/>
+    <constraint desc="" field="bbr_anv_kode" exp=""/>
+    <constraint desc="" field="bbr_anv_tekst" exp=""/>
+    <constraint desc="" field="cnt_oversvoem_nutid" exp=""/>
+    <constraint desc="" field="min_vanddybde_nutid_cm" exp=""/>
+    <constraint desc="" field="max_vanddybde_nutid_cm" exp=""/>
+    <constraint desc="" field="avg_vanddybde_nutid_cm" exp=""/>
+    <constraint desc="" field="cnt_oversvoem_fremtid" exp=""/>
+    <constraint desc="" field="min_vanddybde_fremtid_cm" exp=""/>
+    <constraint desc="" field="max_vanddybde_fremtid_cm" exp=""/>
+    <constraint desc="" field="avg_vanddybde_fremtid_cm" exp=""/>
+    <constraint desc="" field="retur_periode" exp=""/>
+    <constraint desc="" field="omraade" exp=""/>
   </constraintExpressions>
   <expressionfields/>
   <attributeactions>
     <defaultAction key="Canvas" value="{00000000-0000-0000-0000-000000000000}"/>
   </attributeactions>
-  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
+  <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="&quot;aarsbes_antalansatte&quot;">
     <columns>
-      <column hidden="0" name="objectid" width="-1" type="field"/>
-      <column hidden="0" name="kommunenummer" width="-1" type="field"/>
-      <column hidden="0" name="p_nr" width="-1" type="field"/>
-      <column hidden="0" name="cvr_nr" width="-1" type="field"/>
-      <column hidden="0" name="navn" width="-1" type="field"/>
-      <column hidden="0" name="branchekode" width="-1" type="field"/>
-      <column hidden="0" name="branche" width="-1" type="field"/>
-      <column hidden="0" name="bibranchekode_1" width="-1" type="field"/>
-      <column hidden="0" name="bibranche_1" width="-1" type="field"/>
-      <column hidden="0" name="bibranchekode_2" width="-1" type="field"/>
-      <column hidden="0" name="bibranche_2" width="-1" type="field"/>
-      <column hidden="0" name="bibranchekode_3" width="-1" type="field"/>
-      <column hidden="0" name="bibranche_3" width="-1" type="field"/>
-      <column hidden="0" name="aarsbesk_aar" width="-1" type="field"/>
-      <column hidden="0" name="aarsbesk_antalansatteinterval" width="-1" type="field"/>
-      <column hidden="0" name="aarsbes_ant" width="-1" type="field"/>
-      <column hidden="0" name="kvarbesk_aar" width="-1" type="field"/>
-      <column hidden="0" name="kvarbesk_kvartal" width="-1" type="field"/>
-      <column hidden="0" name="kvarbesk_antalansatteinterval" width="-1" type="field"/>
-      <column hidden="0" name="kvarbesk_antalansatte" width="-1" type="field"/>
-      <column hidden="0" name="hovedafdelingkode" width="-1" type="field"/>
-      <column hidden="0" name="hovedafdeling" width="-1" type="field"/>
-      <column hidden="0" name="antalansvarligdeltager" width="-1" type="field"/>
-      <column hidden="0" name="byg_id" width="-1" type="field"/>
-      <column hidden="0" name="kom_kode" width="-1" type="field"/>
-      <column hidden="0" name="bbr_anv_kode" width="-1" type="field"/>
-      <column hidden="0" name="bbr_anv_tekst" width="-1" type="field"/>
-      <column hidden="0" name="cnt_oversvoem_nutid" width="-1" type="field"/>
-      <column hidden="0" name="min_vanddybde_nutid_cm" width="-1" type="field"/>
-      <column hidden="0" name="max_vanddybde_nutid_cm" width="-1" type="field"/>
-      <column hidden="0" name="avg_vanddybde_nutid_cm" width="-1" type="field"/>
-      <column hidden="0" name="cnt_oversvoem_fremtid" width="-1" type="field"/>
-      <column hidden="0" name="min_vanddybde_fremtid_cm" width="-1" type="field"/>
-      <column hidden="0" name="max_vanddybde_fremtid_cm" width="-1" type="field"/>
-      <column hidden="0" name="avg_vanddybde_fremtid_cm" width="-1" type="field"/>
-      <column hidden="0" name="retur_periode" width="-1" type="field"/>
-      <column hidden="0" name="omraade" width="-1" type="field"/>
-      <column hidden="1" width="-1" type="actions"/>
+      <column type="field" hidden="0" width="-1" name="navn"/>
+      <column type="field" hidden="0" width="-1" name="branche"/>
+      <column type="field" hidden="0" width="-1" name="byg_id"/>
+      <column type="field" hidden="0" width="-1" name="kom_kode"/>
+      <column type="field" hidden="0" width="-1" name="bbr_anv_kode"/>
+      <column type="field" hidden="0" width="-1" name="bbr_anv_tekst"/>
+      <column type="field" hidden="0" width="-1" name="cnt_oversvoem_nutid"/>
+      <column type="field" hidden="0" width="-1" name="min_vanddybde_nutid_cm"/>
+      <column type="field" hidden="0" width="-1" name="max_vanddybde_nutid_cm"/>
+      <column type="field" hidden="0" width="-1" name="avg_vanddybde_nutid_cm"/>
+      <column type="field" hidden="0" width="-1" name="cnt_oversvoem_fremtid"/>
+      <column type="field" hidden="0" width="-1" name="min_vanddybde_fremtid_cm"/>
+      <column type="field" hidden="0" width="-1" name="max_vanddybde_fremtid_cm"/>
+      <column type="field" hidden="0" width="-1" name="avg_vanddybde_fremtid_cm"/>
+      <column type="field" hidden="0" width="-1" name="retur_periode"/>
+      <column type="field" hidden="0" width="-1" name="omraade"/>
+      <column type="field" hidden="0" width="-1" name="fid"/>
+      <column type="field" hidden="0" width="-1" name="cvr"/>
+      <column type="field" hidden="0" width="-1" name="brancheTxt"/>
+      <column type="field" hidden="0" width="-1" name="antal_interval"/>
+      <column type="field" hidden="0" width="-1" name="antal_raa"/>
+      <column type="field" hidden="0" width="-1" name="vejnavn"/>
+      <column type="field" hidden="0" width="-1" name="husnummer"/>
+      <column type="field" hidden="0" width="-1" name="etage"/>
+      <column type="field" hidden="0" width="-1" name="postnummer"/>
+      <column type="field" hidden="0" width="-1" name="postdistrikt"/>
+      <column type="field" hidden="0" width="-1" name="X"/>
+      <column type="field" hidden="0" width="-1" name="Y"/>
+      <column type="field" hidden="0" width="-1" name="aarsbes_antalansatte"/>
+      <column type="field" hidden="0" width="-1" name="p_nr_fiktiv"/>
+      <column type="actions" hidden="1" width="-1"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -1145,9 +1058,14 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <editable>
+    <field editable="1" name="X"/>
+    <field editable="1" name="Y"/>
     <field editable="1" name="aarsbes_ant"/>
+    <field editable="1" name="aarsbes_antalansatte"/>
     <field editable="1" name="aarsbesk_aar"/>
     <field editable="1" name="aarsbesk_antalansatteinterval"/>
+    <field editable="1" name="antal_interval"/>
+    <field editable="1" name="antal_raa"/>
     <field editable="1" name="antalansvarligdeltager"/>
     <field editable="1" name="avg_vanddybde_fremtid_cm"/>
     <field editable="1" name="avg_vanddybde_nutid_cm"/>
@@ -1160,13 +1078,18 @@ def my_form_open(dialog, layer, feature):
     <field editable="1" name="bibranchekode_2"/>
     <field editable="1" name="bibranchekode_3"/>
     <field editable="1" name="branche"/>
+    <field editable="1" name="brancheTxt"/>
     <field editable="1" name="branchekode"/>
     <field editable="1" name="byg_id"/>
     <field editable="1" name="cnt_oversvoem_fremtid"/>
     <field editable="1" name="cnt_oversvoem_nutid"/>
+    <field editable="1" name="cvr"/>
     <field editable="1" name="cvr_nr"/>
+    <field editable="1" name="etage"/>
+    <field editable="1" name="fid"/>
     <field editable="1" name="hovedafdeling"/>
     <field editable="1" name="hovedafdelingkode"/>
+    <field editable="1" name="husnummer"/>
     <field editable="1" name="kom_kode"/>
     <field editable="1" name="kommunenummer"/>
     <field editable="1" name="kvarbesk_aar"/>
@@ -1181,51 +1104,74 @@ def my_form_open(dialog, layer, feature):
     <field editable="1" name="objectid"/>
     <field editable="1" name="omraade"/>
     <field editable="1" name="p_nr"/>
+    <field editable="1" name="p_nr_fiktiv"/>
+    <field editable="1" name="postdistrikt"/>
+    <field editable="1" name="postnummer"/>
     <field editable="1" name="retur_periode"/>
+    <field editable="1" name="vejnavn"/>
   </editable>
   <labelOnTop>
-    <field name="aarsbes_ant" labelOnTop="0"/>
-    <field name="aarsbesk_aar" labelOnTop="0"/>
-    <field name="aarsbesk_antalansatteinterval" labelOnTop="0"/>
-    <field name="antalansvarligdeltager" labelOnTop="0"/>
-    <field name="avg_vanddybde_fremtid_cm" labelOnTop="0"/>
-    <field name="avg_vanddybde_nutid_cm" labelOnTop="0"/>
-    <field name="bbr_anv_kode" labelOnTop="0"/>
-    <field name="bbr_anv_tekst" labelOnTop="0"/>
-    <field name="bibranche_1" labelOnTop="0"/>
-    <field name="bibranche_2" labelOnTop="0"/>
-    <field name="bibranche_3" labelOnTop="0"/>
-    <field name="bibranchekode_1" labelOnTop="0"/>
-    <field name="bibranchekode_2" labelOnTop="0"/>
-    <field name="bibranchekode_3" labelOnTop="0"/>
-    <field name="branche" labelOnTop="0"/>
-    <field name="branchekode" labelOnTop="0"/>
-    <field name="byg_id" labelOnTop="0"/>
-    <field name="cnt_oversvoem_fremtid" labelOnTop="0"/>
-    <field name="cnt_oversvoem_nutid" labelOnTop="0"/>
-    <field name="cvr_nr" labelOnTop="0"/>
-    <field name="hovedafdeling" labelOnTop="0"/>
-    <field name="hovedafdelingkode" labelOnTop="0"/>
-    <field name="kom_kode" labelOnTop="0"/>
-    <field name="kommunenummer" labelOnTop="0"/>
-    <field name="kvarbesk_aar" labelOnTop="0"/>
-    <field name="kvarbesk_antalansatte" labelOnTop="0"/>
-    <field name="kvarbesk_antalansatteinterval" labelOnTop="0"/>
-    <field name="kvarbesk_kvartal" labelOnTop="0"/>
-    <field name="max_vanddybde_fremtid_cm" labelOnTop="0"/>
-    <field name="max_vanddybde_nutid_cm" labelOnTop="0"/>
-    <field name="min_vanddybde_fremtid_cm" labelOnTop="0"/>
-    <field name="min_vanddybde_nutid_cm" labelOnTop="0"/>
-    <field name="navn" labelOnTop="0"/>
-    <field name="objectid" labelOnTop="0"/>
-    <field name="omraade" labelOnTop="0"/>
-    <field name="p_nr" labelOnTop="0"/>
-    <field name="retur_periode" labelOnTop="0"/>
+    <field labelOnTop="0" name="X"/>
+    <field labelOnTop="0" name="Y"/>
+    <field labelOnTop="0" name="aarsbes_ant"/>
+    <field labelOnTop="0" name="aarsbes_antalansatte"/>
+    <field labelOnTop="0" name="aarsbesk_aar"/>
+    <field labelOnTop="0" name="aarsbesk_antalansatteinterval"/>
+    <field labelOnTop="0" name="antal_interval"/>
+    <field labelOnTop="0" name="antal_raa"/>
+    <field labelOnTop="0" name="antalansvarligdeltager"/>
+    <field labelOnTop="0" name="avg_vanddybde_fremtid_cm"/>
+    <field labelOnTop="0" name="avg_vanddybde_nutid_cm"/>
+    <field labelOnTop="0" name="bbr_anv_kode"/>
+    <field labelOnTop="0" name="bbr_anv_tekst"/>
+    <field labelOnTop="0" name="bibranche_1"/>
+    <field labelOnTop="0" name="bibranche_2"/>
+    <field labelOnTop="0" name="bibranche_3"/>
+    <field labelOnTop="0" name="bibranchekode_1"/>
+    <field labelOnTop="0" name="bibranchekode_2"/>
+    <field labelOnTop="0" name="bibranchekode_3"/>
+    <field labelOnTop="0" name="branche"/>
+    <field labelOnTop="0" name="brancheTxt"/>
+    <field labelOnTop="0" name="branchekode"/>
+    <field labelOnTop="0" name="byg_id"/>
+    <field labelOnTop="0" name="cnt_oversvoem_fremtid"/>
+    <field labelOnTop="0" name="cnt_oversvoem_nutid"/>
+    <field labelOnTop="0" name="cvr"/>
+    <field labelOnTop="0" name="cvr_nr"/>
+    <field labelOnTop="0" name="etage"/>
+    <field labelOnTop="0" name="fid"/>
+    <field labelOnTop="0" name="hovedafdeling"/>
+    <field labelOnTop="0" name="hovedafdelingkode"/>
+    <field labelOnTop="0" name="husnummer"/>
+    <field labelOnTop="0" name="kom_kode"/>
+    <field labelOnTop="0" name="kommunenummer"/>
+    <field labelOnTop="0" name="kvarbesk_aar"/>
+    <field labelOnTop="0" name="kvarbesk_antalansatte"/>
+    <field labelOnTop="0" name="kvarbesk_antalansatteinterval"/>
+    <field labelOnTop="0" name="kvarbesk_kvartal"/>
+    <field labelOnTop="0" name="max_vanddybde_fremtid_cm"/>
+    <field labelOnTop="0" name="max_vanddybde_nutid_cm"/>
+    <field labelOnTop="0" name="min_vanddybde_fremtid_cm"/>
+    <field labelOnTop="0" name="min_vanddybde_nutid_cm"/>
+    <field labelOnTop="0" name="navn"/>
+    <field labelOnTop="0" name="objectid"/>
+    <field labelOnTop="0" name="omraade"/>
+    <field labelOnTop="0" name="p_nr"/>
+    <field labelOnTop="0" name="p_nr_fiktiv"/>
+    <field labelOnTop="0" name="postdistrikt"/>
+    <field labelOnTop="0" name="postnummer"/>
+    <field labelOnTop="0" name="retur_periode"/>
+    <field labelOnTop="0" name="vejnavn"/>
   </labelOnTop>
   <reuseLastValue>
+    <field reuseLastValue="0" name="X"/>
+    <field reuseLastValue="0" name="Y"/>
     <field reuseLastValue="0" name="aarsbes_ant"/>
+    <field reuseLastValue="0" name="aarsbes_antalansatte"/>
     <field reuseLastValue="0" name="aarsbesk_aar"/>
     <field reuseLastValue="0" name="aarsbesk_antalansatteinterval"/>
+    <field reuseLastValue="0" name="antal_interval"/>
+    <field reuseLastValue="0" name="antal_raa"/>
     <field reuseLastValue="0" name="antalansvarligdeltager"/>
     <field reuseLastValue="0" name="avg_vanddybde_fremtid_cm"/>
     <field reuseLastValue="0" name="avg_vanddybde_nutid_cm"/>
@@ -1238,13 +1184,18 @@ def my_form_open(dialog, layer, feature):
     <field reuseLastValue="0" name="bibranchekode_2"/>
     <field reuseLastValue="0" name="bibranchekode_3"/>
     <field reuseLastValue="0" name="branche"/>
+    <field reuseLastValue="0" name="brancheTxt"/>
     <field reuseLastValue="0" name="branchekode"/>
     <field reuseLastValue="0" name="byg_id"/>
     <field reuseLastValue="0" name="cnt_oversvoem_fremtid"/>
     <field reuseLastValue="0" name="cnt_oversvoem_nutid"/>
+    <field reuseLastValue="0" name="cvr"/>
     <field reuseLastValue="0" name="cvr_nr"/>
+    <field reuseLastValue="0" name="etage"/>
+    <field reuseLastValue="0" name="fid"/>
     <field reuseLastValue="0" name="hovedafdeling"/>
     <field reuseLastValue="0" name="hovedafdelingkode"/>
+    <field reuseLastValue="0" name="husnummer"/>
     <field reuseLastValue="0" name="kom_kode"/>
     <field reuseLastValue="0" name="kommunenummer"/>
     <field reuseLastValue="0" name="kvarbesk_aar"/>
@@ -1259,7 +1210,11 @@ def my_form_open(dialog, layer, feature):
     <field reuseLastValue="0" name="objectid"/>
     <field reuseLastValue="0" name="omraade"/>
     <field reuseLastValue="0" name="p_nr"/>
+    <field reuseLastValue="0" name="p_nr_fiktiv"/>
+    <field reuseLastValue="0" name="postdistrikt"/>
+    <field reuseLastValue="0" name="postnummer"/>
     <field reuseLastValue="0" name="retur_periode"/>
+    <field reuseLastValue="0" name="vejnavn"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>
   <widgets/>
