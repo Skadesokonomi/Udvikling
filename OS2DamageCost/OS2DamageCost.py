@@ -830,8 +830,8 @@ class FloodDamageCost:
             no_secs = toc - tic
             if  vlayer: 
                 addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
-                query = executeSQL('INSERT INTO fdc_results.used_models ( bid, name, no_rows, no_secs) VALUES ({bid},\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, name=rDtnGroup.name(), no_rows=no_rows, no_secs=no_secs))
-                if query:
+               query = executeSQL('INSERT INTO fdc_results.used_models ( bid, name, no_rows, no_secs) VALUES ({bid},\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, name=qname, no_rows=no_rows, no_secs=no_secs))
+                 if query:
                    while query.next(): 
                        bid = query.value(0)
 
