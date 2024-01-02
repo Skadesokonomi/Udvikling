@@ -108,6 +108,7 @@ from .helper import (#tr,
 from .OS2DamageCost_dockwidget import FloodDamageCostDockWidget
 
 import os.path
+import time
 
 PARM_NO_COLUMNS = 10 
 
@@ -814,13 +815,27 @@ class FloodDamageCost:
 
         # Create results layergroup
         rGroup = createGroup(mDict['Model_layergroup'], QgsProject.instance().layerTreeRoot(), True)
-        rDtnGroup = createGroup(sd.leGroupName.text().format(time_stamp=QDateTime.currentDateTime().toString(Qt.ISODate)), rGroup, False)
+        time_stamp=QDateTime.currentDateTime().toString(Qt.ISODate)
+        rDtnGroup = createGroup(sd.leGroupName.text().format(time_stamp=time_stamp), rGroup, False)
+        query = executeSQL('INSERT INTO fdc_results.batches (name, run_at) VALUES (\'{name}\', \'{time_stamp}\') RETURNING bid;'.format(name=rDtnGroup.name(), time_stamp=time_stamp))
+        if query:
+            while query.next(): 
+                bid = query.value(0)
 
         # run choosen models
         for item in self.iterItemsChecked(sd.tvModels.model().invisibleRootItem().child(0,0)):
-            qname, vlayer = self.runModel(item, mDict)
-            if  vlayer: addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
+            tic = time.perf_counter() 
+            qname, vlayer, no_rows = self.runModel(item, mDict)
+            toc = time.perf_counter()
+            no_secs = toc - tic
+            if  vlayer: 
+                addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
+                query = executeSQL('INSERT INTO fdc_results.used_models ( bid, name, no_rows, no_secs) VALUES ({bid},\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, name=rDtnGroup.name(), no_rows=no_rows, no_secs=no_secs))
+                if query:
+                   while query.next(): 
+                       bid = query.value(0)
 
+ 
         self.pbUpdateLayerTreeClicked()
 
      
@@ -889,12 +904,13 @@ class FloodDamageCost:
             uri = self.conuri
             uri.setDataSource(lDict['Result_schema'], lDict['tablename_ts'], geom_col , '', pkey_col)
             vlayer=QgsVectorLayer (uri.uri(), nTxt, contype)
+
     
-            return lTxt, vlayer
+            return lTxt, vlayer, cnt
 
         else:
             messW(self.tr('Execution of model: "{}" did not yield any results').format(nTxt))
-            return lTxt, None
+            return lTxt, None, cnt
 
         
 #    def createTempParmDict (self, roots):
