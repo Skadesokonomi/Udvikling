@@ -22,6 +22,7 @@
  ***************************************************************************/
 """
 import sys
+import re
 
 from qgis.PyQt.QtCore import (QSettings,
                               QTranslator,
@@ -825,17 +826,20 @@ class FloodDamageCost:
         # run choosen models
         for item in self.iterItemsChecked(sd.tvModels.model().invisibleRootItem().child(0,0)):
             tic = time.perf_counter() 
-            qname, vlayer, no_rows = self.runModel(item, mDict)
+            qname, vlayer, no_rows, keylist, sqltxt = self.runModel(item, mDict)
             toc = time.perf_counter()
             no_secs = toc - tic
             if  vlayer: 
                 addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
-               query = executeSQL('INSERT INTO fdc_results.used_models ( bid, name, no_rows, no_secs) VALUES ({bid},\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, name=qname, no_rows=no_rows, no_secs=no_secs))
-                 if query:
-                   while query.next(): 
-                       bid = query.value(0)
+                query = executeSQL('INSERT INTO fdc_results.used_models ( bid, name, no_rows, no_secs) VALUES ({bid},\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, name=qname, no_rows=no_rows, no_secs=no_secs))
+                if query:
+                    while query.next(): 
+                        mid = query.value(0)
 
- 
+                query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name='sqltext', value=sqltxt.replace("'","''")))
+                for k,v in keylist.items(): 
+                    if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
+
         self.pbUpdateLayerTreeClicked()
 
      
@@ -861,11 +865,14 @@ class FloodDamageCost:
         # Create table by executing command
         query = executeSQL(qct)
 
-        cnt = -99
+        cnt = 0
         query = executeSQL('SELECT COUNT(*) FROM "{}"."{}"'.format(lDict['Result_schema'],lDict['tablename_ts']))
         if query:
             while query.next(): 
                 cnt = query.value(0)
+
+        pattern = '\{[\w ,;]+\}'
+        kl = {}
 
         if cnt > 0:        
         
@@ -897,20 +904,24 @@ class FloodDamageCost:
                 query = executeSQL(qct) 
             else:
                 pkey_col = ''
+
+            # Create keylist
+            ldlt =   lDict[lTxt]  
+            for match in re.finditer(pattern,ldlt): 
+                k = ldlt[match.start()+1:match.end()-1]
+                kl[k] = lDict[k]
     
             # Create layer with new table and add it to mapper
-    
             contype = self.contype
             uri = self.conuri
             uri.setDataSource(lDict['Result_schema'], lDict['tablename_ts'], geom_col , '', pkey_col)
             vlayer=QgsVectorLayer (uri.uri(), nTxt, contype)
 
-    
-            return lTxt, vlayer, cnt
+            return lTxt, vlayer, cnt, kl, lDict['sqlquery']
 
         else:
             messW(self.tr('Execution of model: "{}" did not yield any results').format(nTxt))
-            return lTxt, None, cnt
+            return lTxt, None, cnt, kl, lDict['sqlquery']
 
         
 #    def createTempParmDict (self, roots):
