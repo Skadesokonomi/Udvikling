@@ -818,27 +818,35 @@ class FloodDamageCost:
         rGroup = createGroup(mDict['Model_layergroup'], QgsProject.instance().layerTreeRoot(), True)
         time_stamp=QDateTime.currentDateTime().toString(Qt.ISODate)
         rDtnGroup = createGroup(sd.leGroupName.text().format(time_stamp=time_stamp), rGroup, False)
-        query = executeSQL('INSERT INTO fdc_results.batches (name, run_at) VALUES (\'{name}\', \'{time_stamp}\') RETURNING bid;'.format(name=rDtnGroup.name(), time_stamp=time_stamp))
+        query = executeSQL('INSERT INTO fdc_results.batches (name, run_at, no_models) VALUES (\'{name}\', \'{time_stamp}\', 0) RETURNING bid;'.format(name=rDtnGroup.name(), time_stamp=time_stamp))
         if query:
             while query.next(): 
                 bid = query.value(0)
 
         # run choosen models
+        no_models = 0
         for item in self.iterItemsChecked(sd.tvModels.model().invisibleRootItem().child(0,0)):
+
             tic = time.perf_counter() 
             qname, vlayer, no_rows, keylist, sqltxt = self.runModel(item, mDict)
             toc = time.perf_counter()
             no_secs = toc - tic
+
+            query = executeSQL('INSERT INTO fdc_results.used_models ( bid, name, no_rows, no_secs, sql_txt) VALUES ({bid},\'{name}\', {no_rows}, {no_secs}, \'{sql_txt}\') RETURNING mid;'.format(bid=bid, name=qname, no_rows=no_rows, no_secs=no_secs, sql_txt = sqltxt.replace("'","''")))
+            if query:
+                while query.next(): 
+                    mid = query.value(0)
+
+            for k,v in keylist.items(): 
+                if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
+
             if  vlayer: 
                 addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
-                query = executeSQL('INSERT INTO fdc_results.used_models ( bid, name, no_rows, no_secs) VALUES ({bid},\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, name=qname, no_rows=no_rows, no_secs=no_secs))
-                if query:
-                    while query.next(): 
-                        mid = query.value(0)
 
-                query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name='sqltext', value=sqltxt.replace("'","''")))
-                for k,v in keylist.items(): 
-                    if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
+            no_models += 1
+
+
+        query = executeSQL('UPDATE fdc_results.batches SET no_models = {no_models} WHERE bid = {bid};'.format(no_models=no_models, bid = bid))
 
         self.pbUpdateLayerTreeClicked()
 
@@ -859,23 +867,25 @@ class FloodDamageCost:
         # Create artificial query entry in lDict using actual query entry        
         lDict['sqlquery'] = lDict[lTxt].format(**lDict)
 
+        # Set return values ao to default
+        cnt = 0
+        kl = {}
+        pattern = '\{[\w ,;]+\}'
+
         # Create create table... command
         qct = lDict['Create_result_table'].format(**lDict)
-
-        # Create table by executing command
-        query = executeSQL(qct)
-
-        cnt = 0
-        query = executeSQL('SELECT COUNT(*) FROM "{}"."{}"'.format(lDict['Result_schema'],lDict['tablename_ts']))
-        if query:
-            while query.next(): 
-                cnt = query.value(0)
-
-        pattern = '\{[\w ,;]+\}'
-        kl = {}
-
-        if cnt > 0:        
         
+        # Create table by executing command
+        query = executeSQL(qct, showerror=False)
+
+        # Check if query generated a table
+        if query:
+
+            query = executeSQL('SELECT COUNT(*) FROM "{}"."{}"'.format(lDict['Result_schema'],lDict['tablename_ts']))
+            if query:
+                while query.next(): 
+                    cnt = query.value(0)
+    
             if 'f_geom_'+ lTxt in lDict:
     
                 # Create artificial geom_column entry in lDict using actual query name        
@@ -910,7 +920,8 @@ class FloodDamageCost:
             for match in re.finditer(pattern,ldlt): 
                 k = ldlt[match.start()+1:match.end()-1]
                 kl[k] = lDict[k]
-    
+            kl[lTxt] = lDict[lTxt].replace("'","''")
+
             # Create layer with new table and add it to mapper
             contype = self.contype
             uri = self.conuri
@@ -920,7 +931,7 @@ class FloodDamageCost:
             return lTxt, vlayer, cnt, kl, lDict['sqlquery']
 
         else:
-            messW(self.tr('Execution of model: "{}" did not yield any results').format(nTxt))
+            messI(self.tr('Execution of model: "{}" did not yield any results').format(nTxt))
             return lTxt, None, cnt, kl, lDict['sqlquery']
 
         
