@@ -328,6 +328,8 @@ class FloodDamageCost:
                 sd.pbCellExtract.clicked.connect(self.pbCellExtractClicked)
                 sd.pbAdministration.clicked.connect(self.pbAdministrationClicked)
                 sd.cbDatabase.currentIndexChanged.connect(self.cbDatabaseCurrentIndexChanged)
+                sd.pbHistFilterSearch.clicked.connect(self.pbHistFilterSearchClicked)
+                sd.pbHistResetSearch.clicked.connect(self.pbHistResetSearchClicked)
 
 
                 for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels]: #, sd.tvReports]:
@@ -353,6 +355,21 @@ class FloodDamageCost:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
+
+    def pbHistFilterSearchClicked(self):
+
+        sd = self.dockwidget
+        txt = sd.leHistFilter.text().strip()
+        if txt != '':  
+            self.loadHistTree(sd.tvHistory, self.connection,txt)
+        else:
+            messC(self.tr('History filter is empty!'))       
+
+    def pbHistResetSearchClicked(self): 
+
+        sd = self.dockwidget
+        sd.leHistFilter.setText('')
+        self.loadHistTree(sd.tvHistory, self.connection,sd.leHistFilter.text())
 
     def pbAdministrationClicked(self):
     
@@ -773,7 +790,7 @@ class FloodDamageCost:
                 sd.tvQueries.expandAll()
                 sd.tvModels.expandAll()
                 #sd.tvReports.expandAll()
-    
+                self.loadHistTree(sd.tvHistory, self.connection,'')
                 celllayer = self.parmDict['Cell layername']['value']
                 sd.leLayerName.setText(celllayer)
                 
@@ -828,28 +845,29 @@ class FloodDamageCost:
         for item in self.iterItemsChecked(sd.tvModels.model().invisibleRootItem().child(0,0)):
 
             tic = time.perf_counter() 
-            qname, vlayer, no_rows, keylist, sqltxt = self.runModel(item, mDict)
+            qname, vlayer, no_rows, keylist, tablename = self.runModel(item, mDict)
             toc = time.perf_counter()
             no_secs = toc - tic
 
-            query = executeSQL('INSERT INTO fdc_results.used_models ( bid, name, no_rows, no_secs, sql_txt) VALUES ({bid},\'{name}\', {no_rows}, {no_secs}, \'{sql_txt}\') RETURNING mid;'.format(bid=bid, name=qname, no_rows=no_rows, no_secs=no_secs, sql_txt = sqltxt.replace("'","''")))
-            if query:
-                while query.next(): 
-                    mid = query.value(0)
-
-            for k,v in keylist.items(): 
-                if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
-
-            if  vlayer: 
-                addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
-
-            no_models += 1
+            if no_rows > 0:
+                query = executeSQL('INSERT INTO fdc_results.used_models ( bid, table_name, name, no_rows, no_secs) VALUES ({bid},\'{table}\',\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, no_rows=no_rows, no_secs=no_secs, table=tablename, name=item.text()))
+                if query:
+                    while query.next(): 
+                        mid = query.value(0)
+    
+                for k,v in keylist.items(): 
+                    if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
+    
+                if  vlayer: 
+                    addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
+    
+                no_models += 1
 
 
         query = executeSQL('UPDATE fdc_results.batches SET no_models = {no_models} WHERE bid = {bid};'.format(no_models=no_models, bid = bid))
 
         self.pbUpdateLayerTreeClicked()
-
+        self.pbHistResetSearchClicked()
      
     def runModel (self, item, lDict):
     
@@ -916,11 +934,13 @@ class FloodDamageCost:
                 pkey_col = ''
 
             # Create keylist
+            kl['SQL expression'] = lDict['sqlquery'].replace("'","''")
+            kl[lTxt] = lDict[lTxt].replace("'","''")
             ldlt =   lDict[lTxt]  
             for match in re.finditer(pattern,ldlt): 
                 k = ldlt[match.start()+1:match.end()-1]
                 kl[k] = lDict[k]
-            kl[lTxt] = lDict[lTxt].replace("'","''")
+            
 
             # Create layer with new table and add it to mapper
             contype = self.contype
@@ -928,11 +948,11 @@ class FloodDamageCost:
             uri.setDataSource(lDict['Result_schema'], lDict['tablename_ts'], geom_col , '', pkey_col)
             vlayer=QgsVectorLayer (uri.uri(), nTxt, contype)
 
-            return lTxt, vlayer, cnt, kl, lDict['sqlquery']
+            return lTxt, vlayer, cnt, kl, lDict['tablename_ts']
 
         else:
             messI(self.tr('Execution of model: "{}" did not yield any results').format(nTxt))
-            return lTxt, None, cnt, kl, lDict['sqlquery']
+            return lTxt, None, cnt, kl, lDict['tablename_ts']
 
         
 #    def createTempParmDict (self, roots):
@@ -1022,6 +1042,73 @@ class FloodDamageCost:
                 return pdict, [rec.fieldName(i) for i in range(rec.count()-1)]
         
         return None, None
+
+    def loadHistTree(self, tv, connection, filter):
+
+        model = QStandardItemModel()
+        model.setHorizontalHeaderLabels(['Name', 'Value'])
+        tv.header().setDefaultSectionSize(100)
+#        for i in range(5): tv.hideColumn(i)
+#        for i in [0,2]: tv.showColumn(i)
+        tv.header().setStretchLastSection(True);
+        tv.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+        tv.setAlternatingRowColors(True)        
+        tv.setUniformRowHeights(True)
+        tv.setModel(self.importHistModel(connection, model, filter))
+        #tv.expandAll()
+
+
+    def importHistModel(self, connection, model, filter=''):
+
+        model.setRowCount(0)
+        root = model.invisibleRootItem()
+
+        if filter != '': 
+            txtWhere = ' WHERE {filter} '.format(filter=filter)
+        else: 		
+            txtWhere = ' '
+
+        txtSql_b = 'SELECT bid, batch_name, no_models, run_at::varchar FROM fdc_results.used_parameters_view' + txtWhere + ' GROUP BY bid, batch_name, run_at, no_models ORDER BY bid'
+        txtSql_m = 'SELECT bid, mid, model_name, no_rows, no_secs::NUMERIC(6,2) FROM fdc_results.used_parameters_view' + txtWhere + ' GROUP BY bid, mid, model_name, no_rows, no_secs ORDER BY bid, mid'
+        txtSql_p = 'SELECT mid, uid, parameter_name, value FROM fdc_results.used_parameters_view' + txtWhere + ' GROUP BY bid, mid, uid, parameter_name, value ORDER BY mid, uid'
+
+        table_b = connection.executeSql(txtSql_b)
+
+        seen_b = {}
+        for row_b in table_b:
+            unique_id = row_b[0]
+            root.appendRow([
+                QStandardItem(str(row_b[1])),
+                QStandardItem('{} {}, {} {}.'.format(row_b[2], self.tr(' models'), self.tr(' run at '), row_b[3]))
+            ])
+            seen_b[unique_id] = root.child(root.rowCount() - 1)
+
+        table_m = connection.executeSql(txtSql_m)
+
+        seen_m = {}
+        for row_m in table_m:
+            unique_id = row_m[1]
+            parent = seen_b[row_m[0]]
+            parent.appendRow([
+                QStandardItem(str(row_m[2])),
+                QStandardItem('{} {}, {} {}.'.format(row_m[3], self.tr(' rows'), row_m[4], self.tr(' seconds')))
+            ])
+            seen_m[unique_id] = parent.child(parent.rowCount() - 1)
+
+        table_p = connection.executeSql(txtSql_p)
+
+        for row_p in table_p:
+            parent = seen_m[row_p[0]]
+            parent.appendRow([
+                QStandardItem(str(row_p[2])),
+                QStandardItem(str(row_p[3])),
+            ])
+        
+        return model
+
+
+
+
         
     def createTreeModels (self, modG, modD, modQ, modM, modR, pDict, fieldN, fieldP, fieldC, fieldE, hl):
 
@@ -1500,3 +1587,4 @@ class TreeItemSelector(QWidget):
 #            if name.startswith(treeSearch) and type == treeType: self.treeNames.addItem(value, name)
 
         self.treeNames.setCurrentIndex(self.treeNames.findText(fullName))     
+
