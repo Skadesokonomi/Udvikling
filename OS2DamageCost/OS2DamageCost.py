@@ -330,7 +330,15 @@ class FloodDamageCost:
                 sd.cbDatabase.currentIndexChanged.connect(self.cbDatabaseCurrentIndexChanged)
                 sd.pbHistFilterSearch.clicked.connect(self.pbHistFilterSearchClicked)
                 sd.pbHistResetSearch.clicked.connect(self.pbHistResetSearchClicked)
+                sd.cbHistFields.currentIndexChanged.connect(self.cbHistFieldsCurrentIndexChanged)
+                sd.cbHistOperators.currentIndexChanged.connect(self.cbHistOperatorsCurrentIndexChanged)
 
+
+                hist_fields = [".. choose field", "batch_name ", "run_at ", "no_models ", "table_name ", "model_name ", "no_rows ", " no_secs ", "parameter_name " , "value "]
+                sd.cbHistFields.addItems(hist_fields)
+                
+                hist_operators = [".. choose operator", "LIKE ", "ILIKE ", "'%..%' ", "< ", "<= ", "= ", "> ", ">= ", "<> ", "AND ", "OR ", "NOT ", "( ", ") "]
+                sd.cbHistOperators.addItems(hist_operators)
 
                 for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels]: #, sd.tvReports]:
                     tv.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -355,6 +363,19 @@ class FloodDamageCost:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
+
+    def cbHistFieldsCurrentIndexChanged (self, index):
+
+        sd = self.dockwidget        
+        if index != 0:
+            sd.leHistFilter.setText(sd.leHistFilter.text() + sd.cbHistFields.currentText())  
+            sd.cbHistFields.setCurrentIndex(0)
+
+    def cbHistOperatorsCurrentIndexChanged (self, index):
+        sd = self.dockwidget        
+        if index != 0:
+            sd.leHistFilter.setText(sd.leHistFilter.text() + sd.cbHistOperators.currentText())  
+            sd.cbHistOperators.setCurrentIndex(0)
 
     def pbHistFilterSearchClicked(self):
 
@@ -1047,16 +1068,13 @@ class FloodDamageCost:
 
         model = QStandardItemModel()
         model.setHorizontalHeaderLabels(['Name', 'Value'])
-        tv.header().setDefaultSectionSize(100)
-#        for i in range(5): tv.hideColumn(i)
-#        for i in [0,2]: tv.showColumn(i)
+        tv.header().setDefaultSectionSize(90)
         tv.header().setStretchLastSection(True);
         tv.header().setSectionResizeMode(QHeaderView.ResizeToContents)
         tv.setAlternatingRowColors(True)        
         tv.setUniformRowHeights(True)
         tv.setModel(self.importHistModel(connection, model, filter))
-        #tv.expandAll()
-
+        tv.setEditTriggers(QAbstractItemView.NoEditTriggers)     
 
     def importHistModel(self, connection, model, filter=''):
 
