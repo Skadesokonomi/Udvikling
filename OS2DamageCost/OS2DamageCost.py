@@ -340,7 +340,8 @@ class FloodDamageCost:
                 hist_operators = [".. choose operator", "LIKE ", "ILIKE ", "'%..%' ", "< ", "<= ", "= ", "> ", ">= ", "<> ", "AND ", "OR ", "NOT ", "( ", ") "]
                 sd.cbHistOperators.addItems(hist_operators)
 
-                for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels]: #, sd.tvReports]:
+
+                for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels, sd.tvHistory]: #, sd.tvReports]:
                     tv.setEditTriggers(QAbstractItemView.NoEditTriggers)
                     tv.setSelectionBehavior(QAbstractItemView.SelectRows)
                     tv.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -350,6 +351,10 @@ class FloodDamageCost:
                 sd.tvData.doubleClicked.connect(self.tvDataDoubleClicked)
                 sd.tvModels.doubleClicked.connect(self.tvModelsDoubleClicked)
                 #sd.tvReports.doubleClicked.connect(self.tvReportsDoubleClicked)
+                sd.tvHistory.setContextMenuPolicy(Qt.CustomContextMenu)
+                sd.tvHistory.customContextMenuRequested.connect(self.openHistMenu)
+
+
 
                 self.pbDatabaseClicked()
                 self.pbParameterResetClicked()
@@ -363,6 +368,31 @@ class FloodDamageCost:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
+
+    def openHistMenu(self, position):
+    
+        sd = self.dockwidget        
+        indexes = sd.tvHistory.selectedIndexes()
+
+        if len(indexes) > 0:
+       
+            level = 0
+            index = indexes[0]
+            while index.parent().isValid():
+                index = index.parent()
+                level += 1
+
+        
+            menu = QMenu()
+            if level == 0:
+                menu.addAction(self.tr("Batches"))
+            elif level == 1:
+                menu.addAction(self.tr("Models"))
+            elif level == 2:
+                menu.addAction(self.tr("Parameters"))
+        
+            menu.exec_(sd.tvHistory.viewport().mapToGlobal(position))
+
 
     def cbHistFieldsCurrentIndexChanged (self, index):
 

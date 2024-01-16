@@ -151,7 +151,7 @@ def messC(message, prefix=None, duration=30):
     iface.mainWindow().repaint()
 
 
-def executeSQL(cmd, tab=None):
+def executeSQL(cmd, tab=None, showerror=True):
 
     global trClassName
     tab = tab or trClassName
@@ -162,9 +162,10 @@ def executeSQL(cmd, tab=None):
     query.exec(cmd)    
     error = query.lastError().text()
     if error != '':
-        errmsg = tr('Error on SQL command. Se log, tab: {} for command and error message')
-        errmsg = errmsg.format(tab)
-        messC(errmsg) 
+        if showerror:
+            errmsg = tr('Error on SQL command. Se log, tab: {} for command and error message')
+            errmsg = errmsg.format(tab)
+            messC(errmsg) 
         logmsg = tr("""Error on executing sql command
 ======
 The command was;
@@ -179,7 +180,7 @@ The error was:
         errmsg = logmsg.format(cmd,error)
         logC(errmsg,tab)            
         return None
-    
+
     return query
 
 
