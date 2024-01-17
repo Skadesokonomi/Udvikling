@@ -23,6 +23,7 @@
 """
 import sys
 import re
+from functools import partial
 
 from qgis.PyQt.QtCore import (QSettings,
                               QTranslator,
@@ -381,17 +382,28 @@ class FloodDamageCost:
             while index.parent().isValid():
                 index = index.parent()
                 level += 1
-
         
             menu = QMenu()
             if level == 0:
-                menu.addAction(self.tr("Batches"))
+                action_batches_remove = menu.addAction(self.tr("Remove batch entry and result tables"))
+                action_batches_remove.triggered.connect(lambda: messI(self.tr('Function not implemented (yet)')) )
+                action_batches_rerun = menu.addAction(self.tr("Run batch set of models"))
+                action_batches_rerun.triggered.connect(lambda: messI(self.tr('Function not implemented (yet)')) )
             elif level == 1:
-                menu.addAction(self.tr("Models"))
+                action_models_remove = menu.addAction(self.tr("Remove model entry and result table"))
+                action_models_remove.triggered.connect(lambda: messI(self.tr('Function not implemented (yet)')) )
+                action_models_rerun = menu.addAction(self.tr("Run model with possibly changed parameters"))
+                action_models_rerun.triggered.connect(lambda: messI(self.tr('Function not implemented (yet)')) )
             elif level == 2:
-                menu.addAction(self.tr("Parameters"))
+                action_parameters_edit = menu.addAction(self.tr("Edit parameter value"))
+                action_parameters_edit.triggered.connect(lambda: messI(self.tr('Function not implemented (yet)')) )
+#                action_parameters_edit.triggered.connect(partial(self.not_implemented, 2, 3))
         
             menu.exec_(sd.tvHistory.viewport().mapToGlobal(position))
+
+    def not_implemented(self, level, mdlIdx):
+
+        logI(self.tr('Function not implemented (yet)'))
 
 
     def cbHistFieldsCurrentIndexChanged (self, index):
