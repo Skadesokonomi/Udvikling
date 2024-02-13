@@ -23,7 +23,12 @@
 """
 import sys
 import re
+import tempfile
+import pandas as pd
+import numpy as np
+
 from functools import partial
+
 
 from qgis.PyQt.QtCore import (QSettings,
                               QTranslator,
@@ -40,6 +45,7 @@ from qgis.PyQt.QtCore import (QSettings,
 from qgis.PyQt.QtGui import QIcon
 
 from qgis.PyQt.QtWidgets import (QDialog,
+                                 QFileDialog,
                                  QAction,
                                  QMenu,
                                  QWidget,
@@ -71,8 +77,10 @@ from qgis.core import (QgsProject,
                        QgsDataSourceUri,
                        QgsExpressionContextUtils,
                        QgsVectorLayer,
+                       QgsVectorLayerUtils,
                        QgsAbstractDatabaseProviderConnection,
                        QgsAuthMethodConfig,
+                       QgsMapLayer,
                        QgsApplication)
 
 from qgis.gui import QgsFileWidget, QgsCheckableComboBox
@@ -105,6 +113,7 @@ from .helper import (#tr,
                      isFloat,
                      mapperExtent,
                      findLayerVariableList,
+                     merge_layers_in_group,
                      executeSQL)
 
 from .OS2DamageCost_dockwidget import FloodDamageCostDockWidget
@@ -355,7 +364,9 @@ class FloodDamageCost:
                 sd.tvHistory.setContextMenuPolicy(Qt.CustomContextMenu)
                 sd.tvHistory.customContextMenuRequested.connect(self.openHistMenu)
 
-
+                sd.pbCSVExportDir.clicked.connect(self.pbCSVExportDirClicked)
+                sd.pbCSVExport.clicked.connect(self.pbCSVExportClicked)
+                sd.leCSVExportDir.setText(tempfile.gettempdir().rstrip(os.path.sep))
 
                 self.pbDatabaseClicked()
                 self.pbParameterResetClicked()
@@ -1264,7 +1275,20 @@ class FloodDamageCost:
             it = parent.child(row, 6)
             it.model().setData(it, newval2)
 
+    def pbCSVExportDirClicked (self):
 
+        sd = self.dockwidget
+        run_dir = sd.leCSVExportDir.text()
+        new_dir = QFileDialog.getExistingDirectory(None, self.tr("Select directory for CSV files"), run_dir, QFileDialog.ShowDirsOnly)
+        if new_dir: 
+            sd.leCSVExportDir.setText(new_dir)
+
+    def pbCSVExportClicked (self):
+
+        sd = self.dockwidget
+        result_path = sd.leCSVExportDir.text()
+        group_name = self.treeViewItemText(sd.tvGeneral,'Model_layergroup',2)
+        merge_layers_in_group(group_name, result_path)
 
     def treeViewEditItem(self, pos, width, val):
 

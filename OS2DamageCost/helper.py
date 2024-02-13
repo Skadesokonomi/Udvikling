@@ -2,6 +2,8 @@
 from json import load, dump, dumps, loads
 import requests
 import os.path
+import pandas as pd
+import numpy as np
 
 from PyQt5.QtSql import QSqlQuery
 
@@ -19,15 +21,19 @@ from qgis.utils import iface
 from qgis.core import (QgsMessageLog,
                        Qgis,
                        QgsVectorLayer,
+                       QgsVectorLayerUtils,
                        QgsProject,
+                       QgsMapLayer,
                        QgsCoordinateReferenceSystem,
-                       QgsCoordinateTransform,QgsGeometry,
+                       QgsCoordinateTransform,
+                       QgsGeometry,
                        QgsField, 
                        QgsExpressionContextUtils,
                        QgsFeature,QgsPointXY,
                        QgsVectorLayerExporter,
                        QgsNetworkAccessManager,
-                       QgsLayerTreeGroup)
+                       QgsLayerTreeGroup,
+                       NULL)
 
 trClassName = ''
 
@@ -776,3 +782,75 @@ def isTime(s, f):
     except: 
         return False
     return True
+
+def merge_layers_in_group(group_name, result_path):
+    # Get the group from the layer panel
+    group = QgsProject.instance().layerTreeRoot().findGroup(group_name)
+    
+    if not group:
+        messC(f"Group '{group_name}' not found.")
+        return
+    
+    # Initialize a dictionary to store merged dataframes
+    merged_dataframes = {}
+    
+    # Loop through all child nodes (subgroups) of the group
+    for subgroup_node in group.children():
+        subgroup_name = subgroup_node.name()
+        
+        # Check if the subgroup is visible (active)
+        if subgroup_node.isVisible():
+            # Loop through all layers in the subgroup
+            for layer_node in subgroup_node.children():
+                layer_name = layer_node.name()
+                
+                # Check if the layer is visible
+                if layer_node.isVisible():
+                    # Check if the layer is a vector layer
+                    if layer_node.layer().type() == QgsMapLayer.VectorLayer:
+                        layer = layer_node.layer()
+                        if isinstance(layer, QgsVectorLayer):
+                            # Get the attribute table as a pandas dataframe
+                            features = layer.getFeatures()
+                            df = pd.DataFrame([feature.attributes() for feature in features], columns=layer.fields().names())
+                            df['omraade'].replace([None, NULL, 'N/A'], '', inplace=True)
+                            #Replaces empty data values (NULL) with 0
+                            df.replace([None, NULL, 'N/A'], 0, inplace=True)
+                            # Add a 'group' column with the subgroup name
+                            df['gruppe'] = subgroup_name
+                            #checks if layer is one which has economical values
+                            nutid_kr_columns = df.filter(like='nutid_kr', axis=1)
+                            if not nutid_kr_columns.empty:
+                                #add a 'sum' column for present and future (not containging value loss)
+                                #sums all columns for  named 'nutid_kr' and 'fremtid_kr' (except if they start with 'vaerditab' or includes 'total' in the column name)
+                                #df['Total_MioDKK_nutid'] = df.filter(like='nutid_kr', axis=1).filter(regex='^(?!.*total).*$').apply(lambda row: row.sum() if not str(row.name).startswith('vaerdi') else None, axis=1)/1000000
+                                #df['Total_MioDKK_fremtid'] = df.filter(like='fremtid_kr', axis=1).filter(regex='^(?!.*total).*$').apply(lambda row: row.sum() if not str(row.name).startswith('vaerdi') else None, axis=1)/1000000
+                                df['Total_MioDKK_nutid'] = df.filter(like='nutid_kr', axis=1).filter(regex='^(?!.*total|.*vaerdi).*$').sum(axis=1) / 1000000
+                                df['Total_MioDKK_fremtid'] = df.filter(like='fremtid_kr', axis=1).filter(regex='^(?!.*total|.*vaerdi).*$').sum(axis=1) / 1000000
+                                df['oversvoemmet_nutid']=df['Total_MioDKK_nutid'].apply(lambda x: 1 if x > 0 else 0) if 'Total_MioDKK_nutid' in df.columns else None
+                                df['oversvoemmet_fremtid']=df['Total_MioDKK_fremtid'].apply(lambda x: 1 if x > 0 else 0) if 'Total_MioDKK_fremtid' in df.columns else None
+                                #for the human layer we multiply the oversvoem (1/0) column with the number of people in the building
+                                if 'mennesker_total' in df.columns: 
+                                    df['oversvoemmet_nutid']=df['oversvoemmet_nutid']*df['mennesker_total']
+                                    df['oversvoemmet_fremtid']=df['oversvoemmet_fremtid']*df['mennesker_total']
+                                    df['Total_MioDKK_nutid']=df['Total_MioDKK_nutid']-df['skadebeloeb_nutid_kr']/1000000 #the value is already summed in 'skadebeloeb', so we have the sum twice
+                                    df['Total_MioDKK_fremtid']=df['Total_MioDKK_fremtid']-df['skadebeloeb_fremtid_kr']/1000000
+
+                            else:
+                                # Add a new column 'cnt_nutid_column' based on the condition 'cnt_' > 0 and ends with '_nutid'
+                                cnt_nutid_columns = df.filter(regex=r'^cnt_.*_nutid$', axis=1)
+                                df['oversvoemmet_nutid'] = cnt_nutid_columns.apply(lambda row: 1 if row.any() and row.sum() > 0 else 0, axis=1) if not cnt_nutid_columns.empty else None
+                                cnt_fremtid_columns = df.filter(regex=r'^cnt_.*_fremtid$', axis=1)
+                                df['oversvoemmet_fremtid'] = cnt_fremtid_columns.apply(lambda row: 1 if row.any() and row.sum() > 0 else 0, axis=1) if not cnt_fremtid_columns.empty else None
+
+                            # Append the dataframe to the merged_dataframes dictionary
+                            if layer_name not in merged_dataframes:
+                                merged_dataframes[layer_name] = df
+                            else:
+                                merged_dataframes[layer_name] = pd.concat([merged_dataframes[layer_name], df], ignore_index=True)
+    
+    # Save each merged dataframe to a CSV file
+    for layer_name, merged_df in merged_dataframes.items():
+        csv_path = f"{result_path}/{layer_name}_merge.csv"
+        merged_df.to_csv(csv_path, index=False,encoding='iso-8859-1', sep=';',errors='ignore')
+        messI(f"Merged data for '{layer_name}' saved to: {csv_path}")

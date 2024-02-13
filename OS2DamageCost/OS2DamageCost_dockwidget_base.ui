@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>409</width>
+    <width>532</width>
     <height>967</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twFloodDamageCost">
       <property name="currentIndex">
-       <number>3</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -823,12 +823,12 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>CSV file</string>
+                <string>CSV directory</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="leLayerName_2">
+              <widget class="QLineEdit" name="leCSVExportDir">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>6</horstretch>
@@ -838,7 +838,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pbDatabase_2">
+              <widget class="QPushButton" name="pbCSVExportDir">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>1</horstretch>
@@ -853,7 +853,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="pbCSVExport">
              <property name="text">
               <string>Export to CSV</string>
              </property>
