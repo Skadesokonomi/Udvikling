@@ -81,6 +81,7 @@ from qgis.core import (QgsProject,
                        QgsAbstractDatabaseProviderConnection,
                        QgsAuthMethodConfig,
                        QgsMapLayer,
+                       QgsWkbTypes,
                        QgsApplication)
 
 from qgis.gui import QgsFileWidget, QgsCheckableComboBox
@@ -114,6 +115,8 @@ from .helper import (#tr,
                      mapperExtent,
                      findLayerVariableList,
                      merge_layers_in_group,
+                     populateLayerTreeCB,
+                     AssignSubAreas,                     
                      executeSQL)
 
 from .OS2DamageCost_dockwidget import FloodDamageCostDockWidget
@@ -342,7 +345,8 @@ class FloodDamageCost:
                 sd.pbHistResetSearch.clicked.connect(self.pbHistResetSearchClicked)
                 sd.cbHistFields.currentIndexChanged.connect(self.cbHistFieldsCurrentIndexChanged)
                 sd.cbHistOperators.currentIndexChanged.connect(self.cbHistOperatorsCurrentIndexChanged)
-
+                sd.twFloodDamageCost.currentChanged.connect (self.twFloodDamageCostCurrentChanged)
+                sd.cbAreaLayer.currentIndexChanged.connect(self.cbAreaLayerCurrentIndexChanged)
 
                 hist_fields = [".. choose field", "batch_name ", "run_at ", "no_models ", "table_name ", "model_name ", "no_rows ", " no_secs ", "parameter_name " , "value "]
                 sd.cbHistFields.addItems(hist_fields)
@@ -367,12 +371,16 @@ class FloodDamageCost:
                 sd.pbCSVExportDir.clicked.connect(self.pbCSVExportDirClicked)
                 sd.pbCSVExport.clicked.connect(self.pbCSVExportClicked)
                 sd.leCSVExportDir.setText(tempfile.gettempdir().rstrip(os.path.sep))
+                
+                sd.pbAreaSub.clicked.connect(self.pbAreaSubClicked)
+                
 
                 self.pbDatabaseClicked()
                 self.pbParameterResetClicked()
                 self.pbUpdCellLayerClicked()
                 self.pbAdministrationClicked()     
-                
+                self.twFloodDamageCostCurrentChanged (6)                
+
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
@@ -381,6 +389,38 @@ class FloodDamageCost:
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
+
+    def twFloodDamageCostCurrentChanged (self, index):
+    
+        sd = self.dockwidget        
+        if index == 6:
+            populateLayerTreeCB (sd.cbAreaLayer, QgsMapLayer.VectorLayer, QgsWkbTypes.PolygonGeometry)
+    
+    def pbAreaSubClicked(self):
+
+        sd = self.dockwidget        
+        group_name = self.treeViewItemText(sd.tvGeneral,'Model_layergroup',2)
+        subLayer = sd.cbAreaLayer.currentText()
+        subColumn = sd.cbAreaColumn.currentText()
+        #messI(subLayer + ' ' + subColumn)
+        antl, anto = AssignSubAreas(group_name, 'omraade', ' ', subLayer, subColumn)
+        
+        messI (self.tr (f'No layers processed: {antl}, Total no. of objects processed: {anto}'))  
+        
+        
+    def cbAreaLayerCurrentIndexChanged(self, index):
+
+        sd = self.dockwidget    
+        root = QgsProject.instance().layerTreeRoot()
+
+        layerTreeId = sd.cbAreaLayer.currentData()
+        layerTree = root.findLayer(layerTreeId)  
+        if layerTree: 
+            layer = root.findLayer(layerTreeId).layer()
+            sd.cbAreaColumn.clear()
+            for c in layer.fields(): sd.cbAreaColumn.addItem (c.name(),c)
+        
+    
     def openHistMenu(self, position):
     
         sd = self.dockwidget        
@@ -676,7 +716,8 @@ class FloodDamageCost:
         cLtl.layer().reload()
         self.iface.mapCanvas().refresh()
 
-        #QgsProject.instance().reloadAllLayers()             
+        #QgsProject.instance().reloadAllLayers()    
+
 
     def pbParameterSaveClicked(self):
 

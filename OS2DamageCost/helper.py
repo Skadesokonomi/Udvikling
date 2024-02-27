@@ -29,11 +29,15 @@ from qgis.core import (QgsMessageLog,
                        QgsGeometry,
                        QgsField, 
                        QgsExpressionContextUtils,
-                       QgsFeature,QgsPointXY,
+                       QgsExpressionContext,
+                       QgsExpression,
+                       QgsFeature,
+                       QgsPointXY,
                        QgsVectorLayerExporter,
                        QgsNetworkAccessManager,
                        QgsLayerTreeGroup,
-                       NULL)
+                       NULL,
+                       edit)
 
 trClassName = ''
 
@@ -188,6 +192,17 @@ The error was:
         return None
 
     return query
+
+def populateLayerTreeCB (combo, layerType, geometryType):
+
+    combo.clear()
+
+    layers = QgsProject.instance().mapLayers() # dictionary
+    for k,l in layers.items():
+        if l.type() == layerType and l.geometryType() == geometryType:
+            combo.addItem (l.name(),k)
+
+    return combo
 
 
 def xstr(s, r=''):
@@ -854,3 +869,61 @@ def merge_layers_in_group(group_name, result_path):
         csv_path = f"{result_path}/{layer_name}_merge.csv"
         merged_df.to_csv(csv_path, index=False,encoding='iso-8859-1', sep=';',errors='ignore')
         messI(f"Merged data for '{layer_name}' saved to: {csv_path}")
+
+def AssignSubAreas(group_name,AreaName,NulVal,SubAreaLayerName,SubAreaField):
+    
+    # Get the group from the layer panel
+    group = QgsProject.instance().layerTreeRoot().findGroup(group_name)
+    
+    antL = 0
+    antO = 0
+    if not group:
+        messC(f"Group '{group_name}' not found.")
+        return antL, antO
+    
+    # Initialize a dictionary to store merged dataframes
+    merged_dataframes = {}
+    
+    # Loop through all child nodes (subgroups) of the group
+    for subgroup_node in group.children():
+        subgroup_name = subgroup_node.name()
+        
+        # Check if the subgroup is visible (active)
+        if subgroup_node.isVisible():
+            # Loop through all layers in the subgroup
+            for layer_node in subgroup_node.children():
+                layer_name = layer_node.name()
+                # Check if the layer is visible
+                if layer_node.isVisible():
+                    # Check if the layer is a vector layer
+                    if layer_node.layer().type() == QgsMapLayer.VectorLayer:
+                        layer = layer_node.layer()
+                        
+                        if layer and layer.fields().indexFromName(AreaName) != -1:
+                            # Set context
+                            context = QgsExpressionContext()
+                            context.appendScopes(QgsExpressionContextUtils.globalProjectLayerScopes(layer))
+                            # Update the 'omraade' field with the expression using the Field Calculator
+                            
+                            if NulVal:
+                                expression_string = f'coalesce(overlay_intersects(\'{SubAreaLayerName}\', {SubAreaField},sort_by_intersection_size:=\'des\',limit:=1)[0],\'{NulVal}\')'
+                            else:
+                                expression_string = f'overlay_intersects(\'{SubAreaLayerName}\', {SubAreaField},sort_by_intersection_size:=\'des\',limit:=1)[0]'
+                                
+                            expression = QgsExpression(expression_string)
+
+                            if not layer.isEditable():
+                                antL += 1
+                                with edit(layer):
+                                    for feature in layer.getFeatures():
+                                        antO += 1
+                                        context.setFeature(feature)
+                                        feature[AreaName] = expression.evaluate(context)
+                                        layer.updateFeature(feature)
+    
+                                # Commit the changes
+                                layer.commitChanges()
+                            
+                            else:
+                                messC(f"Layer '{layer_name}' is already in edit mode, cannot update layer.")
+    return antL, antO     

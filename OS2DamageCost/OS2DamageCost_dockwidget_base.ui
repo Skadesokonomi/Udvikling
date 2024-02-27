@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>532</width>
+    <width>409</width>
     <height>967</height>
    </rect>
   </property>
@@ -726,7 +726,7 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="cbDatabase_2">
+              <widget class="QComboBox" name="cbAreaLayer">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>5</horstretch>
@@ -764,7 +764,7 @@
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QComboBox" name="cbDatabase_3">
+              <widget class="QComboBox" name="cbAreaColumn">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>5</horstretch>
@@ -791,7 +791,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="pbAreaSub">
              <property name="text">
               <string>Assign subareas</string>
              </property>
