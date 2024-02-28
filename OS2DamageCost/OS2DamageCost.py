@@ -26,6 +26,7 @@ import re
 import tempfile
 import pandas as pd
 import numpy as np
+import shutil
 
 from functools import partial
 
@@ -149,7 +150,6 @@ class FloodDamageCost:
             self.plugin_dir,
             'i18n',
             'OS2DamageCost_{}.qm'.format(locale))
-        logI(locale_path)
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
@@ -347,6 +347,7 @@ class FloodDamageCost:
                 sd.cbHistOperators.currentIndexChanged.connect(self.cbHistOperatorsCurrentIndexChanged)
                 sd.twFloodDamageCost.currentChanged.connect (self.twFloodDamageCostCurrentChanged)
                 sd.cbAreaLayer.currentIndexChanged.connect(self.cbAreaLayerCurrentIndexChanged)
+                sd.pbCreateExcel.clicked.connect(self.pbCreateExcelClicked)
 
                 hist_fields = [".. choose field", "batch_name ", "run_at ", "no_models ", "table_name ", "model_name ", "no_rows ", " no_secs ", "parameter_name " , "value "]
                 sd.cbHistFields.addItems(hist_fields)
@@ -389,6 +390,19 @@ class FloodDamageCost:
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
+    def pbCreateExcelClicked (self):
+        sd = self.dockwidget
+        result_path = os.path.join(sd.leCSVExportDir.text(),'Databehandling_v10.xlsm')
+        excel_path = os.path.join(self.plugin_dir,'excel','Databehandling_v10.xlsm')
+
+        fileName = QFileDialog.getSaveFileName(None, self.tr("Save Excel template file"),  
+                                       result_path,
+                                       self.tr("Excel Files(*.xlsm);;All Files(*)"))
+
+       
+        if fileName[0] != '':
+            shutil.copy(excel_path, fileName[0]) 
+            messI(self.tr('Excel template file copied to: {}').format(fileName[0]))            
 
     def twFloodDamageCostCurrentChanged (self, index):
     
