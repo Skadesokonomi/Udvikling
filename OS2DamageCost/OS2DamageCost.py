@@ -392,8 +392,8 @@ class FloodDamageCost:
 
     def pbCreateExcelClicked (self):
         sd = self.dockwidget
-        result_path = os.path.join(sd.leCSVExportDir.text(),'Databehandling_v10.xlsm')
-        excel_path = os.path.join(self.plugin_dir,'excel','Databehandling_v10.xlsm')
+        result_path = os.path.join(sd.leCSVExportDir.text(),'Databehandling_v11.xlsm')
+        excel_path = os.path.join(self.plugin_dir,'excel','Databehandling_v11.xlsm')
 
         fileName = QFileDialog.getSaveFileName(None, self.tr("Save Excel template file"),  
                                        result_path,
