@@ -349,9 +349,8 @@ class FloodDamageCost:
                 sd.cbAreaLayer.currentIndexChanged.connect(self.cbAreaLayerCurrentIndexChanged)
                 sd.pbCreateExcel.clicked.connect(self.pbCreateExcelClicked)
 
-                hist_fields = [".. choose field", "batch_name ", "run_at ", "no_models ", "table_name ", "model_name ", "no_rows ", " no_secs ", "parameter_name " , "value "]
-                sd.cbHistFields.addItems(hist_fields)
-                
+
+
                 hist_operators = [".. choose operator", "LIKE ", "ILIKE ", "'%..%' ", "< ", "<= ", "= ", "> ", ">= ", "<> ", "AND ", "OR ", "NOT ", "( ", ") "]
                 sd.cbHistOperators.addItems(hist_operators)
 
@@ -475,7 +474,7 @@ class FloodDamageCost:
 
         sd = self.dockwidget        
         if index != 0:
-            sd.leHistFilter.setText(sd.leHistFilter.text() + sd.cbHistFields.currentText())  
+            sd.leHistFilter.setText(sd.leHistFilter.text() + '"{}" '.format(sd.cbHistFields.currentText()))  
             sd.cbHistFields.setCurrentIndex(0)
 
     def cbHistOperatorsCurrentIndexChanged (self, index):
@@ -930,6 +929,17 @@ class FloodDamageCost:
                 self.pbUpdateLayerTreeClicked()
             else:
                 messC(self.tr('Error accessing parameter table'))
+                
+            #hist_fields = [".. choose field", "batch_name ", "run_at ", "no_models ", "table_name ", "model_name ", "no_rows ", " no_secs ", "parameter_name " , "value "]
+
+            try:
+                sd.cbHistFields.clear
+                hist_fields = [self.tr(".. choose field")] + [f.name() for f in self.connection.fields('fdc_results', 'used_parameters_view')]
+                sd.cbHistFields.addItems(hist_fields)
+            except: 
+                messC(self.tr('History function is not working. You probably have to update the database with update script: "Opdatering af historik view"'))
+            
+            
         else:
             messC(self.tr('Database connection and/or parametertable not set'))
             
@@ -1194,10 +1204,7 @@ class FloodDamageCost:
         else: 		
             txtWhere = ' '
 
-        txtSql_b = 'SELECT bid, batch_name, no_models, run_at::varchar FROM fdc_results.used_parameters_view' + txtWhere + ' GROUP BY bid, batch_name, run_at, no_models ORDER BY bid'
-        txtSql_m = 'SELECT bid, mid, model_name, no_rows, no_secs::NUMERIC(6,2) FROM fdc_results.used_parameters_view' + txtWhere + ' GROUP BY bid, mid, model_name, no_rows, no_secs ORDER BY bid, mid'
-        txtSql_p = 'SELECT mid, uid, parameter_name, value FROM fdc_results.used_parameters_view' + txtWhere + ' GROUP BY bid, mid, uid, parameter_name, value ORDER BY mid, uid'
-
+        txtSql_b = 'SELECT {} FROM fdc_results.used_parameters_view {} GROUP BY 1,2,3,4 ORDER BY 1'.format('"' + '","'.join([f.name() for f in self.connection.fields('fdc_results', 'batches_view')]) +  '"',txtWhere)
         table_b = connection.executeSql(txtSql_b)
 
         seen_b = {}
@@ -1209,6 +1216,7 @@ class FloodDamageCost:
             ])
             seen_b[unique_id] = root.child(root.rowCount() - 1)
 
+        txtSql_m = 'SELECT {} FROM fdc_results.used_parameters_view {} GROUP BY 1,2,3,4,5 ORDER BY 1,2'.format('"' + '","'.join([f.name() for f in self.connection.fields('fdc_results', 'models_view')]) +  '"',txtWhere)
         table_m = connection.executeSql(txtSql_m)
 
         seen_m = {}
@@ -1221,6 +1229,7 @@ class FloodDamageCost:
             ])
             seen_m[unique_id] = parent.child(parent.rowCount() - 1)
 
+        txtSql_p = 'SELECT {} FROM fdc_results.used_parameters_view {} GROUP BY 1,2,3,4 ORDER BY 1,2'.format('"' + '","'.join([f.name() for f in self.connection.fields('fdc_results', 'parameters_view')]) +  '"',txtWhere)
         table_p = connection.executeSql(txtSql_p)
 
         for row_p in table_p:
