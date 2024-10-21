@@ -330,6 +330,8 @@ class FloodDamageCost:
                 sd.pbParameterShow.clicked.connect(self.pbParameterShowClicked)
                 sd.pbModelRun.clicked.connect(self.pbModelRunClicked)
                 sd.pbMapperExtents.clicked.connect(self.pbMapperExtentsClicked)
+                sd.pbPromotePolLayer.clicked.connect(self.pbPromotePolLayerClicked)
+                sd.pbUpdPolLayer.clicked.connect(self.pbUpdPolLayerClicked)
                 sd.pbCreateCellLayer.clicked.connect(self.pbCreateCellLayerClicked)
                 sd.pbUpdCellLayer.clicked.connect(self.pbUpdCellLayerClicked)
                 sd.pbClearValues.clicked.connect(self.pbClearValuesClicked)
@@ -377,6 +379,7 @@ class FloodDamageCost:
 
                 self.pbDatabaseClicked()
                 self.pbParameterResetClicked()
+                self.pbUpdPolLayerClicked()
                 self.pbUpdCellLayerClicked()
                 self.pbAdministrationClicked()     
                 self.twFloodDamageCostCurrentChanged (6)                
@@ -544,6 +547,22 @@ class FloodDamageCost:
 
 
 
+    def pbUpdPolLayerClicked(self):
+
+        sd = self.dockwidget
+
+        sd.cbPolLayer.clear()
+        for ltl in QgsProject.instance().layerTreeRoot().findLayers():
+            logI('før: ' + ltl.name())
+
+            if (
+                not evalLayerVariable(ltl.layer(),'eco_celllayer') and
+                isinstance(ltl.layer(), QgsVectorLayer) and 
+                ltl.layer().geometryType() == QgsWkbTypes.PolygonGeometry
+            ):
+                logI('eft: ' + ltl.name())
+                sd.cbPolLayer.addItem(ltl.name(),ltl)
+        
     def pbUpdCellLayerClicked(self):
 
         sd = self.dockwidget
@@ -557,6 +576,110 @@ class FloodDamageCost:
         
        
         
+    def pbPromotePolLayerClicked(self):
+
+        sd = self.dockwidget
+        
+        # Datakilde for valgt lag
+        
+        ltl = sd.cbPolLayer.currentData()
+        layeruri = ltl.layer().dataProvider().uri()
+        logI('layer: ' + layeruri.uri())
+        connuri = QgsDataSourceUri(self.connection.uri())
+        logI('connection: ' + connuri.uri())
+
+        # Giv bruger mulighed for at skrive schema.tabel navn i boks
+
+        if layeruri.host() != connuri.host() or layeruri.port() != connuri.port() or layeruri.database() != connuri.database(): 
+
+            dlg = QDialog()
+            dlg.setWindowTitle(self.tr('Name for new cell table'))
+
+            layout = QVBoxLayout()
+            label = QLabel(self.tr("The chosen layer is not from the Flood Damage database; it has to be cloned. \nPlease specify a tablename for the cloned layer")) 
+            label.setWordWrap(True) 
+            layout.addWidget(label)
+            
+            
+            input = QLineEdit()
+            layout.addWidget(input)
+
+            buttonBox = QDialogButtonBox()
+            buttonBox.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            buttonBox.rejected.connect(dlg.reject)
+            buttonBox.accepted.connect(dlg.accept)
+            layout.addWidget(buttonBox)
+
+            #layout.setSizeConstraint(QLayout.SetFixedSize)
+            dlg.setLayout(layout)
+            dlg.setWindowFlags(dlg.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
+            dlg.setSizeGripEnabled(True)
+            res = dlg.exec()
+            
+            # Er der trykket på ok og er navnet udfyldt ? 
+
+            if res and len(input.text()) > 0:
+
+                clayer = input.text()
+                rschema = ''
+                if clayer.find('.') < 0: # tablename without schema definition 
+                    rschema = self.treeViewItemText(sd.tvGeneral,'Result_schema',2)
+                    clayer = clayer if rschema == '' else rschema + '.' + clayer
+
+                logI('value: ' + clayer)
+ 
+
+            
+                
+                # Find connention string til database
+                # connuri
+                
+                # Find specifik polygontype for lag
+                logI('wkbtype= '+str(layeruri.wkbType()))
+
+                # Find primary key for lag
+                logI('keycolumn= '+layeruri.keyColumn())
+
+                # Sæt geometry kolonne navn
+                # 'geom'
+
+                # Find epsg kode fra lag
+                logI('srid= '+layeruri.srid())
+            
+            # Upload data til database
+
+#            con_string = "dbname='RobaNostra' host='localhost' port='5432' user='Daniele' password='Daniele' key=id_urband type=MULTIPOLYGON table='s_500_patprova'." + mytable + " (geom)"
+#             err = QgsVectorLayerExporter.exportLayer(layer, con_string, 'postgres', QgsCoordinateReferenceSystem(3003), False)
+#            con_string = """dbname='postgres' host='some IP adress' port='5432' user='postgres' password='thepassword' key=my_id type=MULTIPOLYGON table="myschema"."mytable" (geom)"""
+#            err = QgsVectorLayerExporter.exportLayer(my_layer, con_string, 'postgres', QgsCoordinateReferenceSystem(epsg_no), False)
+#            processing.run("native:importintopostgis", {'INPUT':'postgres://dbname=\'ballerup\' host=localhost port=5433 user=\'postgres\' password=\'ukulemy\' key=\'id\' srid=25832 type=MultiLineString checkPrimaryKeyUnicity=\'0\' table="elementer"."elementer_linjer" (geom)','DATABASE':'flood_damage_svendborg at localhost as postgres','SCHEMA':'fdc_results','TABLENAME':'new_name','PRIMARY_KEY':'id','GEOMETRY_COLUMN':'geom','ENCODING':'UTF-8','OVERWRITE':True,'CREATEINDEX':True,'LOWERCASE_NAMES':True,'DROP_STRING_LENGTH':False,'FORCE_SINGLEPART':False})
+
+            # Tilføj 4 celle kolonner hvis nødvendigt
+ #   #        query = QSqlQuery()
+ #   #        query.exec(sqlCmd)    
+ #   #
+ #   #        error = query.lastError().text()
+ #   #        if error != '':
+ #   #            messC(error)                
+
+            # Skift datakilde for lag til database tabel
+ #               uri = self.conuri
+ #               sandt = clayer.split('.',1)
+ #               uri.setDataSource (sandt[0], sandt[1], 'geom')
+ #               layer = QgsVectorLayer(uri.uri(), clayer, self.contype)
+ #               ltl = addLayer2Tree(QgsProject.instance().layerTreeRoot(), layer, True, 'eco_celllayer', clayer, os.path.join(self.plugin_dir, 'styles', 'cells.qml'), clayer)
+
+#             Se kode for denne funktion : ltl = addLayer2Tree(QgsProject.instance().layerTreeRoot(), layer, True, 'eco_celllayer', clayer, os.path.join(self.plugin_dir, 'styles', 'cells.qml'), clayer)
+
+            # Genindlæs lag (nu fra database)
+
+            # sæt env var for lag til eco_celllayer
+
+            # Tilføj lag til cell layer vælger
+ #               sd.cbCellLayer.addItem(layer.name(), ltl)
+ #               sd.cbCellLayer.setCurrentIndex(sd.cbCellLayer.count()-1)
+            
+
     def pbCreateCellLayerClicked(self):
 
         sd = self.dockwidget

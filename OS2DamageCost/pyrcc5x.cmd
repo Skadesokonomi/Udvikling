@@ -1,5 +1,5 @@
 @echo on
-set qprogdir="C:\Program Files\QGIS 3.34.1\bin"
+set qprogdir="C:\Program Files\QGIS 3.38.3\bin"
 call %qprogdir%\o4w_env.bat
 call %qprogdir%\qt5_env.bat
 call %qprogdir%\py3_env.bat
