@@ -83,7 +83,9 @@ from qgis.core import (QgsProject,
                        QgsAuthMethodConfig,
                        QgsMapLayer,
                        QgsWkbTypes,
-                       QgsApplication)
+                       QgsApplication,
+                       QgsCoordinateReferenceSystem,
+                       QgsVectorLayerExporter)
 
 from qgis.gui import QgsFileWidget, QgsCheckableComboBox
 
@@ -596,13 +598,16 @@ class FloodDamageCost:
             dlg.setWindowTitle(self.tr('Name for new cell table'))
 
             layout = QVBoxLayout()
-            label = QLabel(self.tr("The chosen layer is not from the Flood Damage database; it has to be cloned. \nPlease specify a tablename for the cloned layer")) 
+            label = QLabel(self.tr("The chosen layer is not from the Flood Damage database; it has to be cloned. \n\nPlease specify (only) a tablename for the cloned layer. The schema defaults to the results schema")) 
             label.setWordWrap(True) 
             layout.addWidget(label)
             
             
             input = QLineEdit()
             layout.addWidget(input)
+            cbox = QCheckBox(self.tr('Copy only selected objects'))
+            cbox.setChecked(False)
+            layout.addWidget(cbox)
 
             buttonBox = QDialogButtonBox()
             buttonBox.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -619,66 +624,42 @@ class FloodDamageCost:
             # Er der trykket på ok og er navnet udfyldt ? 
 
             if res and len(input.text()) > 0:
-
-                clayer = input.text()
-                rschema = ''
-                if clayer.find('.') < 0: # tablename without schema definition 
-                    rschema = self.treeViewItemText(sd.tvGeneral,'Result_schema',2)
-                    clayer = clayer if rschema == '' else rschema + '.' + clayer
-
-                logI('value: ' + clayer)
- 
-
-            
+                rschema = self.treeViewItemText(sd.tvGeneral,'Result_schema',2)
+                rtable = input.text().strip().lower() 
+                rtable = rtable.replace(' ','_').replace('"','').replace(';','_').replace('.','_').replace('æ','ae').replace('ø','oe').replace('å','aa').replace('ü','u')
                 
                 # Find connention string til database
-                # connuri
+                connuri.setSchema(rschema)
+                connuri.setTable(rtable)
                 
                 # Find specifik polygontype for lag
-                logI('wkbtype= '+str(layeruri.wkbType()))
+                connuri.setWkbType(ltl.layer().wkbType())
 
                 # Find primary key for lag
-                logI('keycolumn= '+layeruri.keyColumn())
+                pkids = ltl.layer().primaryKeyAttributes()
+                if len(pkids) > 0: connuri.setKeyColumn(ltl.layer().fields().names()[pkids[0]])                
 
                 # Sæt geometry kolonne navn
-                # 'geom'
+                connuri.setGeometryColumn('geom')
 
-                # Find epsg kode fra lag
-                logI('srid= '+layeruri.srid())
+                con_string = connuri.uri()
+                err = QgsVectorLayerExporter.exportLayer(ltl.layer(), con_string, 'postgres', QgsCoordinateReferenceSystem(ltl.layer().crs().authid()), cbox.isChecked())
+                self.connection.executeSql('ALTER TABLE "{}"."{}" ADD COLUMN IF NOT EXISTS val_intersect NUMERIC(12,2), ADD COLUMN IF NOT EXISTS num_intersect INTEGER'.format(rschema, rtable))
+                self.connection.executeSql('UPDATE "{}"."{}" SET val_intersect = 0.0 WHERE val_intersect IS NULL'.format(rschema, rtable))
+                self.connection.executeSql('UPDATE "{}"."{}" SET num_intersect = 0 WHERE num_intersect IS NULL'.format(rschema, rtable))
+                ltl.layer().setDataSource(con_string, ltl.layer().name(), 'postgres')
+                QgsExpressionContextUtils.setLayerVariable(ltl.layer(),'eco_celllayer',rschema + '.' + rtable)     
+
+        else:
+            sqlc = 'ALTER TABLE "{}"."{}" ADD COLUMN IF NOT EXISTS val_intersect NUMERIC(12,2), ADD COLUMN IF NOT EXISTS num_intersect INTEGER'.format(layeruri.schema(), layeruri.table())
+            logI(sqlc)
+            self.connection.executeSql(sqlc)
+            ltl.layer().setDataSource( ltl.layer().source(), ltl.layer().name(), ltl.layer().providerType() )
+            QgsExpressionContextUtils.setLayerVariable(ltl.layer(),'eco_celllayer',layeruri.schema() + '.' + layeruri.table())
             
-            # Upload data til database
-
-#            con_string = "dbname='RobaNostra' host='localhost' port='5432' user='Daniele' password='Daniele' key=id_urband type=MULTIPOLYGON table='s_500_patprova'." + mytable + " (geom)"
-#             err = QgsVectorLayerExporter.exportLayer(layer, con_string, 'postgres', QgsCoordinateReferenceSystem(3003), False)
-#            con_string = """dbname='postgres' host='some IP adress' port='5432' user='postgres' password='thepassword' key=my_id type=MULTIPOLYGON table="myschema"."mytable" (geom)"""
-#            err = QgsVectorLayerExporter.exportLayer(my_layer, con_string, 'postgres', QgsCoordinateReferenceSystem(epsg_no), False)
-#            processing.run("native:importintopostgis", {'INPUT':'postgres://dbname=\'ballerup\' host=localhost port=5433 user=\'postgres\' password=\'ukulemy\' key=\'id\' srid=25832 type=MultiLineString checkPrimaryKeyUnicity=\'0\' table="elementer"."elementer_linjer" (geom)','DATABASE':'flood_damage_svendborg at localhost as postgres','SCHEMA':'fdc_results','TABLENAME':'new_name','PRIMARY_KEY':'id','GEOMETRY_COLUMN':'geom','ENCODING':'UTF-8','OVERWRITE':True,'CREATEINDEX':True,'LOWERCASE_NAMES':True,'DROP_STRING_LENGTH':False,'FORCE_SINGLEPART':False})
-
-            # Tilføj 4 celle kolonner hvis nødvendigt
- #   #        query = QSqlQuery()
- #   #        query.exec(sqlCmd)    
- #   #
- #   #        error = query.lastError().text()
- #   #        if error != '':
- #   #            messC(error)                
-
-            # Skift datakilde for lag til database tabel
- #               uri = self.conuri
- #               sandt = clayer.split('.',1)
- #               uri.setDataSource (sandt[0], sandt[1], 'geom')
- #               layer = QgsVectorLayer(uri.uri(), clayer, self.contype)
- #               ltl = addLayer2Tree(QgsProject.instance().layerTreeRoot(), layer, True, 'eco_celllayer', clayer, os.path.join(self.plugin_dir, 'styles', 'cells.qml'), clayer)
-
-#             Se kode for denne funktion : ltl = addLayer2Tree(QgsProject.instance().layerTreeRoot(), layer, True, 'eco_celllayer', clayer, os.path.join(self.plugin_dir, 'styles', 'cells.qml'), clayer)
-
-            # Genindlæs lag (nu fra database)
-
-            # sæt env var for lag til eco_celllayer
-
-            # Tilføj lag til cell layer vælger
- #               sd.cbCellLayer.addItem(layer.name(), ltl)
- #               sd.cbCellLayer.setCurrentIndex(sd.cbCellLayer.count()-1)
-            
+        self.pbUpdPolLayerClicked()        
+        self.pbUpdCellLayerClicked()        
+                        
 
     def pbCreateCellLayerClicked(self):
 

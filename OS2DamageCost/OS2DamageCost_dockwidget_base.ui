@@ -449,7 +449,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>Polygon layer </string>
+                <string>Polygon layer</string>
                </property>
               </widget>
              </item>

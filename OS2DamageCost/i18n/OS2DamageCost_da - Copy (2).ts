@@ -483,15 +483,5 @@ Skriv et tabel navn for det klonede lag. (Schema placering er altid i resultat s
         <source>Get post-proccessing Excel</source>
         <translation>Få Excel efterbehandling</translation>
     </message>
-    <message>
-        <location filename="../OS2DamageCost_dockwidget_base.ui" line="438"/>
-        <source>Promote polygon layer to cell layer</source>
-        <translation>Konverter polygon lag til celle lag</translation>
-    </message>
-    <message>
-        <location filename="../OS2DamageCost_dockwidget_base.ui" line="452"/>
-        <source>Polygon layer</source>
-        <translation>Polygon lag</translation>
-    </message>
 </context>
 </TS>
