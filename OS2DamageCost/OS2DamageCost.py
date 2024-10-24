@@ -99,6 +99,7 @@ from .helper import (#tr,
                      messI,
                      messW,
                      messC,
+                     messS,
                      read_config,
                      write_config,
                      handleRequest,
@@ -574,7 +575,8 @@ class FloodDamageCost:
         root = QgsProject.instance().layerTreeRoot()
         for v in vlist:
             ltl = root.findLayer(v)
-            sd.cbCellLayer.addItem(ltl.name(),ltl)
+            luri = ltl.layer().dataProvider().uri()
+            sd.cbCellLayer.addItem('{} ("{}"."{}")'.format(ltl.name(),luri.schema(), luri.table()),ltl)
         
        
         
@@ -586,9 +588,7 @@ class FloodDamageCost:
         
         ltl = sd.cbPolLayer.currentData()
         layeruri = ltl.layer().dataProvider().uri()
-        logI('layer: ' + layeruri.uri())
         connuri = QgsDataSourceUri(self.connection.uri())
-        logI('connection: ' + connuri.uri())
 
         # Giv bruger mulighed for at skrive schema.tabel navn i boks
 
@@ -633,7 +633,8 @@ class FloodDamageCost:
                 connuri.setTable(rtable)
                 
                 # Find specifik polygontype for lag
-                connuri.setWkbType(ltl.layer().wkbType())
+                wkbtype = QgsWkbTypes.multiType(ltl.layer().wkbType())
+                connuri.setWkbType(wkbtype)
 
                 # Find primary key for lag
                 pkids = ltl.layer().primaryKeyAttributes()
@@ -643,23 +644,34 @@ class FloodDamageCost:
                 connuri.setGeometryColumn('geom')
 
                 con_string = connuri.uri()
-                err = QgsVectorLayerExporter.exportLayer(ltl.layer(), con_string, 'postgres', QgsCoordinateReferenceSystem(ltl.layer().crs().authid()), cbox.isChecked())
+
+
+#                err = QgsVectorLayerExporter.exportLayer(ltl.layer(), con_string, 'postgres', QgsCoordinateReferenceSystem(ltl.layer().crs().authid()), cbox.isChecked())
+#                messC(str(err))
+                exporter = QgsVectorLayerExporter(con_string, 'postgres', fields=ltl.layer().fields(), crs=QgsCoordinateReferenceSystem(ltl.layer().crs().authid()), overwrite=False, geometryType=wkbtype)
+                if cbox.isChecked():
+                    exporter.addFeatures(ltl.layer().getSelectedFeatures())
+                else:
+                    exporter.addFeatures(ltl.layer().getFeatures())
+
                 self.connection.executeSql('ALTER TABLE "{}"."{}" ADD COLUMN IF NOT EXISTS val_intersect NUMERIC(12,2), ADD COLUMN IF NOT EXISTS num_intersect INTEGER'.format(rschema, rtable))
                 self.connection.executeSql('UPDATE "{}"."{}" SET val_intersect = 0.0 WHERE val_intersect IS NULL'.format(rschema, rtable))
                 self.connection.executeSql('UPDATE "{}"."{}" SET num_intersect = 0 WHERE num_intersect IS NULL'.format(rschema, rtable))
                 ltl.layer().setDataSource(con_string, ltl.layer().name(), 'postgres')
                 QgsExpressionContextUtils.setLayerVariable(ltl.layer(),'eco_celllayer',rschema + '.' + rtable)     
-
+                messS(self.tr('Layer "{} is converted to cell layer and copied to Flood Damage database as table "{}"."{}"').format(ltl.layer().name(), rschema, rtable))
         else:
             sqlc = 'ALTER TABLE "{}"."{}" ADD COLUMN IF NOT EXISTS val_intersect NUMERIC(12,2), ADD COLUMN IF NOT EXISTS num_intersect INTEGER'.format(layeruri.schema(), layeruri.table())
-            logI(sqlc)
             self.connection.executeSql(sqlc)
+
             ltl.layer().setDataSource( ltl.layer().source(), ltl.layer().name(), ltl.layer().providerType() )
+
             QgsExpressionContextUtils.setLayerVariable(ltl.layer(),'eco_celllayer',layeruri.schema() + '.' + layeruri.table())
+            messS(self.tr('Layer "{} is converted to a cell layer').format(ltl.layer().name()))
             
         self.pbUpdPolLayerClicked()        
         self.pbUpdCellLayerClicked()        
-                        
+        QgsProject.instance().reloadAllLayers()                        
 
     def pbCreateCellLayerClicked(self):
 

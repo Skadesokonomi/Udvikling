@@ -160,6 +160,14 @@ def messC(message, prefix=None, duration=30):
     iface.messageBar().pushMessage(prefix, message, Qgis.Critical, duration)
     iface.mainWindow().repaint()
 
+def messS(message, prefix=None, duration=20):
+    """Replace with explanation"""
+
+    global trClassName
+    prefix = prefix or trClassName
+    iface.messageBar().pushMessage(prefix, message, Qgis.Success, duration)
+    iface.mainWindow().repaint()
+
 
 def executeSQL(cmd, tab=None, showerror=True):
 
