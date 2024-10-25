@@ -4,12 +4,12 @@
 <context>
     <name>@default</name>
     <message>
-        <location filename="../helper.py" line="176"/>
+        <location filename="../helper.py" line="184"/>
         <source>Error on SQL command. Se log, tab: {} for command and error message</source>
         <translation>Fejl i SQL kommando. Læs loggen, faneblad &quot;{}&quot; for at se kommando og fejlbeskrivelse</translation>
     </message>
     <message>
-        <location filename="../helper.py" line="179"/>
+        <location filename="../helper.py" line="187"/>
         <source>Error on executing sql command
 ======
 The command was;
@@ -37,92 +37,92 @@ Fejlmeddelelse var:
 <context>
     <name>FloodDamageCost</name>
     <message>
-        <location filename="../OS2DamageCost.py" line="533"/>
+        <location filename="../OS2DamageCost.py" line="534"/>
         <source>Error using connection type: {}</source>
         <translation>Fejl ved brug af forbindelse: {}</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1048"/>
+        <location filename="../OS2DamageCost.py" line="1060"/>
         <source>Database connection and/or parametertable not set</source>
         <translation>Database forbindelse og/eller parametertabel ikke værdisat</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1247"/>
+        <location filename="../OS2DamageCost.py" line="1259"/>
         <source>Cant find item: &quot;{}&quot; in tree: &quot;{}&quot;</source>
         <translation>Kan ikke finde element: &quot;{}&quot; i træ: &quot;{}&quot;</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="303"/>
+        <location filename="../OS2DamageCost.py" line="304"/>
         <source>&amp;OS2 Flood Damage Cost</source>
         <translation>&amp;OS2 Skadesøkonomi</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="272"/>
+        <location filename="../OS2DamageCost.py" line="273"/>
         <source>Open OS2 Flood Damage Cost</source>
         <translation>Vis OS2 Skadesøkonomi</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1035"/>
+        <location filename="../OS2DamageCost.py" line="1047"/>
         <source>Error accessing parameter table</source>
         <translation>Fejl ved læsning af parametertabel</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1197"/>
+        <location filename="../OS2DamageCost.py" line="1209"/>
         <source>Execution of model: &quot;{}&quot; did not yield any results</source>
         <translation>Udførelse af model: {} gav ingen resultater</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="402"/>
+        <location filename="../OS2DamageCost.py" line="403"/>
         <source>Save Excel template file</source>
         <translation>Gem Excel skabelon fil</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="402"/>
+        <location filename="../OS2DamageCost.py" line="403"/>
         <source>Excel Files(*.xlsm);;All Files(*)</source>
         <translation>Excel Files(*.xlsm);;Alle Filer(*)</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="409"/>
+        <location filename="../OS2DamageCost.py" line="410"/>
         <source>Excel template file copied to: {}</source>
         <translation>Excel skabelon fil kopieret til: {}</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="426"/>
+        <location filename="../OS2DamageCost.py" line="427"/>
         <source>No layers processed: {antl}, Total no. of objects processed: {anto}</source>
         <translation>Antal behandlede lag: {antl}, Samlet antal objekter behandlet: {anto}</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="457"/>
+        <location filename="../OS2DamageCost.py" line="458"/>
         <source>Remove batch entry and result tables</source>
         <translation>Fjern batch kørsel og resultat tabeller</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="475"/>
+        <location filename="../OS2DamageCost.py" line="476"/>
         <source>Function not implemented (yet)</source>
         <translation>Funktion ikke implementeret (endnu)</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="459"/>
+        <location filename="../OS2DamageCost.py" line="460"/>
         <source>Run batch set of models</source>
         <translation>Udfør batch modeller</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="462"/>
+        <location filename="../OS2DamageCost.py" line="463"/>
         <source>Remove model entry and result table</source>
         <translation>Fjern model og resultat tabel</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="464"/>
+        <location filename="../OS2DamageCost.py" line="465"/>
         <source>Run model with possibly changed parameters</source>
         <translation>Kør nodel med muligvis ændrede paramtre</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="467"/>
+        <location filename="../OS2DamageCost.py" line="468"/>
         <source>Edit parameter value</source>
         <translation>redigér parameterværdi</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="498"/>
+        <location filename="../OS2DamageCost.py" line="499"/>
         <source>History filter is empty!</source>
         <translation>Historik filter ikke sat!</translation>
     </message>
@@ -146,39 +146,49 @@ Skriv et tabel navn for det klonede lag. (Schema placering er altid i resultat s
         <translation>Kopier kun valgte objekter</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1041"/>
+        <location filename="../OS2DamageCost.py" line="1053"/>
         <source>.. choose field</source>
         <translation>.. vælg felt</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1044"/>
+        <location filename="../OS2DamageCost.py" line="1056"/>
         <source>History function is not working. You probably have to update the database with update script: &quot;Opdatering af historik view&quot;</source>
         <translation>Historik funktion virker ikke. Det er sandsynligvis nødvendigt at opdatere databasen med script: &quot;Opdatering af historik view&quot;</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1317"/>
+        <location filename="../OS2DamageCost.py" line="1329"/>
         <source> models</source>
         <translation> modeller</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1317"/>
+        <location filename="../OS2DamageCost.py" line="1329"/>
         <source> run at </source>
         <translation> tidspunkt </translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1330"/>
+        <location filename="../OS2DamageCost.py" line="1342"/>
         <source> rows</source>
         <translation> rækker</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1330"/>
+        <location filename="../OS2DamageCost.py" line="1342"/>
         <source> seconds</source>
         <translation> sekunder</translation>
     </message>
     <message>
-        <location filename="../OS2DamageCost.py" line="1450"/>
+        <location filename="../OS2DamageCost.py" line="1462"/>
         <source>Select directory for CSV files</source>
         <translation>Vælge mappe for CSV filer</translation>
+    </message>
+    <message>
+        <location filename="../OS2DamageCost.py" line="662"/>
+        <source>Layer &quot;{} is converted to cell layer and copied to Flood Damage database as table &quot;{}&quot;.&quot;{}&quot;</source>
+        <translation>Lag &quot;{} er konverteret til et celle lag og kopieret til Skadesøkonomi databasen som tabel &quot;{}&quot;.&quot;{}&quot;</translation>
+    </message>
+    <message>
+        <location filename="../OS2DamageCost.py" line="670"/>
+        <source>Layer &quot;{} is converted to a cell layer</source>
+        <translation>Lag &quot;{} er konverteret til et celle lag</translation>
     </message>
 </context>
 <context>
