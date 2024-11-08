@@ -1,0 +1,94 @@
+Behandling;Kode;Tekst
+
+
+Slettes;054;Grøft
+Slettes;078;Mose
+Slettes;098;Rørsump
+Slettes;BYGN;Bygning
+Slettes;GGRG;Rabatgræs
+Slettes;RSKR;Rabatgræs skråning
+Slettes;SD;Stendige
+Slettes;SM;Sportsmål
+Slettes;SOE;Sø
+
+
+
+
+1.niveau;BGV;Bygværker
+1.niveau;BHP;Buske
+1.niveau;BL;Belægning
+1.niveau;BSK;Blomster
+1.niveau;BV;Bevoksning
+1.niveau;HogP;Hække og Pur
+1.niveau;SogKP;Slyng- og klatreplanter
+1.niveau;Traer;Træer
+1.niveau;VD;Vand
+1.niveau;VEJ;Veje, stier og fortove
+1.niveau;VT;Vintertjeneste
+1.niveau;VUD;Vejudstyr
+
+
+
+
+
+
+2.niveau;AfVa;Afvanding
+2.niveau;BogB;Bænke og borde
+2.niveau;CykSt;Cykelstativer
+2.niveau;Be;Fast belægning
+2.niveau;FAiG;Forsøgsarealer i græsrabatter
+2.niveau;FG;Fælledgræs
+2.niveau;GaBe;Gadebelysning
+2.niveau;LBe;Løs belægning
+2.niveau;RG;Rabatgræs
+
+
+
+
+('054','078','098','BYGN',
+'GGRG',
+'RSKR',
+'SD',  
+'SM',  
+'SOE') 
+
+
+
+ALTER TABLE IF EXISTS elementer.elementer_punkter DROP CONSTRAINT IF EXISTS elementer_punkter_element_typer_fk;
+
+ALTER TABLE IF EXISTS elementer.elementer_punkter
+    ADD CONSTRAINT elementer_punkter_element_typer_fk FOREIGN KEY (etype_key)
+    REFERENCES elementer.element_typer (etype_key) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS elementer.elementer_linjer DROP CONSTRAINT IF EXISTS elementer_linjer_element_typer_fk;
+
+ALTER TABLE IF EXISTS elementer.elementer_linjer
+    ADD CONSTRAINT elementer_linjer_element_typer_fk FOREIGN KEY (etype_key)
+    REFERENCES elementer.element_typer (etype_key) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+
+
+ALTER TABLE IF EXISTS elementer.element_flader_omraader DROP CONSTRAINT IF EXISTS element_flader_omraader_arbejds_elementer_flader_fk;
+ALTER TABLE IF EXISTS elementer.element_flader_omraader
+    ADD CONSTRAINT element_flader_omraader_arbejds_elementer_flader_fk FOREIGN KEY (element_id)
+    REFERENCES elementer.elementer_flader (id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS elementer.element_linjer_omraader DROP CONSTRAINT IF EXISTS element_linjer_omraader_arbejds_elementer_flader_fk;
+ALTER TABLE IF EXISTS elementer.element_linjer_omraader
+    ADD CONSTRAINT element_linjer_omraader_arbejds_elementer_linjer_fk FOREIGN KEY (element_id)
+    REFERENCES elementer.elementer_linjer (id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS elementer.element_punkter_omraader DROP CONSTRAINT IF EXISTS element_punkter_omraader_arbejds_elementer_flader_fk;
+ALTER TABLE IF EXISTS elementer.element_punkter_omraader
+    ADD CONSTRAINT element_punkter_omraader_arbejds_elementer_punkter_fk FOREIGN KEY (element_id)
+    REFERENCES elementer.elementer_punkter (id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
