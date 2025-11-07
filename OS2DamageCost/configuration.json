@@ -1,6 +1,6 @@
 {
     "Data": {
-        "Database": "postgres: fdc_hvidovre at localhost as postgres",
+        "Database": "postgres: flood_damage_mm at localhost as postgres",
         "Parametertable": "fdc_admin.parametre",
         "Parameterkeyfield": "name",
         "Parametervaluefield": "value",

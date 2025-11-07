@@ -1067,8 +1067,11 @@ class FloodDamageCost:
 
         mDict = {}
         nDict = {}
-      
+
+        # For alle grene (faneblade)
         for root in [sd.tvGeneral.model().invisibleRootItem().child(0,0),sd.tvQueries.model().invisibleRootItem().child(0,0),sd.tvData.model().invisibleRootItem().child(0,0),sd.tvModels.model().invisibleRootItem().child(0,0)]:
+
+            # For alle undergrene/blade i det enkelte faneblad som er afkrydset
             for item in self.iterItemsChecked(root, True):
                 parent = item.parent()
                 key = parent.child(item.row(),0).text()
