@@ -1,10 +1,10 @@
 {
     "Data": {
-        "Database": "",
+        "Database": "postgres: flood_damage_mm at localhost as postgres",
         "Parametertable": "fdc_admin.parametre",
-		"Parameterkeyfield" : "name",
-		"Parametervaluefield" : "value",
-		"Parameterkeyvalue" : "Fetch parameter table",
-        "Item delimiter" : "¤"
+        "Parameterkeyfield": "name",
+        "Parametervaluefield": "value",
+        "Parameterkeyvalue": "Fetch parameter table",
+        "Item delimiter": "\u00a4"
     }
 }

@@ -42,7 +42,7 @@ from qgis.PyQt.QtCore import (QSettings,
                               QTime,
                               QDateTime
                               )
-                          
+
 from qgis.PyQt.QtGui import QIcon
 
 from qgis.PyQt.QtWidgets import (QDialog,
@@ -72,7 +72,7 @@ from qgis.PyQt.Qt import (QStandardItemModel,
                           QStandardItem)
 
 from qgis.PyQt.QtSql import (QSqlDatabase, QSqlQuery)
-                          
+
 from qgis.core import (QgsProject,
                        QgsProviderRegistry,
                        QgsDataSourceUri,
@@ -120,7 +120,7 @@ from .helper import (#tr,
                      findLayerVariableList,
                      merge_layers_in_group,
                      populateLayerTreeCB,
-                     AssignSubAreas,                     
+                     AssignSubAreas,
                      executeSQL)
 
 from .OS2DamageCost_dockwidget import FloodDamageCostDockWidget
@@ -128,7 +128,7 @@ from .OS2DamageCost_dockwidget import FloodDamageCostDockWidget
 import os.path
 import time
 
-PARM_NO_COLUMNS = 10 
+PARM_NO_COLUMNS = 10
 
 class FloodDamageCost:
     """QGIS Plugin Implementation."""
@@ -156,7 +156,7 @@ class FloodDamageCost:
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
-            
+
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
@@ -189,8 +189,8 @@ class FloodDamageCost:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('FloodDamageCost', message)
-    
-    
+
+
     def add_action(
         self,
         icon_path,
@@ -376,16 +376,16 @@ class FloodDamageCost:
                 sd.pbCSVExportDir.clicked.connect(self.pbCSVExportDirClicked)
                 sd.pbCSVExport.clicked.connect(self.pbCSVExportClicked)
                 sd.leCSVExportDir.setText(tempfile.gettempdir().rstrip(os.path.sep))
-                
+
                 sd.pbAreaSub.clicked.connect(self.pbAreaSubClicked)
-                
+
 
                 self.pbDatabaseClicked()
                 self.pbParameterResetClicked()
                 self.pbUpdPolLayerClicked()
                 self.pbUpdCellLayerClicked()
-                self.pbAdministrationClicked()     
-                self.twFloodDamageCostCurrentChanged (6)                
+                self.pbAdministrationClicked()
+                self.twFloodDamageCostCurrentChanged (6)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -400,59 +400,59 @@ class FloodDamageCost:
         result_path = os.path.join(sd.leCSVExportDir.text(),'Databehandling_v11.xlsm')
         excel_path = os.path.join(self.plugin_dir,'excel','Databehandling_v11.xlsm')
 
-        fileName = QFileDialog.getSaveFileName(None, self.tr("Save Excel template file"),  
+        fileName = QFileDialog.getSaveFileName(None, self.tr("Save Excel template file"),
                                        result_path,
                                        self.tr("Excel Files(*.xlsm);;All Files(*)"))
 
-       
+
         if fileName[0] != '':
-            shutil.copy(excel_path, fileName[0]) 
-            messI(self.tr('Excel template file copied to: {}').format(fileName[0]))            
+            shutil.copy(excel_path, fileName[0])
+            messI(self.tr('Excel template file copied to: {}').format(fileName[0]))
 
     def twFloodDamageCostCurrentChanged (self, index):
-    
-        sd = self.dockwidget        
+
+        sd = self.dockwidget
         if index == 6:
             populateLayerTreeCB (sd.cbAreaLayer, QgsMapLayer.VectorLayer, QgsWkbTypes.PolygonGeometry)
-    
+
     def pbAreaSubClicked(self):
 
-        sd = self.dockwidget        
+        sd = self.dockwidget
         group_name = self.treeViewItemText(sd.tvGeneral,'Model_layergroup',2)
         subLayer = sd.cbAreaLayer.currentText()
         subColumn = sd.cbAreaColumn.currentText()
         #messI(subLayer + ' ' + subColumn)
         antl, anto = AssignSubAreas(group_name, 'omraade', ' ', subLayer, subColumn)
-        
-        messI (self.tr (f'No layers processed: {antl}, Total no. of objects processed: {anto}'))  
-        
-        
+
+        messI (self.tr (f'No layers processed: {antl}, Total no. of objects processed: {anto}'))
+
+
     def cbAreaLayerCurrentIndexChanged(self, index):
 
-        sd = self.dockwidget    
+        sd = self.dockwidget
         root = QgsProject.instance().layerTreeRoot()
 
         layerTreeId = sd.cbAreaLayer.currentData()
-        layerTree = root.findLayer(layerTreeId)  
-        if layerTree: 
+        layerTree = root.findLayer(layerTreeId)
+        if layerTree:
             layer = root.findLayer(layerTreeId).layer()
             sd.cbAreaColumn.clear()
             for c in layer.fields(): sd.cbAreaColumn.addItem (c.name(),c)
-        
-    
+
+
     def openHistMenu(self, position):
-    
-        sd = self.dockwidget        
+
+        sd = self.dockwidget
         indexes = sd.tvHistory.selectedIndexes()
 
         if len(indexes) > 0:
-       
+
             level = 0
             index = indexes[0]
             while index.parent().isValid():
                 index = index.parent()
                 level += 1
-        
+
             menu = QMenu()
             if level == 0:
                 action_batches_remove = menu.addAction(self.tr("Remove batch entry and result tables"))
@@ -468,7 +468,7 @@ class FloodDamageCost:
                 action_parameters_edit = menu.addAction(self.tr("Edit parameter value"))
                 action_parameters_edit.triggered.connect(lambda: messI(self.tr('Function not implemented (yet)')) )
 #                action_parameters_edit.triggered.connect(partial(self.not_implemented, 2, 3))
-        
+
             menu.exec_(sd.tvHistory.viewport().mapToGlobal(position))
 
     def not_implemented(self, level, mdlIdx):
@@ -478,38 +478,38 @@ class FloodDamageCost:
 
     def cbHistFieldsCurrentIndexChanged (self, index):
 
-        sd = self.dockwidget        
+        sd = self.dockwidget
         if index != 0:
-            sd.leHistFilter.setText(sd.leHistFilter.text() + '"{}" '.format(sd.cbHistFields.currentText()))  
+            sd.leHistFilter.setText(sd.leHistFilter.text() + '"{}" '.format(sd.cbHistFields.currentText()))
             sd.cbHistFields.setCurrentIndex(0)
 
     def cbHistOperatorsCurrentIndexChanged (self, index):
-        sd = self.dockwidget        
+        sd = self.dockwidget
         if index != 0:
-            sd.leHistFilter.setText(sd.leHistFilter.text() + sd.cbHistOperators.currentText())  
+            sd.leHistFilter.setText(sd.leHistFilter.text() + sd.cbHistOperators.currentText())
             sd.cbHistOperators.setCurrentIndex(0)
 
     def pbHistFilterSearchClicked(self):
 
         sd = self.dockwidget
         txt = sd.leHistFilter.text().strip()
-        if txt != '':  
+        if txt != '':
             self.loadHistTree(sd.tvHistory, self.connection,txt)
         else:
-            messC(self.tr('History filter is empty!'))       
+            messC(self.tr('History filter is empty!'))
 
-    def pbHistResetSearchClicked(self): 
+    def pbHistResetSearchClicked(self):
 
         sd = self.dockwidget
         sd.leHistFilter.setText('')
         self.loadHistTree(sd.tvHistory, self.connection,sd.leHistFilter.text())
 
     def pbAdministrationClicked(self):
-    
+
         sd = self.dockwidget
-        
+
         vis = (sd.twFloodDamageCost.isTabVisible(0) == False)
-        
+
         sd.twFloodDamageCost.setTabVisible(0,vis)
         sd.twFloodDamageCost.setTabVisible(1,vis)
         sd.twFloodDamageCost.setTabVisible(2,vis)
@@ -532,12 +532,12 @@ class FloodDamageCost:
 
         except Exception as e:
             logC(self.tr('Error using connection type: {}').format(k))
-                
+
         sd.cbDatabase.setCurrentIndex(sd.cbDatabase.findText(spd['Database']))
-        sd.leParameterTable.setText(spd['Parametertable'])        
-        #sd.leParameterSQL.setText(spd['ParameterSQL'])        
-        #sd.chbParameter.setChecked(spd['Load as layer'])        
-        
+        sd.leParameterTable.setText(spd['Parametertable'])
+        #sd.leParameterSQL.setText(spd['ParameterSQL'])
+        #sd.chbParameter.setChecked(spd['Load as layer'])
+
     def pbMapperExtentsClicked(self):
 
         sd = self.dockwidget
@@ -560,12 +560,12 @@ class FloodDamageCost:
 
             if (
                 not evalLayerVariable(ltl.layer(),'eco_celllayer') and
-                isinstance(ltl.layer(), QgsVectorLayer) and 
+                isinstance(ltl.layer(), QgsVectorLayer) and
                 ltl.layer().geometryType() == QgsWkbTypes.PolygonGeometry
             ):
                 logI('eft: ' + ltl.name())
                 sd.cbPolLayer.addItem(ltl.name(),ltl)
-        
+
     def pbUpdCellLayerClicked(self):
 
         sd = self.dockwidget
@@ -577,32 +577,32 @@ class FloodDamageCost:
             ltl = root.findLayer(v)
             luri = ltl.layer().dataProvider().uri()
             sd.cbCellLayer.addItem('{} ("{}"."{}")'.format(ltl.name(),luri.schema(), luri.table()),ltl)
-        
-       
-        
+
+
+
     def pbPromotePolLayerClicked(self):
 
         sd = self.dockwidget
-        
+
         # Datakilde for valgt lag
-        
+
         ltl = sd.cbPolLayer.currentData()
         layeruri = ltl.layer().dataProvider().uri()
         connuri = QgsDataSourceUri(self.connection.uri())
 
         # Giv bruger mulighed for at skrive schema.tabel navn i boks
 
-        if layeruri.host() != connuri.host() or layeruri.port() != connuri.port() or layeruri.database() != connuri.database(): 
+        if layeruri.host() != connuri.host() or layeruri.port() != connuri.port() or layeruri.database() != connuri.database():
 
             dlg = QDialog()
             dlg.setWindowTitle(self.tr('Name for new cell table'))
 
             layout = QVBoxLayout()
-            label = QLabel(self.tr("The chosen layer is not from the Flood Damage database; it has to be cloned. \n\nPlease specify (only) a tablename for the cloned layer. The schema defaults to the results schema")) 
-            label.setWordWrap(True) 
+            label = QLabel(self.tr("The chosen layer is not from the Flood Damage database; it has to be cloned. \n\nPlease specify (only) a tablename for the cloned layer. The schema defaults to the results schema"))
+            label.setWordWrap(True)
             layout.addWidget(label)
-            
-            
+
+
             input = QLineEdit()
             layout.addWidget(input)
             cbox = QCheckBox(self.tr('Copy only selected objects'))
@@ -620,25 +620,25 @@ class FloodDamageCost:
             dlg.setWindowFlags(dlg.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
             dlg.setSizeGripEnabled(True)
             res = dlg.exec()
-            
-            # Er der trykket på ok og er navnet udfyldt ? 
+
+            # Er der trykket på ok og er navnet udfyldt ?
 
             if res and len(input.text()) > 0:
                 rschema = self.treeViewItemText(sd.tvGeneral,'Result_schema',2)
-                rtable = input.text().strip().lower() 
+                rtable = input.text().strip().lower()
                 rtable = rtable.replace(' ','_').replace('"','').replace(';','_').replace('.','_').replace('æ','ae').replace('ø','oe').replace('å','aa').replace('ü','u')
-                
+
                 # Find connention string til database
                 connuri.setSchema(rschema)
                 connuri.setTable(rtable)
-                
+
                 # Find specifik polygontype for lag
                 wkbtype = QgsWkbTypes.multiType(ltl.layer().wkbType())
                 connuri.setWkbType(wkbtype)
 
                 # Find primary key for lag
                 pkids = ltl.layer().primaryKeyAttributes()
-                if len(pkids) > 0: connuri.setKeyColumn(ltl.layer().fields().names()[pkids[0]])                
+                if len(pkids) > 0: connuri.setKeyColumn(ltl.layer().fields().names()[pkids[0]])
 
                 # Sæt geometry kolonne navn
                 connuri.setGeometryColumn('geom')
@@ -658,7 +658,7 @@ class FloodDamageCost:
                 self.connection.executeSql('UPDATE "{}"."{}" SET val_intersect = 0.0 WHERE val_intersect IS NULL'.format(rschema, rtable))
                 self.connection.executeSql('UPDATE "{}"."{}" SET num_intersect = 0 WHERE num_intersect IS NULL'.format(rschema, rtable))
                 ltl.layer().setDataSource(con_string, ltl.layer().name(), 'postgres')
-                QgsExpressionContextUtils.setLayerVariable(ltl.layer(),'eco_celllayer',rschema + '.' + rtable)     
+                QgsExpressionContextUtils.setLayerVariable(ltl.layer(),'eco_celllayer',rschema + '.' + rtable)
                 messS(self.tr('Layer "{} is converted to cell layer and copied to Flood Damage database as table "{}"."{}"').format(ltl.layer().name(), rschema, rtable))
         else:
             sqlc = 'ALTER TABLE "{}"."{}" ADD COLUMN IF NOT EXISTS val_intersect NUMERIC(12,2), ADD COLUMN IF NOT EXISTS num_intersect INTEGER'.format(layeruri.schema(), layeruri.table())
@@ -668,10 +668,10 @@ class FloodDamageCost:
 
             QgsExpressionContextUtils.setLayerVariable(ltl.layer(),'eco_celllayer',layeruri.schema() + '.' + layeruri.table())
             messS(self.tr('Layer "{} is converted to a cell layer').format(ltl.layer().name()))
-            
-        self.pbUpdPolLayerClicked()        
-        self.pbUpdCellLayerClicked()        
-        QgsProject.instance().reloadAllLayers()                        
+
+        self.pbUpdPolLayerClicked()
+        self.pbUpdCellLayerClicked()
+        QgsProject.instance().reloadAllLayers()
 
     def pbCreateCellLayerClicked(self):
 
@@ -682,7 +682,7 @@ class FloodDamageCost:
         clayer = sd.leLayerName.text()
 
         rschema = ''
-        if clayer.find('.') < 0: # tablename without schema definition 
+        if clayer.find('.') < 0: # tablename without schema definition
             rschema = self.treeViewItemText(sd.tvGeneral,'Result_schema',2)
 
         if clayer and createCellTemplate and rschema:
@@ -696,16 +696,16 @@ class FloodDamageCost:
                 ymax=sd.dsbYMax.value(),
                 cellsize=sd.dsbCellSize.value()
             )
-    
+
     #        query = QSqlQuery()
-    #        query.exec(sqlCmd)    
+    #        query.exec(sqlCmd)
     #
     #        error = query.lastError().text()
     #        if error != '':
-    #            messC(error)                
+    #            messC(error)
     #
     #
-    #        else: 
+    #        else:
             query = executeSQL(sqlCmd)
             if query:
                 uri = self.conuri
@@ -715,7 +715,7 @@ class FloodDamageCost:
                 ltl = addLayer2Tree(QgsProject.instance().layerTreeRoot(), layer, True, 'eco_celllayer', clayer, os.path.join(self.plugin_dir, 'styles', 'cells.qml'), clayer)
                 sd.cbCellLayer.addItem(layer.name(), ltl)
                 sd.cbCellLayer.setCurrentIndex(sd.cbCellLayer.count()-1)
-            
+
     def pbClearValuesClicked(self):
 
         sd = self.dockwidget
@@ -724,7 +724,7 @@ class FloodDamageCost:
         uri = ltl.layer().dataProvider().uri()
         sqlCmd = clearTemplate.format(schema = uri.schema(), table = uri.table())
 #        query = QSqlQuery()
-#        query.exec(sqlCmd)    
+#        query.exec(sqlCmd)
         query = executeSQL(sqlCmd)
         if query:
             ltl.layer().triggerRepaint()
@@ -746,58 +746,58 @@ class FloodDamageCost:
 
         # Enumerate list
         for id in idList:
-            ltl = ltRoot.findLayer(id)        
+            ltl = ltRoot.findLayer(id)
             qsi = QStandardItem(ltl.name())
 
-            qname = QgsExpressionContextUtils.layerScope(ltl.layer()).variable('eco_resultlayer') 
+            qname = QgsExpressionContextUtils.layerScope(ltl.layer()).variable('eco_resultlayer')
 
             uri = ltl.layer().dataProvider().uri()
-            tabledef = uri.quotedTablename() 
+            tabledef = uri.quotedTablename()
             # Find query item
-            for item in self.iterItemsMatch(tvqmRoot, qname): 
+            for item in self.iterItemsMatch(tvqmRoot, qname):
                 # Find field item thats checkable
-                for jtem in self.iterRowCheckable(item): 
+                for jtem in self.iterRowCheckable(item):
                     qsisub = QStandardItem(jtem[2].text())
                     qsisub.setFlags(qsisub.flags() | Qt.ItemIsUserCheckable)
                     qsisub.setCheckState(Qt.Unchecked)
-                    vtype = 'Skadesomkostninger' if jtem[0].text()[:6]=='f_dama' else 'Værditab' if jtem[0].text()[:6]=='f_loss' else 'Risiko' 
-                    qsi.appendRow([qsisub,QStandardItem(vtype),QStandardItem(id)])  
-            
-            if qsi.hasChildren(): 
+                    vtype = 'Skadesomkostninger' if jtem[0].text()[:6]=='f_dama' else 'Værditab' if jtem[0].text()[:6]=='f_loss' else 'Risiko'
+                    qsi.appendRow([qsisub,QStandardItem(vtype),QStandardItem(id)])
+
+            if qsi.hasChildren():
                 rootC.appendRow([qsi, QStandardItem(ltl.parent().name()), QStandardItem('')])
-            
-            
+
+
             #if qsi.hasChildren(): rootC.appendRow([qsi, QStandardItem(ltl.parent().name())])
 
         sd.tvCells.setModel(modC)
         sd.tvCells.hideColumn(2)
         sd.tvCells.header().setStretchLastSection(True);
         sd.tvCells.header().setSectionResizeMode(QHeaderView.ResizeToContents)
-        sd.tvCells.setAlternatingRowColors(True)        
+        sd.tvCells.setAlternatingRowColors(True)
         sd.tvCells.expandAll()
 
     def pbDamageClicked(self):
 
         sd = self.dockwidget
         self.setCheckModel(sd.tvCells.model().invisibleRootItem(),'Skadesomkostninger',1,Qt.Checked)
-    
+
     def pbValueClicked(self):
 
         sd = self.dockwidget
         self.setCheckModel(sd.tvCells.model().invisibleRootItem(),'Værditab',1,Qt.Checked)
-    
+
     def pbRiskClicked(self):
 
         sd = self.dockwidget
         self.setCheckModel(sd.tvCells.model().invisibleRootItem(),'Risiko',1,Qt.Checked)
-    
+
     def pbClearAllClicked(self):
 
         sd = self.dockwidget
         self.setCheckModel(sd.tvCells.model().invisibleRootItem(),'Risiko',1,Qt.Unchecked)
         self.setCheckModel(sd.tvCells.model().invisibleRootItem(),'Værditab',1,Qt.Unchecked)
         self.setCheckModel(sd.tvCells.model().invisibleRootItem(),'Skadesomkostninger',1,Qt.Unchecked)
-    
+
     def setCheckModel(self,root,txt,col,value=Qt.Unchecked):
         if root is not None:
             stack = [root]
@@ -808,21 +808,21 @@ class FloodDamageCost:
                     child2 = parent.child(row, col)
                     if child.isCheckable() and child2.text() == txt: child.setCheckState(value)
                     if child.hasChildren(): stack.append(child)
-     
+
     def pbCellExtractClicked(self):
-        
+
         sd = self.dockwidget
-        
+
         # Update template information
-        for item in self.iterItemsMatch(sd.tvGeneral.model().invisibleRootItem(), 'update cell layer'): 
+        for item in self.iterItemsMatch(sd.tvGeneral.model().invisibleRootItem(), 'update cell layer'):
             parent = item.parent()
             updTemplate = parent.child(item.row(),2).text()
 
         # Cell table information
         cLtl = sd.cbCellLayer.currentData()
         cUri = cLtl.layer().dataProvider().uri()
-        cell_table = cUri.quotedTablename() 
-        geom_cell = cUri.geometryColumn()        
+        cell_table = cUri.quotedTablename()
+        geom_cell = cUri.geometryColumn()
         pci = cLtl.layer().dataProvider().pkAttributeIndexes()[0]
         pkey_cell = cLtl.layer().dataProvider().fields()[pci].name()
 
@@ -832,20 +832,20 @@ class FloodDamageCost:
             # Value table information
             parent = item.parent()
             layerId = parent.child(item.row(),2).text()
-            
-            vLtl = ltRoot.findLayer(layerId)        
+
+            vLtl = ltRoot.findLayer(layerId)
             vUri = vLtl.layer().dataProvider().uri()
-            value_table = vUri.quotedTablename() 
-            geom_value = vUri.geometryColumn()        
+            value_table = vUri.quotedTablename()
+            geom_value = vUri.geometryColumn()
             value_value = item.text()
             updCmd = updTemplate.format(cell_table=cell_table, pkey_cell=pkey_cell, geom_cell=geom_cell, value_table=value_table, geom_value=geom_value, value_value=value_value)
             query = executeSQL(updCmd)
- 
+
         cLtl.layer().triggerRepaint()
         cLtl.layer().reload()
         self.iface.mapCanvas().refresh()
 
-        #QgsProject.instance().reloadAllLayers()    
+        #QgsProject.instance().reloadAllLayers()
 
 
     def pbParameterSaveClicked(self):
@@ -871,13 +871,13 @@ class FloodDamageCost:
         insertDataQuery = QSqlQuery()
         insertDataQuery.prepare(insertCmd)
         for tv in [sd.tvGeneral, sd.tvQueries, sd.tvData, sd.tvModels]: #, sd.tvReports]:
-            for row in self.iterRowItems(tv.model().invisibleRootItem()): 
+            for row in self.iterRowItems(tv.model().invisibleRootItem()):
                 if row[0] == 'Group name template': row[2] = sd.leGroupName.text()
                 for i in range(len(row)): insertDataQuery.addBindValue(row[i])
                 insertDataQuery.exec()
-                if insertDataQuery.lastError().text() != '': logC(insertDataQuery.lastError().text())                
-              
-        
+                if insertDataQuery.lastError().text() != '': logC(insertDataQuery.lastError().text())
+
+
     def iterRowItems(self, root):
         if root is not None:
             stack = [root]
@@ -899,8 +899,8 @@ class FloodDamageCost:
         cnvDict = {'ogr':'QSPATIALITE','spatialite':'QSPATIALITE','postgres':'QPSQL','mssql':'QODBC'} # , 'oracle':'QOCI', 'sqlite':'QSQLITE'}
 
         if dbType in cnvDict:
-        
-            dbQtType = cnvDict[dbType]            
+
+            dbQtType = cnvDict[dbType]
             db = QSqlDatabase.addDatabase(dbQtType);
 
             if dbQtType ==  'QPSQL':
@@ -918,18 +918,18 @@ class FloodDamageCost:
 
             elif dbQtType ==  'QSPATIALITE':
 
-                db.setDatabaseName(uri.uri())    
+                db.setDatabaseName(uri.uri())
 
             if not db.open():
                 logC('dbConnection2Db: Open error: {}'.format(db.lastError().databaseText()))
                 messC('Database open error: {}'.format(db.lastError().databaseText()))
 
         else:
- 
+
             logC('dbConnection2Db: Unknown databasetype: {}'.format(dbType))
             return None, None
 
-        return uri    
+        return uri
 
     def get_postgres_conn_info(self, selected):
         """ Read PostgreSQL connection details from QSettings stored by QGIS
@@ -938,10 +938,10 @@ class FloodDamageCost:
         settings.beginGroup(u"/PostgreSQL/connections/" + selected)
         if not settings.contains("database"): # non-existent entry?
             return {}
-    
+
         conn_info = dict()
         conn_info["host"] = settings.value("host", "", type=str)
-    
+
         # password and username
         username = ''
         password = ''
@@ -967,7 +967,7 @@ class FloodDamageCost:
 
         schema = ''
         table = ''
-        geom = ''        
+        geom = ''
         if sd.leParameterTable.text().find('.') >= 0:
             sandt = sd.leParameterTable.text().split('.',1)
             schema = sandt[0]
@@ -980,23 +980,23 @@ class FloodDamageCost:
         if self.parameterLayer: addLayer2Tree(QgsProject.instance().layerTreeRoot(), self.parameterLayer, False, 'eco_layername', sd.leParameterTable.text(), os.path.join(self.plugin_dir, 'styles', 'parameters.qml'),'Parameters')
 
     def cbDatabaseCurrentIndexChanged(self, index):
-    
+
         sd = self.dockwidget
 
         if sd.cbDatabase.currentIndex() >= 0:
             setting = sd.cbDatabase.itemData(sd.cbDatabase.currentIndex())
             metadata = QgsProviderRegistry.instance().providerMetadata(setting[0])
             self.connection = metadata.findConnection(setting[1])
-            
-    
+
+
 
     def pbParameterResetClicked(self):
 
         sd = self.dockwidget
         spd = self.parm["Data"]
 
-        spd["Parametertable"] =  sd.leParameterTable.text() 
-        spd["Database"] =  sd.cbDatabase.currentText() 
+        spd["Parametertable"] =  sd.leParameterTable.text()
+        spd["Database"] =  sd.cbDatabase.currentText()
         write_config(os.path.join(self.plugin_dir, 'configuration.json'), self.parm)
 
         if sd.cbDatabase.currentIndex() >= 0:
@@ -1010,25 +1010,25 @@ class FloodDamageCost:
             self.conuri = self.dbConnection2Db (setting[0], setting[1])
             self.contype = setting[0]
 
-            self.parmDict, hl = self.createParmDict(spd["Parametertable"], spd["Parameterkeyfield"], spd["Parameterkeyvalue"], spd["Parametervaluefield"])        
+            self.parmDict, hl = self.createParmDict(spd["Parametertable"], spd["Parameterkeyfield"], spd["Parameterkeyvalue"], spd["Parametervaluefield"])
             if hl:
                 sd.leGroupName.setText(self.parmDict['Group name template']['value'])
                 (modG, modD, modQ, modM, modR) = self.createTreeModels (QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), QStandardItemModel(), self.parmDict, 'name', 'parent', 'checkable', 'explanation', hl)
-            
+
                 sd.tvGeneral.setModel(modG)
                 sd.tvData.setModel(modD)
                 sd.tvQueries.setModel(modQ)
                 sd.tvModels.setModel(modM)
                 #sd.tvReports.setModel(modR)
-    
+
                 for tv in [sd.tvGeneral, sd.tvData, sd.tvQueries, sd.tvModels]: #, sd.tvReports]:
                     for i in range(modG.columnCount()): tv.hideColumn(i)
                     for i in [0,2]: tv.showColumn(i)
-                    tv.header().setStretchLastSection(True);
+                    tv.header().setStretchLastSection(True)
                     tv.header().setSectionResizeMode(QHeaderView.ResizeToContents)
-                    tv.setAlternatingRowColors(True)        
+                    tv.setAlternatingRowColors(True)
                     tv.setUniformRowHeights(True)
-                    
+
                 sd.tvGeneral.expandAll()
                 sd.tvData.expandAll()
                 sd.tvQueries.expandAll()
@@ -1037,28 +1037,28 @@ class FloodDamageCost:
                 self.loadHistTree(sd.tvHistory, self.connection,'')
                 celllayer = self.parmDict['Cell layername']['value']
                 sd.leLayerName.setText(celllayer)
-                
+
                 cellsize = float(self.parmDict['Cell size']['value'])
                 sd.dsbCellSize.setValue(cellsize)
-                
+
                 self.pbMapperExtentsClicked()
                 self.pbUpdateLayerTreeClicked()
             else:
                 messC(self.tr('Error accessing parameter table'))
-                
+
             #hist_fields = [".. choose field", "batch_name ", "run_at ", "no_models ", "table_name ", "model_name ", "no_rows ", " no_secs ", "parameter_name " , "value "]
 
             try:
                 sd.cbHistFields.clear
                 hist_fields = [self.tr(".. choose field")] + [f.name() for f in self.connection.fields('fdc_results', 'used_parameters_view')]
                 sd.cbHistFields.addItems(hist_fields)
-            except: 
+            except:
                 messC(self.tr('History function is not working. You probably have to update the database with update script: "Opdatering af historik view"'))
-            
-            
+
+
         else:
             messC(self.tr('Database connection and/or parametertable not set'))
-            
+
     def pbModelRunClicked(self):
 
         sd = self.dockwidget
@@ -1067,24 +1067,26 @@ class FloodDamageCost:
 
         mDict = {}
         nDict = {}
-      
+
+        # Overfør alle elementer fra alle faneblade til een dictionary
         for root in [sd.tvGeneral.model().invisibleRootItem().child(0,0),sd.tvQueries.model().invisibleRootItem().child(0,0),sd.tvData.model().invisibleRootItem().child(0,0),sd.tvModels.model().invisibleRootItem().child(0,0)]:
             for item in self.iterItemsChecked(root, True):
                 parent = item.parent()
                 key = parent.child(item.row(),0).text()
                 if parent.child(item.row(),3).text() == 'Q': # Key is an alias
                     alias = parent.child(item.row(),6).text()
-                    #logI('alias='+alias)                    
+                    #logI('alias='+alias)
                     for k in mDict:
-                        #logI('key={}, value={}'.format(k,mDict[k]))                    
-                        if k.endswith(alias): 
-                            nDict[k.replace(alias,'')+key] = mDict[k] 
-                            #logI('***key={}, value={}'.format(k.replace(alias,'')+key,nDict[k.replace(alias,'')+key]))                    
+                        #logI('key={}, value={}'.format(k,mDict[k]))
+                        if k.endswith(alias):
+                            nDict[k.replace(alias,'')+key] = mDict[k]
+                            #logI('***key={}, value={}'.format(k.replace(alias,'')+key,nDict[k.replace(alias,'')+key]))
                 else:
                     value = parent.child(item.row(),2).text()
                     mDict[key] = value
 
-        for k,v in nDict.items(): mDict[k] = v
+        for k,v in nDict.items():
+            mDict[k] = v
 
         # Create results layergroup
         rGroup = createGroup(mDict['Model_layergroup'], QgsProject.instance().layerTreeRoot(), True)
@@ -1092,52 +1094,73 @@ class FloodDamageCost:
         rDtnGroup = createGroup(sd.leGroupName.text().format(time_stamp=time_stamp), rGroup, False)
         query = executeSQL('INSERT INTO fdc_results.batches (name, run_at, no_models) VALUES (\'{name}\', \'{time_stamp}\', 0) RETURNING bid;'.format(name=rDtnGroup.name(), time_stamp=time_stamp))
         if query:
-            while query.next(): 
+            while query.next():
                 bid = query.value(0)
 
         # run choosen models
         no_models = 0
-        for item in self.iterItemsChecked(sd.tvModels.model().invisibleRootItem().child(0,0)):
 
-            tic = time.perf_counter() 
-            qname, vlayer, no_rows, keylist, tablename = self.runModel(item, mDict)
-            toc = time.perf_counter()
-            no_secs = toc - tic
+#        Ny metode omfatter:
+#            1) Find gren med sektordata
+#            2) Find gren med oversvømmelses data
+#            3) Dobbeltløkke: Find alle afkrydsede sektordata -> Find alle afkrydsede oversvømmelsesdata
+#            4) For hvert par af sektordata/oversvømmelsesedata: Kør model og generer lag
+#               NB! Navngivning og sortering TBD +
+#                   ny funktion med angivelse af både sektor- og oversvømmelsesmodel-valg
 
-            if no_rows > 0:
-                query = executeSQL('INSERT INTO fdc_results.used_models ( bid, table_name, name, no_rows, no_secs) VALUES ({bid},\'{table}\',\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, no_rows=no_rows, no_secs=no_secs, table=tablename, name=item.text()))
-                if query:
-                    while query.next(): 
-                        mid = query.value(0)
-    
-                for k,v in keylist.items(): 
-                    if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
-    
-                if  vlayer: 
-                    addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
-    
-                no_models += 1
+        for item in self.iterItemsMatch(sd.tvModels.model().invisibleRootItem(), 'sector_models', 7):
+            sector_branch = item
+        logI('Sector text: ' + sector_branch.text())
+
+        for item in self.iterItemsMatch(sd.tvModels.model().invisibleRootItem(), 'flood_models', 7):
+            flood_branch = item
+        logI('Flood text: ' + flood_branch.text())
+
+        for item in self.iterItemsChecked(sector_branch):
+            for jtem in self.iterItemsChecked(flood_branch):
+                logI('Sektor: ' + item.text() + ', Oversvømmelse: ' + jtem.text())
+                mDict['Oversvømmelsesmodel, nutid'] = jtem.text()
+                # Run model, count milliseconds for each run
+                tic = time.perf_counter()
+                qname, vlayer, no_rows, keylist, tablename = self.runModel(item, mDict)
+                toc = time.perf_counter()
+                no_secs = toc - tic
+
+                if no_rows > 0:
+                    query = executeSQL('INSERT INTO fdc_results.used_models ( bid, table_name, name, no_rows, no_secs) VALUES ({bid},\'{table}\',\'{name}\', {no_rows}, {no_secs}) RETURNING mid;'.format(bid=bid, no_rows=no_rows, no_secs=no_secs, table=tablename, name=item.text()))
+                    if query:
+                        while query.next():
+                            mid = query.value(0)
+
+                    for k,v in keylist.items():
+                        if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
+
+                    if  vlayer:
+                        addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
+
+                    no_models += 1
 
 
         query = executeSQL('UPDATE fdc_results.batches SET no_models = {no_models} WHERE bid = {bid};'.format(no_models=no_models, bid = bid))
 
         self.pbUpdateLayerTreeClicked()
         self.pbHistResetSearchClicked()
-     
+
     def runModel (self, item, lDict):
-    
+
         sd = self.dockwidget
-        
+
         # First create query instance.
         query = QSqlQuery()
-        
+
         # Find query name
         parent = item.parent()
         lTxt = parent.child(item.row(),7).text() # From column "default"
         nTxt = parent.child(item.row(),0).text() # From column "name"
         # Create new tablename for result datasaet using model name and timestamp
         lDict['tablename_ts'] = createDateTimeName(item.text())
-        # Create artificial query entry in lDict using actual query entry        
+        # Create artificial query entry in lDict using actual query entry
+        logI('Query fra db: ' + lDict[lTxt])
         lDict['sqlquery'] = lDict[lTxt].format(**lDict)
 
         # Set return values ao to default
@@ -1146,8 +1169,9 @@ class FloodDamageCost:
         pattern = '\{[\w ,;]+\}'
 
         # Create create table... command
+        logI('Samlet pre-forespørgsel: ' + qct)
         qct = lDict['Create_result_table'].format(**lDict)
-        
+        logI('Samlet forespørgsel: ' + qct)
         # Create table by executing command
         query = executeSQL(qct, showerror=False)
 
@@ -1156,46 +1180,46 @@ class FloodDamageCost:
 
             query = executeSQL('SELECT COUNT(*) FROM "{}"."{}"'.format(lDict['Result_schema'],lDict['tablename_ts']))
             if query:
-                while query.next(): 
+                while query.next():
                     cnt = query.value(0)
-    
+
             if 'f_geom_'+ lTxt in lDict:
-    
-                # Create artificial geom_column entry in lDict using actual query name        
-                lDict['geom_column'] = lDict['f_geom_' + lTxt] 
+
+                # Create artificial geom_column entry in lDict using actual query name
+                lDict['geom_column'] = lDict['f_geom_' + lTxt]
                 geom_col = lDict['geom_column']
-        
+
                 # Create spatial index... command
                 qct = lDict['Create_result_index'].format(**lDict)
                 # Create spatial index by executing command
-                query = executeSQL(qct) 
+                query = executeSQL(qct)
             else:
                 geom_col = ''
-            
-    
+
+
             if 'f_pkey_'+ lTxt in lDict:
-                # Create artificial pkey_column entry in lDict using actual query name        
-    
+                # Create artificial pkey_column entry in lDict using actual query name
+
                 lDict['pkey_column'] = lDict['f_pkey_'+ lTxt]
                 pkey_col = lDict['pkey_column']
-        
+
                 # Create primary key... command
                 qct = lDict['Create_result_pkey'].format(**lDict)
-        
+
                 # Create primary key by executing command
-    #            query.exec(qct) 
-                query = executeSQL(qct) 
+    #            query.exec(qct)
+                query = executeSQL(qct)
             else:
                 pkey_col = ''
 
             # Create keylist
             kl['SQL expression'] = lDict['sqlquery'].replace("'","''")
             kl[lTxt] = lDict[lTxt].replace("'","''")
-            ldlt =   lDict[lTxt]  
-            for match in re.finditer(pattern,ldlt): 
+            ldlt =   lDict[lTxt]
+            for match in re.finditer(pattern,ldlt):
                 k = ldlt[match.start()+1:match.end()-1]
                 kl[k] = lDict[k]
-            
+
 
             # Create layer with new table and add it to mapper
             contype = self.contype
@@ -1209,13 +1233,13 @@ class FloodDamageCost:
             messI(self.tr('Execution of model: "{}" did not yield any results').format(nTxt))
             return lTxt, None, cnt, kl, lDict['tablename_ts']
 
-        
+
 #    def createTempParmDict (self, roots):
 #
-#        tDict = {}    
+#        tDict = {}
 #        for r in roots:
 #            r0 = r[0]
-#            r1 = r[1]            
+#            r1 = r[1]
 #            for row in range(r0.rowCount()):
 #                key   = r0.child(row, 0).text()
 #                value = r0.child(row, 2).text()
@@ -1229,6 +1253,7 @@ class FloodDamageCost:
 #
 #        return tDict
 
+
     def iterItemsChecked(self, root, dontCheck=False):
         if root is not None:
             stack = [root]
@@ -1239,27 +1264,27 @@ class FloodDamageCost:
                     if child.checkState() == Qt.Checked or dontCheck : yield child
                     if child.hasChildren(): stack.append(child)
 
-    def iterItemsMatch(self, root, match=None):
+    def iterItemsMatch(self, root, match=None,column=0):
         if root is not None:
             stack = [root]
             while stack:
                 parent = stack.pop(0)
                 for row in range(parent.rowCount()):
                     child = parent.child(row, 0)
-                    if match is None or match == child.text(): yield child
-                    if child.hasChildren(): stack.append(child)
+                    if (match is None) or (match == parent.child(row, column).text()): yield child
+                    if (child.hasChildren()): stack.append(child)
 
     def treeViewItemText(self, tv, match, column):
-         
+
         root = tv.model().invisibleRootItem()
         for item in self.iterItemsMatch(root, match):
             parent = item.parent()
             return parent.child(item.row(),column).text()
-        
+
         messC(self.tr('Can''t find item: "{}" in tree: "{}"').format(match,tv.objectName()),'treeViewItemText')
         return None
-        
-        
+
+
     def iterRowCheckable(self, root, dontCheck=False):
         if root is not None:
             stack = [root]
@@ -1276,26 +1301,26 @@ class FloodDamageCost:
     def createParmDict(self, ptable, pkfield, pkvalue, pvfield):
 
         txt = 'SELECT "{0}" FROM {1} WHERE "{2}"=\'{3}\''.format( pvfield, ptable, pkfield, pkvalue)
-        query = executeSQL(txt) 
-         
+        query = executeSQL(txt)
+
         if query:
             while query.next(): txt = query.value(0)
             txt = txt.format(parametertable=ptable)
 
-            query = executeSQL(txt) 
+            query = executeSQL(txt)
             if query:
                 #logI('createparmDict, sql udført')
-                pdict = {}    
+                pdict = {}
                 while query.next():
                     ldict = {}
                     rec = query.record()
-                    for i in range(rec.count()-1): 
+                    for i in range(rec.count()-1):
                         #logI('createparmDict, value ' + str(rec.fieldName(i)) + ' = ' + str(query.value(i)))
                         ldict[rec.fieldName(i)] = query.value(i)
                     pdict[query.value(pkfield)] = ldict
-        
+
                 return pdict, [rec.fieldName(i) for i in range(rec.count()-1)]
-        
+
         return None, None
 
     def loadHistTree(self, tv, connection, filter):
@@ -1305,19 +1330,19 @@ class FloodDamageCost:
         tv.header().setDefaultSectionSize(90)
         tv.header().setStretchLastSection(True);
         tv.header().setSectionResizeMode(QHeaderView.ResizeToContents)
-        tv.setAlternatingRowColors(True)        
+        tv.setAlternatingRowColors(True)
         tv.setUniformRowHeights(True)
         tv.setModel(self.importHistModel(connection, model, filter))
-        tv.setEditTriggers(QAbstractItemView.NoEditTriggers)     
+        tv.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
     def importHistModel(self, connection, model, filter=''):
 
         model.setRowCount(0)
         root = model.invisibleRootItem()
 
-        if filter != '': 
+        if filter != '':
             txtWhere = ' WHERE {filter} '.format(filter=filter)
-        else: 		
+        else:
             txtWhere = ' '
 
         txtSql_b = 'SELECT {} FROM fdc_results.used_parameters_view {} GROUP BY 1,2,3,4 ORDER BY 1'.format('"' + '","'.join([f.name() for f in self.connection.fields('fdc_results', 'batches_view')]) +  '"',txtWhere)
@@ -1354,13 +1379,13 @@ class FloodDamageCost:
                 QStandardItem(str(row_p[2])),
                 QStandardItem(str(row_p[3])),
             ])
-        
+
         return model
 
 
 
 
-        
+
     def createTreeModels (self, modG, modD, modQ, modM, modR, pDict, fieldN, fieldP, fieldC, fieldE, hl):
 
         #QStandardItemModel()
@@ -1375,7 +1400,7 @@ class FloodDamageCost:
         modQ.setHorizontalHeaderLabels(hl)
         modM.setHorizontalHeaderLabels(hl)
         modR.setHorizontalHeaderLabels(hl)
-        
+
         rootG = modG.invisibleRootItem()
         rootD = modD.invisibleRootItem()
         rootQ = modQ.invisibleRootItem()
@@ -1393,7 +1418,7 @@ class FloodDamageCost:
                 elif v[fieldN] == 'Reports': parent = rootR
 
             else:
-                parent = pDict[v[fieldP]]['_Id_']            
+                parent = pDict[v[fieldP]]['_Id_']
 
             row = []
             cable = False
@@ -1405,8 +1430,8 @@ class FloodDamageCost:
                         qsi.setCheckState(Qt.Unchecked)
                         cable = True
                     if v[fieldE] != 'NULL' or v[fieldE] != '': qsi.setToolTip(str(v[fieldE]))
-                row.append(qsi) 
-                
+                row.append(qsi)
+
             parent.appendRow(row)
             if cable: parent.setFlags(parent.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable)
             pDict[k]['_Id_'] = parent.child(parent.rowCount() - 1)
@@ -1429,7 +1454,7 @@ class FloodDamageCost:
     #    self.tvAllDoubleClicked(self.dockwidget.tvReports, index)
 
     def tvAllDoubleClicked(self, tree, index):
-    
+
         sd = self.dockwidget
         spd = self.parm["Data"]
         parent = index.parent()
@@ -1444,9 +1469,9 @@ class FloodDamageCost:
         rect = tree.visualRect(parent.child(row, 0))
         pos = tree.viewport().mapToGlobal(rect.topLeft())
         width = int(sd.width()*0.8)
-        
+
         result, newval, newval2 =  self.treeViewEditItem(pos, width, val)
-        
+
         if result and newval:
             it = parent.child(row, 2)
             it.model().setData(it, newval)
@@ -1460,7 +1485,7 @@ class FloodDamageCost:
         sd = self.dockwidget
         run_dir = sd.leCSVExportDir.text()
         new_dir = QFileDialog.getExistingDirectory(None, self.tr("Select directory for CSV files"), run_dir, QFileDialog.ShowDirsOnly)
-        if new_dir: 
+        if new_dir:
             sd.leCSVExportDir.setText(new_dir)
 
     def pbCSVExportClicked (self):
@@ -1489,7 +1514,7 @@ class FloodDamageCost:
                 input = QLineEdit()
                 input.setText(val[2])
 
-            elif func=='P': # Multiple line           
+            elif func=='P': # Multiple line
 
                 input = QTextEdit()
                 input.setText(val[2])
@@ -1516,7 +1541,7 @@ class FloodDamageCost:
                 input.clear()
                 input.addItems(val[6].split(spdid))
                 input.setCurrentIndex(input.findText(val[2]))
-                
+
             elif func=='M': # Multiple select
 
                 input = QgsCheckableComboBox()
@@ -1525,20 +1550,20 @@ class FloodDamageCost:
                 input.addItems(val[6].split(spdid))
                 input.setCheckedItems(val[2].split(spdid))
                 #input.checkedItems()-- liste med checked items
-                
+
             elif func=='X': # Datetime
 
                 input = QDateTimeEdit()
                 input.setDateTime(QDateTime.fromString(val[2],"yyyy-MM-dd HH:mm:ss"))
                 input.setCalendarPopup(True)
 
-                
+
             elif func=='D': # Date
 
                 input = QDateEdit()
                 input.setDate(QDate.fromString(val[2],"yyyy-MM-dd"))
                 input.setCalendarPopup(True)
-                
+
             elif func=='E': # Time
 
                 input = QTimeEdit()
@@ -1570,7 +1595,7 @@ class FloodDamageCost:
 
                 input = TreeItemSelector(sd.tvData)
                 input.setFullName(val[2],'S',val[7])
-                
+
             layout.addWidget(input,5)
 
             buttonBox = QDialogButtonBox()
@@ -1586,47 +1611,47 @@ class FloodDamageCost:
             dlg.move(pos)
             dlg.setSizeGripEnabled(True)
             res = dlg.exec()
-            
+
             value2 = None
-            
+
             if res:
 
                 if func=='T': # Single line
-    
+
                     value = input.text()
-    
-                elif func=='P': # Multiple line           
-    
+
+                elif func=='P': # Multiple line
+
                     value = input.toPlainText()
-    
+
                 elif func=='R': # Real value
-    
+
                     value = str(input.value())
-    
+
                 elif func=='I': # Integer value
-    
+
                     value = str(input.value())
-    
+
                 elif func=='O': # Single select
-    
+
                     value = str(input.currentText())
-                    
+
                 elif func=='M': # Multiple select
-    
+
                     value = spdid.join(input.checkedItems())
-                    
+
                 elif func=='X': # Datetime
-    
+
                     value = input.dateTime().toString("yyyy-MM-dd HH:mm:ss")
-                    
+
                 elif func=='D': # Date
-    
+
                     value = input.date().toString("yyyy-MM-dd")
-                    
+
                 elif func=='E': # Time
-    
+
                     value = input.time().toString("HH:mm:ss")
-    
+
                 elif func=='B': # Boolean
 
                     value = 'True' if input.isChecked() else 'False'
@@ -1642,12 +1667,12 @@ class FloodDamageCost:
                 elif func=='Q': # Tree selector
 
                     value, value2 = input.getFullName()
-                
+
             else:
                 value = None
-                
+
             return res, value, value2
-            
+
         return None, None
 
 class DBTableSelector(QWidget):
@@ -1664,7 +1689,7 @@ class DBTableSelector(QWidget):
         self.tName= None
 
         layout = QVBoxLayout()
-        
+
         if (self.connection.capabilities() & QgsAbstractDatabaseProviderConnection.Schemas):
 
             self.schemaLabel = QLabel()
@@ -1695,7 +1720,7 @@ class DBTableSelector(QWidget):
 
     def schemaNamesCurrentIndexChanged(self, index):
 
-        if self.schemaNames is not None: self.sName = self.schemaNames.currentText() 
+        if self.schemaNames is not None: self.sName = self.schemaNames.currentText()
         self.setTableNames(self.sName, self.tName)
 
     def setTableNames(self, schema, table):
@@ -1704,18 +1729,18 @@ class DBTableSelector(QWidget):
 
         self.tableNames.clear()
         for t in tables: self.tableNames.addItem(t.tableName())
-        
-        self.tableNames.setCurrentIndex(self.tableNames.findText(table))                
+
+        self.tableNames.setCurrentIndex(self.tableNames.findText(table))
 
     def tableNamesCurrentIndexChanged(self, index):
-        self.tName = self.tableNames.currentText() 
-    
+        self.tName = self.tableNames.currentText()
+
     def getFullName(self):
         if self.sName is not None:
             return '"{}"."{}"'.format(self.sName,self.tName)
         else:
             return '"{}"'.format(self.tName)
-    
+
     def setFullName(self,fullName=''):
 
         if fullName != '':
@@ -1723,13 +1748,13 @@ class DBTableSelector(QWidget):
             names = fullName.replace('"','').split('.')
 
             if len(names) == 2:
-                self.sName = names[0]        
-                self.tName = names[1] 
+                self.sName = names[0]
+                self.tName = names[1]
 
-            else:            
-                self.tName = names[0]        
+            else:
+                self.tName = names[0]
 
-        if self.sName is not None: self.schemaNames.setCurrentIndex(self.schemaNames.findText(self.sName))                
+        if self.sName is not None: self.schemaNames.setCurrentIndex(self.schemaNames.findText(self.sName))
         self.setTableNames(self.sName, self.tName)
 
 class DBFieldSelector(QWidget):
@@ -1756,36 +1781,36 @@ class DBFieldSelector(QWidget):
 
 
     def fieldNamesCurrentIndexChanged(self, index):
-        self.fName = self.fieldNames.currentText() 
-    
+        self.fName = self.fieldNames.currentText()
+
     def getFieldName(self):
         return '"{}"'.format(self.fName)
-    
+
     def setFieldName(self, fullName='', fieldName=''):
 
         fieldName = fieldName.replace('"','')
-        
+
         if fullName != '':
 
             names = fullName.replace('"','').split('.')
 
             if len(names) == 2:
-                self.sName = names[0]        
-                self.tName = names[1] 
+                self.sName = names[0]
+                self.tName = names[1]
 
-            else:            
-                self.tName = names[0]        
+            else:
+                self.tName = names[0]
 
         self.fieldNames.clear()
 
         if self.connection.tableExists (self.sName, self.tName):
- 
+
             fields = self.connection.fields(self.sName, self.tName)
             for f in fields: self.fieldNames.addItem(f.name())
 
-        self.fieldNames.setCurrentIndex(self.fieldNames.findText(fieldName))                
+        self.fieldNames.setCurrentIndex(self.fieldNames.findText(fieldName))
         self.fName = self.fieldNames.currentText()
-        
+
 class TreeItemSelector(QWidget):
 
     """
@@ -1799,7 +1824,7 @@ class TreeItemSelector(QWidget):
         self.tree = tree
         self.fName = None
         self.fVal = None
-        
+
         self.treeLabel = QLabel()
         self.treeLabel.setText(treePrefix)
         self.treeNames = QComboBox()
@@ -1811,13 +1836,13 @@ class TreeItemSelector(QWidget):
         self.setLayout(layout)
 
     def treeNamesCurrentIndexChanged(self, index):
-        self.fName = self.treeNames.currentText() 
-        self.fVal = self.treeNames.currentData() 
-    
+        self.fName = self.treeNames.currentText()
+        self.fVal = self.treeNames.currentData()
+
     def getFullName(self):
-        
+
         return self.fName, self.fVal
-    
+
     def iterRowItems(self, root):
         if root is not None:
             stack = [root]
@@ -1836,7 +1861,7 @@ class TreeItemSelector(QWidget):
 
         root = self.tree.model().invisibleRootItem()
 
-        for row in self.iterRowItems(root): 
+        for row in self.iterRowItems(root):
             name  = row[0]
             value = row[2]
             type  = row[3]
@@ -1850,5 +1875,5 @@ class TreeItemSelector(QWidget):
 #            type  = root.child(row,3).text()
 #            if name.startswith(treeSearch) and type == treeType: self.treeNames.addItem(value, name)
 
-        self.treeNames.setCurrentIndex(self.treeNames.findText(fullName))     
+        self.treeNames.setCurrentIndex(self.treeNames.findText(fullName))
 
