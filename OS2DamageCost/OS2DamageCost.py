@@ -1169,7 +1169,7 @@ class FloodDamageCost:
         pattern = '\{[\w ,;]+\}'
 
         # Create create table... command
-        logI('Samlet pre-forespørgsel: ' + qct)
+        logI('Samlet pre-forespørgsel: ' + lDict['Create_result_table'])
         qct = lDict['Create_result_table'].format(**lDict)
         logI('Samlet forespørgsel: ' + qct)
         # Create table by executing command
