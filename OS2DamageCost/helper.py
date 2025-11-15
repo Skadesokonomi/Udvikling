@@ -219,14 +219,14 @@ def xstr(s, r=''):
     return r if not s else str(s)
 
 
-def createGroup(groupName, root, top=False):
+def createGroup(groupName, root, top=False, addName = None):
     """TBD"""
 
     group = root.findGroup(groupName)
 
     if group is None:
         if top:
-            group = root.insertGroup(0, groupName)            
+            group = root.insertGroup(0, groupName + (addName if addName is not None else ''))            
         else:
             group = root.addGroup(groupName)
     return group

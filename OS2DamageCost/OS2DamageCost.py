@@ -1068,23 +1068,39 @@ class FloodDamageCost:
         mDict = {}
         nDict = {}
 
-        # Overfør alle elementer fra alle faneblade til een dictionary
+        # Overfør alle elementer fra alle faneblade til een master dictionary
         for root in [sd.tvGeneral.model().invisibleRootItem().child(0,0),sd.tvQueries.model().invisibleRootItem().child(0,0),sd.tvData.model().invisibleRootItem().child(0,0),sd.tvModels.model().invisibleRootItem().child(0,0)]:
             for item in self.iterItemsChecked(root, True):
+
                 parent = item.parent()
                 key = parent.child(item.row(),0).text()
+                value = parent.child(item.row(),2).text()
+                
                 if parent.child(item.row(),3).text() == 'Q': # Key is an alias
                     alias = parent.child(item.row(),6).text()
-                    #logI('alias='+alias)
+                    logI('alias='+alias)
                     for k in mDict:
                         #logI('key={}, value={}'.format(k,mDict[k]))
                         if k.endswith(alias):
                             nDict[k.replace(alias,'')+key] = mDict[k]
                             #logI('***key={}, value={}'.format(k.replace(alias,'')+key,nDict[k.replace(alias,'')+key]))
+
+                
+#                elif parent.child(item.row(),3).text() == 'U': # Key is an U alias
+#                    alias = value
+#                    logI('U alias: ' + key + ' -> '+ alias)
+#                    # Tjek eksisterende entries i mDict og find elementer, som indeholder alias som en del af nøglen 
+#                    for k in mDict:
+#                        if k.endswith(alias):
+#                            # Opret nyt element i nDict som laver en tilsvarende nøgle baseret på org key og hvor value findes i den fundne mDict element
+#                            nkey = k.replace(alias,'')+key # Ny nøgle
+#                            nDict[nkey] = mDict[k] # value i nyt element sættes tilvalue fra fundet mDict element
+#                            logI('***key={}, value={}'.format(nkey, nDict[nkey])
                 else:
-                    value = parent.child(item.row(),2).text()
+                    # nøgle/vlalue er simpel,  overføres uændret
                     mDict[key] = value
 
+        # Overfør evt. oprettede nye element fra nDict til mDict
         for k,v in nDict.items():
             mDict[k] = v
 
@@ -1110,19 +1126,25 @@ class FloodDamageCost:
 
         for item in self.iterItemsMatch(sd.tvModels.model().invisibleRootItem(), 'sector_models', 7):
             sector_branch = item
-        logI('Sector text: ' + sector_branch.text())
+        #logI('Sector text: ' + sector_branch.text())
 
         for item in self.iterItemsMatch(sd.tvModels.model().invisibleRootItem(), 'flood_models', 7):
             flood_branch = item
-        logI('Flood text: ' + flood_branch.text())
+        #logI('Flood text: ' + flood_branch.text())
 
         for item in self.iterItemsChecked(sector_branch):
             for jtem in self.iterItemsChecked(flood_branch):
-                logI('Sektor: ' + item.text() + ', Oversvømmelse: ' + jtem.text())
-                mDict['Oversvømmelsesmodel, nutid'] = jtem.text()
+                alias = jtem.parent().child(jtem.row(),2).text()
+                logI('Sektor: ' + item.text() + ', Oversvømmelse: ' + jtem.text() + ', Alias: ' + alias)
+                mDict['Oversvømmelsesmodel, nutid'] = mDict[alias]
+                mDict['f_pkey_'+'Oversvømmelsesmodel, nutid'] = mDict['f_pkey_'+alias]
+                mDict['f_geom_'+'Oversvømmelsesmodel, nutid'] = mDict['f_geom_'+alias]
+                mDict['f_depth_'+'Oversvømmelsesmodel, nutid'] = mDict['f_depth_'+alias]
+                
                 # Run model, count milliseconds for each run
                 tic = time.perf_counter()
-                qname, vlayer, no_rows, keylist, tablename = self.runModel(item, mDict)
+                qname, vlayer, no_rows, keylist, tablename = self.runModel(item, jtem, mDict)
+                logI('{} & {} & {} & {} & {}'.format(qname, vlayer, no_rows, keylist, tablename))
                 toc = time.perf_counter()
                 no_secs = toc - tic
 
@@ -1136,7 +1158,7 @@ class FloodDamageCost:
                         if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
 
                     if  vlayer:
-                        addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text())
+                        addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text()+ '/' + jtem.text())
 
                     no_models += 1
 
@@ -1146,7 +1168,7 @@ class FloodDamageCost:
         self.pbUpdateLayerTreeClicked()
         self.pbHistResetSearchClicked()
 
-    def runModel (self, item, lDict):
+    def runModel (self, item, jtem, lDict):
 
         sd = self.dockwidget
 
@@ -1158,7 +1180,7 @@ class FloodDamageCost:
         lTxt = parent.child(item.row(),7).text() # From column "default"
         nTxt = parent.child(item.row(),0).text() # From column "name"
         # Create new tablename for result datasaet using model name and timestamp
-        lDict['tablename_ts'] = createDateTimeName(item.text())
+        lDict['tablename_ts'] = createDateTimeName(item.text()+'_'+jtem.text())
         # Create artificial query entry in lDict using actual query entry
         logI('Query fra db: ' + lDict[lTxt])
         lDict['sqlquery'] = lDict[lTxt].format(**lDict)
@@ -1505,11 +1527,16 @@ class FloodDamageCost:
 
         func = val[3].strip().upper()
 
-        if func in ['T','P','R','I','O','M','X','D','E','B','S','F','Q']:
+        if func in ['T','P','R','I','O','M','X','D','E','B','S','F','Q','U']:
 
             layout = QVBoxLayout()
 
             if func=='T': # Single line
+
+                input = QLineEdit()
+                input.setText(val[2])
+
+            elif func=='U': # Single line
 
                 input = QLineEdit()
                 input.setText(val[2])
@@ -1617,6 +1644,10 @@ class FloodDamageCost:
             if res:
 
                 if func=='T': # Single line
+
+                    value = input.text()
+
+                elif func=='U': # Single line, alias
 
                     value = input.text()
 
