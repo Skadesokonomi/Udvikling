@@ -117,6 +117,7 @@ from .helper import (#tr,
                      isInt,
                      isFloat,
                      mapperExtent,
+                     sanitizeName,
                      findLayerVariableList,
                      merge_layers_in_group,
                      populateLayerTreeCB,
@@ -1158,7 +1159,7 @@ class FloodDamageCost:
                         if k[0:2] != 'f_' and k[0:2] != 't_': query = executeSQL('INSERT INTO fdc_results.used_parameters (mid, name, value) VALUES ({mid},\'{name}\',\'{value}\');'.format(mid=mid, name=k, value=v))
 
                     if  vlayer:
-                        addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text()+ '/' + jtem.text())
+                        addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text()+ ' - ' + jtem.text())
 
                     no_models += 1
 
@@ -1180,7 +1181,7 @@ class FloodDamageCost:
         lTxt = parent.child(item.row(),7).text() # From column "default"
         nTxt = parent.child(item.row(),0).text() # From column "name"
         # Create new tablename for result datasaet using model name and timestamp
-        lDict['tablename_ts'] = createDateTimeName(item.text()+'_'+jtem.text())
+        lDict['tablename_ts'] = createDateTimeName(sanitizeName(item.text())+'_'+sanitizeName(jtem.text()))
         # Create artificial query entry in lDict using actual query entry
         logI('Query fra db: ' + lDict[lTxt])
         lDict['sqlquery'] = lDict[lTxt].format(**lDict)

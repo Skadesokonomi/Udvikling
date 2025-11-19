@@ -806,6 +806,16 @@ def isTime(s, f):
         return False
     return True
 
+def sanitizeName(tablename):
+
+    tablename = tablename.lower()
+
+    replace_dict= {"%":"_","&":"_","-":"_",".":"_",",":"_"," ":"_","!":"_","?":"_","æ":"ae","ø":"oe","å":"aa"}
+    for old, new in replace_dict.items(): tablename = tablename.replace(old, new)
+
+    return tablename
+    
+
 def merge_layers_in_group(group_name, result_path):
     # Get the group from the layer panel
     group = QgsProject.instance().layerTreeRoot().findGroup(group_name)
