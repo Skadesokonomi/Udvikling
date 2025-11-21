@@ -1137,10 +1137,10 @@ class FloodDamageCost:
             for jtem in self.iterItemsChecked(flood_branch):
                 alias = jtem.parent().child(jtem.row(),2).text()
                 logI('Sektor: ' + item.text() + ', Oversvømmelse: ' + jtem.text() + ', Alias: ' + alias)
-                mDict['Oversvømmelsesmodel, nutid'] = mDict[alias]
-                mDict['f_pkey_'+'Oversvømmelsesmodel, nutid'] = mDict['f_pkey_'+alias]
-                mDict['f_geom_'+'Oversvømmelsesmodel, nutid'] = mDict['f_geom_'+alias]
-                mDict['f_depth_'+'Oversvømmelsesmodel, nutid'] = mDict['f_depth_'+alias]
+                mDict['Oversvømmelsesmodel'] = mDict[alias]
+                mDict['f_pkey_'+'Oversvømmelsesmodel'] = mDict['f_pkey_'+alias]
+                mDict['f_geom_'+'Oversvømmelsesmodel'] = mDict['f_geom_'+alias]
+                mDict['f_depth_'+'Oversvømmelsesmodel'] = mDict['f_depth_'+alias]
                 
                 # Run model, count milliseconds for each run
                 tic = time.perf_counter()
