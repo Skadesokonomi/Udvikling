@@ -219,14 +219,14 @@ def xstr(s, r=''):
     return r if not s else str(s)
 
 
-def createGroup(groupName, root, top=False):
+def createGroup(groupName, root, top=False, addName = None):
     """TBD"""
 
     group = root.findGroup(groupName)
 
     if group is None:
         if top:
-            group = root.insertGroup(0, groupName)            
+            group = root.insertGroup(0, groupName + (addName if addName is not None else ''))            
         else:
             group = root.addGroup(groupName)
     return group
@@ -805,6 +805,16 @@ def isTime(s, f):
     except: 
         return False
     return True
+
+def sanitizeName(tablename):
+
+    tablename = tablename.lower()
+
+    replace_dict= {"%":"_","&":"_","-":"_",".":"_",",":"_"," ":"_","!":"_","?":"_","æ":"ae","ø":"oe","å":"aa"}
+    for old, new in replace_dict.items(): tablename = tablename.replace(old, new)
+
+    return tablename
+    
 
 def merge_layers_in_group(group_name, result_path):
     # Get the group from the layer panel
