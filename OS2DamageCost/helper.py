@@ -174,7 +174,7 @@ def executeSQL(cmd, tab=None, showerror=True):
     global trClassName
     tab = tab or trClassName
 
-    #logI('executeSQL - SQL to excute: '+ cmd,tab)            
+    logI('executeSQL - SQL to excute: '+ cmd,tab)            
 
     query = QSqlQuery()
     query.exec(cmd)    
