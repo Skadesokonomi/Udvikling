@@ -543,11 +543,11 @@ class FloodDamageCost:
 
         sd = self.dockwidget
         extent = self.iface.mapCanvas().extent()
-
-        sd.dsbXMin.setValue(extent.xMinimum())
-        sd.dsbXMax.setValue(extent.xMaximum())
-        sd.dsbYMin.setValue(extent.yMinimum())
-        sd.dsbYMax.setValue(extent.yMaximum())
+        cs = sd.dsbCellSize.value()
+        sd.dsbXMin.setValue((extent.xMinimum()//cs)*cs)
+        sd.dsbXMax.setValue((extent.xMaximum()//cs)*cs+cs)
+        sd.dsbYMin.setValue((extent.yMinimum()//cs)*cs)
+        sd.dsbYMax.setValue((extent.yMaximum()//cs)*cs+cs)
 
 
 
