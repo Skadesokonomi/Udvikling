@@ -1,0 +1,238 @@
+--CREATE TABLE fdc_results.ead_table_1234567890 AS 
+-- t1 foretager summeringer på enkeltkader på objekter og alle summeringer samles vha. UNION operator
+WITH t1 AS (
+    SELECT 
+        'Bygningskade Stormflod 2024'::TEXT AS groupname,
+        'Bygningskade'::TEXT AS sector,
+        'Stormflod'::TEXT AS floodtype,
+        ''::TEXT AS extra,
+        2024::INTEGER AS year,
+        ''::TEXT AS model,
+	    REPLACE('T5','T','')::INTEGER AS period,
+		COUNT(*) AS number,
+		SUM(COALESCE(skadebeloeb_kr,0.0) + COALESCE(skadebeloeb_kaelder_kr,0.0))::DECIMAL(15,2) AS damage
+    FROM "fdc_results"."bygningskade_stormflod__2024_t5_1764350813"
+    UNION
+    SELECT 
+        'Bygningskade Stormflod 2024'::TEXT AS groupname,
+        'Bygningskade'::TEXT AS sector,
+        'Stormflod'::TEXT AS floodtype,
+        ''::TEXT AS extra,
+        2024::INTEGER AS year,
+        ''::TEXT AS model,
+	    REPLACE('T10','T','')::INTEGER AS period,
+		COUNT(*) AS number,
+		SUM(COALESCE(skadebeloeb_kr,0.0) + COALESCE(skadebeloeb_kaelder_kr,0.0))::DECIMAL(15,2) AS damage
+    FROM "fdc_results"."bygningskade_stormflod__2024_t10_1764350813"
+    UNION
+    SELECT 
+        'Bygningskade Stormflod 2024'::TEXT AS groupname,
+        'Bygningskade'::TEXT AS sector,
+        'Stormflod'::TEXT AS floodtype,
+        ''::TEXT AS extra,
+        2024::INTEGER AS year,
+        ''::TEXT AS model,
+	    REPLACE('T20','T','')::INTEGER AS period,
+		COUNT(*) AS number,
+		SUM(COALESCE(skadebeloeb_kr,0.0) + COALESCE(skadebeloeb_kaelder_kr,0.0))::DECIMAL(15,2) AS damage
+    FROM "fdc_results"."bygningskade_stormflod__2024_t20_1764350812"
+    UNION
+    SELECT 
+        'Bygningskade Stormflod 2024'::TEXT AS groupname,
+        'Bygningskade'::TEXT AS sector,
+        'Stormflod'::TEXT AS floodtype,
+        ''::TEXT AS extra,
+        2024::INTEGER AS year,
+        ''::TEXT AS model,
+	    REPLACE('T50','T','')::INTEGER AS period,
+		COUNT(*) AS number,
+		SUM(COALESCE(skadebeloeb_kr,0.0) + COALESCE(skadebeloeb_kaelder_kr,0.0))::DECIMAL(15,2) AS damage
+    FROM "fdc_results"."bygningskade_stormflod__2024_t50_1764350813"
+    UNION
+    SELECT 
+        'Bygningskade Stormflod 2024'::TEXT AS groupname,
+        'Bygningskade'::TEXT AS sector,
+        'Stormflod'::TEXT AS floodtype,
+        ''::TEXT AS extra,
+        2024::INTEGER AS year,
+        ''::TEXT AS model,
+	    REPLACE('T100','T','')::INTEGER AS period,
+		COUNT(*) AS number,
+		SUM(COALESCE(skadebeloeb_kr,0.0) + COALESCE(skadebeloeb_kaelder_kr,0.0))::DECIMAL(15,2) AS damage
+    FROM "fdc_results"."bygningskade_stormflod__2024_t100_1764350814"
+    UNION
+    SELECT 
+        'Bygningskade Stormflod 2024'::TEXT AS groupname,
+        'Bygningskade'::TEXT AS sector,
+        'Stormflod'::TEXT AS floodtype,
+        ''::TEXT AS extra,
+        2024::INTEGER AS year,
+        ''::TEXT AS model,
+	    REPLACE('T500','T','')::INTEGER AS period,
+		COUNT(*) AS number,
+		SUM(COALESCE(skadebeloeb_kr,0.0) + COALESCE(skadebeloeb_kaelder_kr,0.0))::DECIMAL(15,2) AS damage
+    FROM "fdc_results"."bygningskade_stormflod__2024_t500_1764350815"),
+-- t2 tilføjer kolonne dtd2 som ligning: d(t)/d^2 
+t2 AS (
+    SELECT *,(damage/period^2)::DECIMAL(15,2) AS dtd2 FROM t1),
+-- t3 tilføjer kolonnerne previous_period (forrige periodeværd) samt previous_dtd2 (forrige dtdt2) vha. Windows funktion "LAG"
+t3 AS (
+    SELECT 
+        *, 
+	    LAG(period) OVER (PARTITION BY groupname ORDER BY period) previous_period,
+	    LAG(dtd2) OVER (PARTITION BY groupname ORDER BY period) previous_dtd2
+	    FROM t2)
+-- Endelig udregnes EAD som ligning: (nuv.dtdt + forr.dtd2)/ 2.0 * (nuv.periode - forr.periode) 
+SELECT 
+    *,
+	((dtd2 + previous_dtd2)/2.0*(period - previous_period))::DECIMAL(15,2) AS ead
+FROM t3
+/*
+=(D4+D5)/2*(A5-A4)
+
+=(dtd2_nu + dtd2_foer)/2.0 * (periode_nu - periode_foer))
+
+
+2025-11-28T18:29:08     INFO    {
+              "sector": "Bygningskade",
+              "token": "q_building",
+              "period": {
+              "T20": "\"fdc_results\".\"bygningskade_stormflod__2024_t20_1764350812\"",
+              "T5": "\"fdc_results\".\"bygningskade_stormflod__2024_t5_1764350813\"",
+              "T10": "\"fdc_results\".\"bygningskade_stormflod__2024_t10_1764350813\"",
+              "T50": "\"fdc_results\".\"bygningskade_stormflod__2024_t50_1764350813\"",
+              "T100": "\"fdc_results\".\"bygningskade_stormflod__2024_t100_1764350814\"",
+              "T500": "\"fdc_results\".\"bygningskade_stormflod__2024_t500_1764350815\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+2025-11-28T18:29:08     INFO    {
+              "sector": "Infrastruktur",
+              "token": "q_infrastructure",
+              "period": {
+              "T20": "\"fdc_results\".\"infrastruktur_stormflod__2024_t20_1764350812\"",
+              "T5": "\"fdc_results\".\"infrastruktur_stormflod__2024_t5_1764350812\"",
+              "T10": "\"fdc_results\".\"infrastruktur_stormflod__2024_t10_1764350812\"",
+              "T50": "\"fdc_results\".\"infrastruktur_stormflod__2024_t50_1764350812\"",
+              "T100": "\"fdc_results\".\"infrastruktur_stormflod__2024_t100_1764350812\"",
+              "T500": "\"fdc_results\".\"infrastruktur_stormflod__2024_t500_1764350812\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+2025-11-28T18:29:08     INFO    {
+              "sector": "Markarealer",
+              "token": "q_agriculture",
+              "period": {
+              "T20": "\"fdc_results\".\"markarealer_stormflod__2024_t20_1764350909\"",
+              "T5": "\"fdc_results\".\"markarealer_stormflod__2024_t5_1764350909\"",
+              "T10": "\"fdc_results\".\"markarealer_stormflod__2024_t10_1764350909\"",
+              "T50": "\"fdc_results\".\"markarealer_stormflod__2024_t50_1764350910\"",
+              "T100": "\"fdc_results\".\"markarealer_stormflod__2024_t100_1764350910\"",
+              "T500": "\"fdc_results\".\"markarealer_stormflod__2024_t500_1764350911\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+2025-11-28T18:29:08     INFO    {
+              "sector": "Mennesker",
+              "token": "q_human_health",
+              "period": {
+              "T20": "\"fdc_results\".\"mennesker_stormflod__2024_t20_1764350905\"",
+              "T5": "\"fdc_results\".\"mennesker_stormflod__2024_t5_1764350905\"",
+              "T10": "\"fdc_results\".\"mennesker_stormflod__2024_t10_1764350906\"",
+              "T50": "\"fdc_results\".\"mennesker_stormflod__2024_t50_1764350906\"",
+              "T100": "\"fdc_results\".\"mennesker_stormflod__2024_t100_1764350906\"",
+              "T500": "\"fdc_results\".\"mennesker_stormflod__2024_t500_1764350907\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+2025-11-28T18:29:08     INFO    {
+              "sector": "Off.service",
+              "token": "q_publicservice",
+              "period": {
+              "T20": "\"fdc_results\".\"off_service_stormflod__2024_t20_1764350812\"",
+              "T50": "\"fdc_results\".\"off_service_stormflod__2024_t50_1764350812\"",
+              "T100": "\"fdc_results\".\"off_service_stormflod__2024_t100_1764350812\"",
+              "T500": "\"fdc_results\".\"off_service_stormflod__2024_t500_1764350812\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+2025-11-28T18:29:08     INFO    {
+              "sector": "Personale",
+              "token": "q_comp_build",
+              "period": {
+              "T20": "\"fdc_results\".\"personale_stormflod__2024_t20_1764350904\"",
+              "T5": "\"fdc_results\".\"personale_stormflod__2024_t5_1764350905\"",
+              "T10": "\"fdc_results\".\"personale_stormflod__2024_t10_1764350905\"",
+              "T50": "\"fdc_results\".\"personale_stormflod__2024_t50_1764350905\"",
+              "T100": "\"fdc_results\".\"personale_stormflod__2024_t100_1764350905\"",
+              "T500": "\"fdc_results\".\"personale_stormflod__2024_t500_1764350905\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+2025-11-28T18:29:08     INFO    {
+              "sector": "Rekreative omr",
+              "token": "q_recreative",
+              "period": {
+              "T20": "\"fdc_results\".\"rekreative_omr_stormflod__2024_t20_1764350850\"",
+              "T5": "\"fdc_results\".\"rekreative_omr_stormflod__2024_t5_1764350855\"",
+              "T10": "\"fdc_results\".\"rekreative_omr_stormflod__2024_t10_1764350860\"",
+              "T50": "\"fdc_results\".\"rekreative_omr_stormflod__2024_t50_1764350865\"",
+              "T100": "\"fdc_results\".\"rekreative_omr_stormflod__2024_t100_1764350871\"",
+              "T500": "\"fdc_results\".\"rekreative_omr_stormflod__2024_t500_1764350884\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+2025-11-28T18:29:08     INFO    {
+              "sector": "Skade,turisme",
+              "token": "q_tourism",
+              "period": {
+              "T20": "\"fdc_results\".\"skade_turisme_stormflod__2024_t20_1764350846\"",
+              "T5": "\"fdc_results\".\"skade_turisme_stormflod__2024_t5_1764350846\"",
+              "T10": "\"fdc_results\".\"skade_turisme_stormflod__2024_t10_1764350847\"",
+              "T50": "\"fdc_results\".\"skade_turisme_stormflod__2024_t50_1764350847\"",
+              "T100": "\"fdc_results\".\"skade_turisme_stormflod__2024_t100_1764350847\"",
+              "T500": "\"fdc_results\".\"skade_turisme_stormflod__2024_t500_1764350848\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+2025-11-28T18:29:08     INFO    {
+              "sector": "vej&trafik",
+              "token": "q_road_traffic",
+              "period": {
+              "T20": "\"fdc_results\".\"vej_trafik_stormflod__2024_t20_1764350810\"",
+              "T5": "\"fdc_results\".\"vej_trafik_stormflod__2024_t5_1764350810\"",
+              "T10": "\"fdc_results\".\"vej_trafik_stormflod__2024_t10_1764350810\"",
+              "T50": "\"fdc_results\".\"vej_trafik_stormflod__2024_t50_1764350811\"",
+              "T100": "\"fdc_results\".\"vej_trafik_stormflod__2024_t100_1764350811\"",
+              "T500": "\"fdc_results\".\"vej_trafik_stormflod__2024_t500_1764350811\""
+              },
+              "year": "2024",
+              "model": "",
+              "floodtype": "Stormflod",
+              "extra": ""
+             }
+			 */

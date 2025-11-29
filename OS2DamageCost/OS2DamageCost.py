@@ -21,12 +21,14 @@
  *                                                                         *
  ***************************************************************************/
 """
+import datetime
 import sys
 import re
 import tempfile
 #import pandas as pd
 #import numpy as np
 import shutil
+import json 
 
 from functools import partial
 
@@ -122,6 +124,7 @@ from .helper import (#tr,
                      merge_layers_in_group,
                      populateLayerTreeCB,
                      AssignSubAreas,
+                     assignLayerVariable,
                      executeSQL)
 
 from .OS2DamageCost_dockwidget import FloodDamageCostDockWidget
@@ -379,8 +382,11 @@ class FloodDamageCost:
                 sd.leCSVExportDir.setText(tempfile.gettempdir().rstrip(os.path.sep))
 
                 sd.pbAreaSub.clicked.connect(self.pbAreaSubClicked)
+                sd.pbSetScenarios.clicked.connect(self.pbSetScenariosClicked)
+                sd.pbClearScenarios.clicked.connect(self.pbClearScenariosClicked)
+                sd.pbCalculateEAD.clicked.connect (self.pbCalculateEADClicked)
 
-
+               
                 self.pbDatabaseClicked()
                 self.pbParameterResetClicked()
                 self.pbUpdPolLayerClicked()
@@ -415,6 +421,7 @@ class FloodDamageCost:
         sd = self.dockwidget
         if index == 6:
             populateLayerTreeCB (sd.cbAreaLayer, QgsMapLayer.VectorLayer, QgsWkbTypes.PolygonGeometry)
+            self.pbUpdScenariosClicked()
 
     def pbAreaSubClicked(self):
 
@@ -426,6 +433,105 @@ class FloodDamageCost:
         antl, anto = AssignSubAreas(group_name, 'omraade', ' ', subLayer, subColumn)
 
         messI (self.tr (f'No layers processed: {antl}, Total no. of objects processed: {anto}'))
+
+    def pbUpdScenariosClicked (self):
+       
+        sd = self.dockwidget
+        root = QgsProject.instance().layerTreeRoot()
+        ename = 'eco_parameters'
+        sd.cbScenariosEAD.clear()
+        loadd = {}
+
+        vlist = findLayerVariableList(ename)
+
+        for vl in vlist:
+            ltl = root.findLayer(vl)
+            jdict=json.loads(evalLayerVariable(ltl.layer(), ename))
+            key = '{}{} {} {}{}'.format(jdict['sector'], ' ' if jdict['extra'] != '' else '' + jdict['extra'], jdict['floodtype'], jdict['year'], ' ' if jdict['model'] != '' else '' + jdict['model'])
+
+            # laves om til key/val dictionary: Key er det samme, val er et dictonary med jdict['sector'],jdict['extra'], jdict['floodtype'], jdict['year'],jdict['model'], 'periods': [jdict['period'] :schema og table]    
+            if key not in loadd: 
+                loadd[key]=jdict
+            else:
+                for keyr,valr in jdict['period'].items(): loadd[key]['period'][keyr] = valr
+     
+        for k in (sorted(loadd)): 
+            logI('Scenario: '+key+'->'+json.dumps(loadd[k]))
+            sd.cbScenariosEAD.addItemWithCheckState(k,0,json.dumps(loadd[k]))
+        sd.cbScenariosEAD.setDefaultText('Choose scenarios...')
+
+
+    def pbSetScenariosClicked (self):
+       
+        sd = self.dockwidget
+        sd.cbScenariosEAD.selectAllOptions()
+
+    def pbClearScenariosClicked (self):
+       
+        sd = self.dockwidget
+        sd.cbScenariosEAD.deselectAllOptions()
+
+    def pbCalculateEADClicked (self):
+
+        sd = self.dockwidget
+        # Find relevante templates
+
+        for item in self.iterItemsMatch(sd.tvGeneral.model().invisibleRootItem(), 'Create EAD command'):
+            parent = item.parent()
+            createEADTemplate = parent.child(item.row(),2).text()
+            
+        for item in self.iterItemsMatch(sd.tvGeneral.model().invisibleRootItem(), 'Create EAD unionpart'):
+            parent = item.parent()
+            createPartTemplate = parent.child(item.row(),2).text()
+            
+        for item in self.iterItemsMatch(sd.tvGeneral.model().invisibleRootItem(), 'Result_schema'):
+            parent = item.parent()
+            result_schema = parent.child(item.row(),2).text()
+
+        # Hoveddel af SQL kommando
+        result_table = createDateTimeName('ead_results')
+        partSQL = ''
+
+        # For hver gruppe valgt -  checkedItemsData
+        checked_items = sd.cbScenariosEAD.checkedItems()
+        for item in checked_items: # Opbygning af partSQL 
+
+            # Find sektornavn, evt. ekstra, oversvømmelsestype, årstal, gentagelseperiode, evt. scenarie
+            j = sd.cbScenariosEAD.findText(item)
+            jtem = sd.cbScenariosEAD.itemData(j)
+            jdict = json.loads(jtem) # Næsten alle parametre findes i jdict dictionary
+
+            for ktem in self.iterItemsMatch(sd.tvQueries.model().invisibleRootItem(), jdict['token']): # Finder kun een query af gangen
+                damage = ''
+                for ltem in self.iterItemsChecked(ktem,True): # Finder alle børn til funden query
+                    if ltem.text().startswith('f_damage'): # fundet et damage definitions felt
+                        damage_field = ltem.parent().child(ltem.row(),2).text()
+                        damage = damage_field if damage == '' else damage + ' + ' + damage_field 
+
+                # Hvis damage feltnavn findes (feltnavn <> '') 
+                if damage != '':
+    
+                    # For hvert lag i gruppen (for hver eks. gentagelses værdi 1,2,5,10.... 1000
+                    for p,t in jdict['period'].items():   # p: specific period, t: specific result table
+                        singleSQL = createPartTemplate.format(groupname=item,sector=jdict['sector'],floodtype=jdict['floodtype'],extra=jdict['extra'],year=jdict['year'],model=jdict['model'],period=p,part_table=t,damage=damage)
+                        partSQL = partSQL + ' UNION ' + singleSQL if partSQL != '' else singleSQL
+                
+        if partSQL != '': # Der er fundet nogle resultater..
+
+            tableSQL = createEADTemplate.format (result_schema=result_schema,aed_table=result_table,ead_union_part=partSQL)
+            #logI('EAD SQL: \n' + tableSQL)
+            query = executeSQL(tableSQL, showerror=False)
+            if query:
+                uri = self.conuri
+                uri.setDataSource (result_schema, result_table, '')
+                eadname = 'EAD beregning - ' + str(datetime.datetime.now())
+                layer = QgsVectorLayer(uri.uri(), eadname, self.contype)
+                ltl = addLayer2Tree(QgsProject.instance().layerTreeRoot(), layer, False, 'eco_eadlayer', eadname)
+
+
+
+
+
 
 
     def cbAreaLayerCurrentIndexChanged(self, index):
@@ -1147,7 +1253,7 @@ class FloodDamageCost:
                 # Run model, count milliseconds for each run
                 tic = time.perf_counter()
                 qname, vlayer, no_rows, keylist, tablename = self.runModel(item, jtem, mDict)
-                logI('{} & {} & {} & {} & {}'.format(qname, vlayer, no_rows, keylist, tablename))
+                #logI('{} & {} & {} & {} & {}'.format(qname, vlayer, no_rows, keylist, tablename))
                 toc = time.perf_counter()
                 no_secs = toc - tic
 
@@ -1162,7 +1268,19 @@ class FloodDamageCost:
 
                     if  vlayer:
                         addLayer2Tree(rDtnGroup, vlayer, False, 'eco_resultlayer', qname, os.path.join(self.plugin_dir, 'styles', item.text() + '.qml'), item.text()+ ' - ' + jtem.text())
-
+                        # Hack for at tilføje ekstra oplysning via environment variable 'eco_parameters'
+                        jdict = {}
+                        
+                        jdict['sector'] = item.parent().child(item.row(),0).text()
+                        jdict['token'] = item.parent().child(item.row(),7).text()
+                        jdict['period'] = {jtem.parent().child(jtem.row(),4).text():'"{}"."{}"'.format(mDict['Result_schema'].replace('"',''),tablename)}
+                        jdict['year'] = jtem.parent().child(jtem.row(),5).text()
+                        jdict['model'] = jtem.parent().child(jtem.row(),6).text()
+                        jdict['floodtype'] = jtem.parent().child(jtem.row(),7).text()
+                        jdict['extra'] = jtem.parent().child(jtem.row(),8).text()
+                        vvalue = json.dumps(jdict)
+                        assignLayerVariable(vlayer, 'eco_parameters', vvalue)
+                        
                     no_models += 1
 
 

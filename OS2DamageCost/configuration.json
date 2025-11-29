@@ -1,6 +1,6 @@
 {
     "Data": {
-        "Database": "",
+        "Database": "postgres: fd_dragoer at localhost as postgres",
         "Parametertable": "fdc_admin.parametre",
         "Parameterkeyfield": "name",
         "Parametervaluefield": "value",
