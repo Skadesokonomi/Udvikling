@@ -625,9 +625,9 @@ ON CONFLICT DO NOTHING;
         IF tgv_functions.projects_exists(proj_name) THEN 
             IF tgv_functions.parameter_groups_exists (parm_name) THEN 
                 SELECT p.parameter_values INTO parm_json FROM tgv_data.tgv_parameter_groups WHERE p.parameter_id = parm_name; 
-                tab_name =  (parm_json ->> 'tab_name')::character varying;
-                x_name =  (parm_json ->> 'x_name')::character varying;
-                y_name =  (parm_json ->> 'y_name')::character varying;
+                tab_name =  (parm_json ->> 'import_table')::character varying;
+                x_name =  (parm_json ->> 'import_x')::character varying;
+                y_name =  (parm_json ->> 'import_y')::character varying;
                 cell_size = (parm_json ->> 'cell_size')::numeric;
                 epsg_code = (parm_json ->> 'epsg_code')::integer;
             EXECUTE FORMAT(insert_sql, proj_name, x_name, y_name, epsg_code, tab_name);
@@ -742,6 +742,41 @@ INSERT INTO tgv_data.tgv_cell_values
 			END IF;
         ELSE
             RAISE EXCEPTION 'Non existing project id: %', proj_name USING HINT = 'Choose another id for project';
+        END IF;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tgv_functions.imports_create_geometry (parm_name character varying) RETURNS void AS $$
+    DECLARE 
+        parm_json jsonb := NULL; 		 
+        epsg_code integer := NULL;
+		x_name character varying := NULL;
+		y_name character varying := NULL;
+		date_name character varying := NULL;
+		depth_name character varying := NULL;
+		tab_name character varying := NULL;
+        insert_sql character varying := '
+ALTER TABLE tgv_import.%1$I ADD COLUMN IF NOT EXISTS geom geometry(Point,%2$s);
+UPDATE tgv_import.%1$I SET geom = ST_SetSRID(ST_MakePoint(%3$I, %4$I), %2$s);
+CREATE INDEX IF NOT EXISTS "%1$s_geom_idx" ON tgv_import.%1$I USING gist(geom);
+--ALTER TABLE tgv_import.%1$I RENAME COLUMN %3$I to x_pos;
+--ALTER TABLE tgv_import.%1$I RENAME COLUMN %4$I to y_pos;
+--ALTER TABLE tgv_import.%1$I RENAME COLUMN %5$I to date_stamp;
+--ALTER TABLE tgv_import.%1$I RENAME COLUMN %6$I to depth;
+';
+    BEGIN
+        IF tgv_functions.parameter_groups_exists (parm_name) THEN 
+            SELECT parameter_values INTO parm_json FROM tgv_data.tgv_parameter_groups WHERE parameter_id = parm_name; 
+            tab_name =  (parm_json ->> 'import_table')::character varying;
+            x_name =  (parm_json ->> 'import_x')::character varying;
+            y_name =  (parm_json ->> 'import_y')::character varying;
+            date_name = (parm_json ->> 'import_date')::character varying;
+            depth_name = (parm_json ->> 'import_depth')::character varying;
+            epsg_code = (parm_json ->> 'epsg_code')::integer;
+            EXECUTE FORMAT(insert_sql, tab_name, epsg_code, x_name, y_name,date_name, depth_name);
+        ELSE
+            RAISE EXCEPTION 'Non existing parameter id: %', mod_name USING HINT = 'Choose another id for parameter';
         END IF;
         RETURN;
     END;
