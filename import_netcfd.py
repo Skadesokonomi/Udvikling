@@ -1,7 +1,7 @@
 
 
 # --- parameters I/O ---
-input_file = 'D:/projekter/tgv/envidan/Caseberegninger/Soevang - Simpel - Loesning A1/groundwater/dk1_2020_100m_phreatic_10km_616_72.nc'
+input_file = 'C:/projekter/tgv/envidan/Caseberegninger/Soevang - Simpel - Loesning A1/groundwater/dk1_2020_100m_phreatic_10km_616_72.nc'
 db_parameters = 'postgresql://postgres:ukulemy@localhost:5435/tgv_18'
 
 # --- parameter_group default extra ---
@@ -23,7 +23,7 @@ parameter_name = 'default'
 original = True
 
 # ======== No changes below this line ==========
-import rioxarray as rxr
+#import rioxarray as rxr
 import time
 import os
 import csv
