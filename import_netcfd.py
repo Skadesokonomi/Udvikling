@@ -1,14 +1,14 @@
+
+
 # --- parameters I/O ---
-
-input_file = os.path.join('D:/projekter/tgv/envidan/Caseberegninger/Soevang - Simpel - Loesning A1/groundwater','dk1_2020_100m_phreatic_10km_616_72.nc')
-db_parameters = 'postgresql://postgres:ukulemy@localhost:5433/tgv'
-
+input_file = 'D:/projekter/tgv/envidan/Caseberegninger/Soevang - Simpel - Loesning A1/groundwater/dk1_2020_100m_phreatic_10km_616_72.nc'
+db_parameters = 'postgresql://postgres:ukulemy@localhost:5435/tgv_18'
 
 # --- parameter_group default extra ---
 
 parameter_dict = {}
 parameter_dict['import_schema'] ='tgv_import'
-parameter_dict['import_table'] ='raadata'
+#parameter_dict['import_correction'] ='cor_'
 parameter_dict['import_date'] = 'time'
 parameter_dict['import_depth'] = 'depth to phreatic surface (negative)'
 parameter_dict['import_x'] = 'X'
@@ -23,15 +23,17 @@ parameter_name = 'default'
 original = True
 
 # ======== No changes below this line ==========
-
+import rioxarray as rxr
 import time
 import os
 import csv
 import xarray as xr 
 from sqlalchemy import create_engine, text
 from io import StringIO
-from osgeo import ogr
+from osgeo import ogr, gdal
 import json
+import uuid
+from osgeo import gdal
 
 def psql_insert_copy(table, conn, keys, data_iter):
     dbapi_conn = conn.connection
@@ -55,6 +57,7 @@ def psql_insert_copy(table, conn, keys, data_iter):
 
 
 # --- program start
+
 
 print ('Starting... ',time.asctime())
 engine = create_engine(db_parameters)
@@ -83,12 +86,19 @@ filter = '{xcol} > {xmi} and {xcol} < {xma} and {ycol} > {ymi} and {ycol} < {yma
 dff = df.query(filter)
 
 print ('Import data... ',time.asctime())
+
+parameter_dict['import_table'] ='rd_{}'.format(uuid.uuid4().hex) # 'raadata'
+
+print ('Import schema is: {}',parameter_dict['import_schema'])
+print ('Import table  is: {}',parameter_dict['import_table'])
+
 dff.to_sql(parameter_dict['import_table'], engine, method=psql_insert_copy,schema=parameter_dict['import_schema'],if_exists='replace')
 
 with engine.connect() as conn:
 
     print ('Updating relevant parameter block to reflect the structure of the imported table... ',time.asctime())
     sql = "SELECT tgv_functions.parameter_groups_update('{}','{}',{})".format(parameter_name, json.dumps(parameter_dict),True)
+    print(sql)
     result = conn.execute(text(sql))
 
     print ('Creating project... ',time.asctime())
@@ -104,18 +114,22 @@ with engine.connect() as conn:
     print ('Creating project cells... ',time.asctime())
     sql = "SELECT tgv_functions.cells_create_from_project_parameter('{}','{}')".format(project_name, parameter_name)
     result = conn.execute(text(sql))
-
+    
+     # This function is not used right now   
 #    print ('Importing raw data to project cells... ',time.asctime())
-#    sql = "SELECT tgv_functions.cells_create_from_import('{}','{}',{},'{}','{}')".format(project_name, parameter_name)
+#    sql = "SELECT tgv_functions.cells_create_from_import('{}','{}')".format(project_name, parameter_name)
 #    result = conn.execute(text(sql))
+
 
     print ('Importing raw data til project cell_values... ',time.asctime())
     sql = "SELECT tgv_functions.cell_values_create_from_import('{}','{}')".format(project_name, model_name)
     result = conn.execute(text(sql))
 
-    print ('Creating geometry on raw data... ',time.asctime())
-    sql = "SELECT tgv_functions.imports_create_geometry('{}')".format(parameter_name)
-    result = conn.execute(text(sql))
+     # This function is not used right now   
+#    print ('Creating geometry on raw data... ',time.asctime())
+#    sql = "SELECT tgv_functions.imports_standardize('{}')".format(parameter_name)
+#    result = conn.execute(text(sql))
+
     conn.commit()
 
 print ('Ending... ',time.asctime())

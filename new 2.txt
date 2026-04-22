@@ -1,0 +1,187 @@
+                WITH ce AS (
+                    SELECT
+                        tc.project_id,
+                        tc.cell_no,
+                        c.spring,
+                        c.summer,
+                        c.autumn,
+                        c.winter,
+                        generate_series('2025-01-01'::date,'2125-12-31'::date,'1 day'::interval) AS date_stamp
+                    FROM tgv_data.tgv_cells tc 
+					LEFT JOIN tgv_data.tgv_cells c ON c.cell_no = tc.cell_no AND c.project_id = tc.project_id 
+					WHERE tc.project_id = 'Markby'
+                ),
+                cc  AS ( 
+                    SELECT
+                        ce.project_id AS project_id,
+                        ce.cell_no,
+                        ce.date_stamp,
+                        CASE EXTRACT (MONTH FROM ce.date_stamp)
+                            WHEN 12 THEN ce.winter
+                            WHEN  1 THEN ce.winter
+                            WHEN  2 THEN ce.winter
+                            WHEN  3 THEN ce.spring
+                            WHEN  4 THEN ce.spring
+                            WHEN  5 THEN ce.spring
+                            WHEN  6 THEN ce.summer
+                            WHEN  7 THEN ce.summer
+                            WHEN  8 THEN ce.summer
+                            WHEN  9 THEN ce.autumn
+                            WHEN 10 THEN ce.autumn
+                            WHEN 11 THEN ce.autumn
+                        END::real AS correction,
+                        (EXTRACT(YEAR FROM ce.date_stamp) - 2019)::integer AS afst,
+                        DIV(EXTRACT(YEAR FROM ce.date_stamp) - 2019,30) AS ant,
+                        (DIV(EXTRACT(YEAR FROM ce.date_stamp) - 2019,30)+1)*30 AS cvno
+					FROM ce
+                ),
+				ci AS (
+                    SELECT 
+					    
+						cc.project_id,
+						cv.model_id,
+						cc.cell_no,
+						cc.date_stamp,
+						cv.depth -- + skal rettes
+					FROM cc
+                    LEFT JOIN tgv_data.tgv_cell_values cv ON
+						/*cv.project_id = cc.project_id AND
+						cv.model_id = 'Initial data' AND'*/
+					    cv.cell_no = cc.cell_no AND 
+						cv.date_stamp = cc.date_stamp - FORMAT('%s YEARS', value1)::interval
+					WHERE cv.project_id = 'Markby' AND	cv.model_id = 'Initial data'
+                )
+                SELECT * FROM ci
+
+
+                WITH c1 AS (
+                    SELECT
+                        tc.project_id,
+                        tc.cell_no,
+                        c.spring,
+                        c.summer,
+                        c.autumn,
+                        c.winter,
+                        generate_series('2048-01-01'::date,'2053-12-31'::date,'1 day'::interval) AS date_stamp
+                    FROM tgv_data.tgv_cells tc 
+					LEFT JOIN tgv_data.tgv_cells c ON c.cell_no = tc.cell_no AND c.project_id = tc.project_id 
+                    WHERE tc.project_id = 'Markby'
+                ),
+                c2 AS (
+                    SELECT 
+                        c1.project_id,
+                        c1.cell_no, 
+                        c1.date_stamp,
+                        c.spring,
+                        c.summer,
+                        c.autumn,
+                        c.winter,
+                        EXTRACT(YEAR  FROM c1.date_stamp) AS dsyear,
+                        EXTRACT(MONTH FROM c1.date_stamp) AS dsmonth,
+                        EXTRACT(DAY   FROM c1.date_stamp) AS dsday
+                    FROM c1			
+			    ),
+                c3 AS ( 
+                    SELECT
+                        c2.project_id AS project_id,
+                        c2.cell_no,
+                        c2.date_stamp,
+                        (CASE 
+                             WHEN dsmonth IN (12,1,2) THEN ce.winter
+                             WHEN dsmonth IN (3,4,5) THEN ce.spring 
+                             WHEN dsmonth IN (6,7,8) THEN ce.summer
+                             ELSE ce.autumn 
+                        END)::real AS correction,
+
+                        (EXTRACT(YEAR FROM ce.date_stamp) - 2019)::integer AS afst,
+                        DIV(c2.dsyear - 2019,30) AS mpant,
+                        MAKE_DATE(c2.dsyear - (mpant+1)*30, c2.dsmont, c2.dsday) AS pdate_stamp
+                       
+                FROM ce
+                )SELECT * FROM cc
+				,
+				ci AS (
+                    SELECT 
+					    
+						cc.project_id,
+						cv.model_id,
+						cc.cell_no,
+						cc.date_stamp,
+						cv.depth -- + skal rettes
+					FROM cc
+                    LEFT JOIN tgv_data.tgv_cell_values cv ON
+						/*cv.project_id = cc.project_id AND
+						cv.model_id = 'Initial data' AND'*/
+					    cv.cell_no = cc.cell_no AND 
+						cv.date_stamp = cc.date_stamp - FORMAT('%s YEARS',cvno)::interval
+					WHERE cv.project_id = 'Markby' AND	cv.model_id = 'Initial data'
+                )
+                SELECT * FROM ci
+                
+                
+                
+                WITH c1 AS (
+                    SELECT
+                        tc.project_id,
+                        tc.cell_no,
+                        c.spring,
+                        c.summer,
+                        c.autumn,
+                        c.winter,
+                        2019::integer AS mstart,
+						30::integer AS mperiod,
+						'Initial data'::character varying AS model_id,
+                        generate_series('2048-01-01'::date,'2053-12-31'::date,'1 day'::interval) AS date_stamp
+                    FROM tgv_data.tgv_cells tc 
+					LEFT JOIN tgv_data.tgv_cells c ON c.cell_no = tc.cell_no AND c.project_id = tc.project_id 
+                    WHERE tc.project_id = 'Markby'
+                ),
+                c2 AS (
+                    SELECT 
+                        c1.project_id,
+						c1.model_id,
+                        c1.cell_no, 
+                        c1.date_stamp,
+						c1.mperiod,
+                        c1.spring,
+                        c1.summer,
+                        c1.autumn,
+                        c1.winter,
+                        (EXTRACT(YEAR FROM c1.date_stamp) - c1.mstart)::integer AS afst,
+                        DIV(EXTRACT(YEAR FROM c1.date_stamp) - c1.mstart,c1.mperiod) AS mpant,
+                        EXTRACT(YEAR  FROM c1.date_stamp)::integer AS dsyear,
+                        EXTRACT(MONTH FROM c1.date_stamp)::integer AS dsmonth,
+                        EXTRACT(DAY   FROM c1.date_stamp)::integer AS dsday
+                    FROM c1			
+			    ),
+                c3 AS ( 
+                    SELECT
+                        c2.project_id,
+                        c2.cell_no,
+                        c2.model_id,
+                        c2.date_stamp,
+						(c2.mpant*2)::integer AS mpant2,
+                        (CASE 
+                             WHEN dsmonth IN (12,1,2) THEN c2.winter
+                             WHEN dsmonth IN (3,4,5) THEN c2.spring 
+                             WHEN dsmonth IN (6,7,8) THEN c2.summer
+                             ELSE c2.autumn 
+                        END)::real AS correction,
+						c2.date_stamp - FORMAT('%s YEARS',((c2.mpant+1)*c2.mperiod)::integer)::interval AS pdate_stamp
+                FROM c2
+                ),
+				c4 AS (
+                    SELECT
+                        c3.project_id,
+                        c3.cell_no,
+                        c3.model_id,
+                        c3.date_stamp,
+						(cv.depth + correction*c3.mpant2)::real AS depth 
+                    FROM c3 JOIN tgv_data.tgv_cell_values cv ON
+                        cv.project_id = c3.project_id AND
+                        cv.model_id = c3.model_id AND
+                        cv.cell_no = c3.cell_no AND 
+                        cv.date_stamp = c3.pdate_stamp
+				)
+				SELECT * FROM c4
+

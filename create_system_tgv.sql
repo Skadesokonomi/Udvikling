@@ -39,8 +39,8 @@ INSERT INTO tgv_parameter_groups (parameter_id, parameter_values) VALUES (
 "s1": 652.00,
 "s2": 84.00,
 "s3": 84.00,
-"year_start": 2025,
-"year_end": 2125,
+"year_start": 2020,
+"year_end": 2120,
 "v0": 0,
 "v7": 7,
 "v30": 30,
@@ -50,7 +50,7 @@ INSERT INTO tgv_parameter_groups (parameter_id, parameter_values) VALUES (
 "spring_mean":0.1,
 "autumn_mean":0.1,
 "year_start_measure": 1990,
-"year_end_measure": 2020
+"year_end_measure": 2019
 }'
 );
 
@@ -64,6 +64,7 @@ ALTER TABLE tgv_projects ADD PRIMARY KEY (project_id);
 CREATE TABLE tgv_models (
     project_id character varying NOT NULL,
     model_id character varying NOT NULL,
+    model_description character varying,
     parameter_id character varying NOT NULL,
     original boolean NOT NULL DEFAULT FALSE
 );
@@ -79,6 +80,10 @@ ALTER TABLE tgv_models ADD CONSTRAINT fk_tgv_models_parameter_groups
 CREATE TABLE tgv_cells (
     project_id character varying NOT NULL,
     cell_no bigint NOT NULL,
+    correction_winter  real,
+    correction_spring  real,
+    correction_summer  real,
+    correction_autumn  real,
     geom Geometry(Multipolygon,25832) NOT NULL
 );
 ALTER TABLE tgv_cells ADD PRIMARY KEY (project_id,cell_no);
@@ -304,8 +309,8 @@ CREATE OR REPLACE FUNCTION tgv_functions.projects_copy (proj_name character vary
             IF NOT tgv_functions.projects_exists(new_name) THEN 
                 INSERT INTO tgv_data.tgv_projects SELECT new_name AS project_id, geom FROM tgv_data.tgv_projects WHERE parameter_id = proj_name;
                 IF deep_copy THEN
-                    INSERT INTO tgv_data.models SELECT new_name AS project_id, model_id, parameter_id, false AS original FROM tgv_data.models WHERE project_id = proj_name;
-                    INSERT INTO tgv_data.cells SELECT new_name AS project_id, cell_no,geom FROM tgv_data.cells WHERE project_id = proj_name;
+                    INSERT INTO tgv_data.models SELECT new_name AS project_id, model_id, model_description, parameter_id, false AS original FROM tgv_data.models WHERE project_id = proj_name;
+                    INSERT INTO tgv_data.cells SELECT new_name AS project_id, cell_no, geom FROM tgv_data.cells WHERE project_id = proj_name;
                     INSERT INTO tgv_data.tgv_cell_values SELECT new_name AS project_id,model_id,cell_no,date_stamp,depth FROM tgv_data.cell_values WHERE project_id = proj_name;
                     INSERT INTO tgv_data.tgv_cell_calculations 
                         SELECT new_name AS project_id,model_id,cell_no,year,depths,days_tot,days_mut1,days_mut2 FROM tgv_data.tgv_cell_calculations WHERE project_id = proj_name;
@@ -324,12 +329,12 @@ $$ LANGUAGE plpgsql;
 
 -- model functions
 
-CREATE OR REPLACE FUNCTION tgv_functions.models_create (proj_name character varying, mod_name character varying, orig boolean DEFAULT true, parm_name character varying DEFAULT 'default') RETURNS void AS $$ 
+CREATE OR REPLACE FUNCTION tgv_functions.models_create (proj_name character varying, mod_name character varying, mod_desc character varying, orig boolean DEFAULT true, parm_name character varying DEFAULT 'default') RETURNS void AS $$ 
     BEGIN
         IF tgv_functions.projects_exists(proj_name) THEN  
             IF NOT tgv_functions.models_exists(proj_name,mod_name) THEN
                 IF tgv_functions.parameter_groups_exists(parm_name) THEN
-                    INSERT INTO tgv_data.tgv_models (project_id, model_id, parameter_id, original) VALUES (proj_name, mod_name, parm_name, orig);
+                    INSERT INTO tgv_data.tgv_models (project_id, model_id, model_description, parameter_id, original) VALUES (proj_name, mod_name, mod_desc, parm_name, orig);
                 ELSE
                     RAISE EXCEPTION 'Non existing parameter id: %', parm_name USING HINT = 'Use another id for parameter record';
                 END IF;       
@@ -361,20 +366,18 @@ CREATE OR REPLACE FUNCTION tgv_functions.models_read (proj_name character varyin
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION tgv_functions.models_update (proj_name character varying, mod_name character varying, orig boolean, parm_name character varying) RETURNS void AS $$ 
+CREATE OR REPLACE FUNCTION tgv_functions.models_update (proj_name character varying, mod_name character varying, mod_desc character varying, orig boolean, parm_name character varying) RETURNS void AS $$ 
     BEGIN
         IF tgv_functions.projects_exists(proj_name) THEN  
             IF tgv_functions.models_exists(proj_name,mod_name) THEN
                 IF COALESCE(parm_name,'') <> '' THEN 
                     IF tgv_functions.parameter_groups_exists(parm_name) THEN
-                        UPDATE tgv_data.tgv_models SET parameter_id = parm_name WHERE model_id = mod_name; 
+                        UPDATE tgv_data.tgv_models SET parameter_id = parm_name WHERE project_id = proj_name AND model_id = mod_name; 
                     ELSE
                         RAISE EXCEPTION 'Non existing parameter id: %', parm_name USING HINT = 'Use another id for parameter record';
                     END IF;
                 END IF;       
-                IF orig IS NOT NULL THEN
-                    UPDATE tgv_data.tgv_models SET original = orig WHERE model_id = mod_name; 
-                END IF;
+                UPDATE tgv_data.tgv_models SET original = COALESCE(orig, original), model_description = COALESCE(mod_desc, model_description)  WHERE project_id = proj_name AND model_id = mod_name; 
             ELSE
                 RAISE EXCEPTION 'Non existing model id: %', mod_name USING HINT = 'Choose another id for model';
             END IF;       
@@ -408,7 +411,7 @@ CREATE OR REPLACE FUNCTION tgv_functions.models_copy (proj_name character varyin
             IF tgv_functions.models_exists (proj_name,mod_name) THEN 
                 IF NOT tgv_functions.models_exists (new_name) THEN 
                     INSERT INTO tgv_data.tgv_models 
-                        SELECT project_id, new_name AS model_id, parameter_id, original FROM tgv_data.tgv_models WHERE project_id = proj_name AND model_id = mod_name;
+                        SELECT project_id, new_name AS model_id, '(Copy from '|| model_id || ')' || COALESCE(model_description,''), parameter_id, false FROM tgv_data.tgv_models WHERE project_id = proj_name AND model_id = mod_name;
                     IF deep_copy THEN
                         INSERT INTO tgv_data.tgv_cell_values SELECT project_id,new_name AS model_id,cell_no,date_stamp,depth FROM tgv_data.cell_values WHERE project_id = proj_name AND model_id = mod_name;
                         INSERT INTO tgv_data.tgv_cell_calculations 
@@ -429,7 +432,7 @@ CREATE OR REPLACE FUNCTION tgv_functions.models_copy (proj_name character varyin
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION tgv_functions.models_extrapolate_cell_values(proj_name character varying, mod_name character varying) RETURNS void AS $$
+/* CREATE OR REPLACE FUNCTION tgv_functions.models_extrapolate_cell_values_old(proj_name character varying, mod_name character varying) RETURNS void AS $$
     DECLARE 
         parm_json jsonb := NULL; 		 
         year_start integer;
@@ -469,6 +472,84 @@ CREATE OR REPLACE FUNCTION tgv_functions.models_extrapolate_cell_values(proj_nam
         RETURN;
     END;
 $$ LANGUAGE plpgsql;
+*/
+
+CREATE OR REPLACE FUNCTION tgv_functions.models_extrapolate_cell_values(proj_name character varying, mod_name character varying) RETURNS void AS $$
+    DECLARE 
+        parm_json jsonb := NULL; 		 
+
+        eps integer; -- extraction period start
+        epe integer; -- extraction period end
+        epl integer; -- extraction period length
+        mps integer; -- measurement period start
+        mpe integer; -- measurement period end
+        mpl integer; -- measurement period length
+        mpc integer; -- measurement period blockcount 
+        psd integer; -- difference periods start
+        cnt integer; -- counter
+        disp integer; -- year displacement value 
+        dtxt interval;    -- year displacement value as interval
+        
+    BEGIN
+        IF tgv_functions.projects_exists(proj_name) THEN 
+            IF tgv_functions.models_exists (proj_name,mod_name) THEN 
+
+                SELECT p.parameter_values INTO parm_json FROM tgv_data.tgv_parameter_groups p JOIN tgv_data.tgv_models m ON p.parameter_id = m.parameter_id WHERE m.project_id = proj_name AND m.model_id = mod_name; 
+
+                eps = (parm_json ->> 'year_start')::integer;
+                epe = (parm_json ->> 'year_end')::integer;
+                mps = (parm_json ->> 'year_start_measure')::integer;
+                mpe = (parm_json ->> 'year_end_measure')::integer;
+
+                -- Find length of extraction period
+                epl = epe - eps +1;
+
+                -- Find length of measurement period
+                mpl = mpe - mps + 1;
+
+                -- Find year difference og measurement period start and extraction period start
+                psd = eps - mps;
+
+                -- Find no of blocks to create 
+                IF MOD(mpl, epl) <> 0 THEN  
+                    mpc = DIV(mpl, epl);
+                ELSE
+                    mpc = DIV(mpl, epl) -1; 
+                END IF;
+
+                -- For each block generate rows in table cell_values                
+                FOR cnt in 0..mpc LOOP
+                
+                    -- Calculate year displacement value 
+                    disp = (psd+cnt*mpl);
+                    dtxt = (disp::text || ' years')::interval;
+                    
+                    -- insert calculated depth values in cell_values table
+                    INSERT INTO tgv_data.tgv_cell_values 
+                        SELECT
+                            proj_name AS project_id,
+                            mod_name AS model_id,
+                            cv.cell_no,
+                            (cv.date_stamp + dtxt) AS date_stamp,
+                            (cv.depth + 
+                            CASE 
+                                WHEN EXTRACT(MONTH FROM cv.date_stamp) IN (12,1,2) THEN cv.depth + disp*c.correction_winter -- winter factor
+                                WHEN EXTRACT(MONTH FROM cv.date_stamp) IN (3,4,5)  THEN cv.depth + disp*c.correction_spring -- spring factor 
+                                WHEN EXTRACT(MONTH FROM cv.date_stamp) IN (6,7,8) THEN cv.depth + disp*c.correction_summer -- summer factor
+                                WHEN EXTRACT(MONTH FROM cv.date_stamp) IN (9,10,11) THEN cv.depth + disp*c.correction_autumn  -- autumn factor
+                            END)::real AS depth
+                        FROM tgv_data.tgv_cell_values cv JOIN cells c on c.cell_no = cv.cell_no
+                        WHERE EXTRACT (YEAR FROM cv.date_stamp) BETWEEN mps AND mpe AND project_id = proj_name AND model_id = mod_name; 
+                END LOOP;
+            ELSE
+                RAISE EXCEPTION 'Non existing model id: %', mod_name USING HINT = 'Choose another id for model to copy';
+            END IF;
+        ELSE
+            RAISE EXCEPTION 'Non existing project id: %', id USING HINT = 'Choose another id for project to copy model from';
+        END IF;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION tgv_functions.models_create_cell_calculations(proj_name character varying, mod_name character varying) RETURNS void AS $$
@@ -492,16 +573,18 @@ CREATE OR REPLACE FUNCTION tgv_functions.models_create_cell_calculations(proj_na
                 year_start = (parm_json ->> 'year_start')::integer;
                 year_end = (parm_json ->> 'year_end')::integer;
 
-                INSERT INTO tgv_data.tgv_cell_calculations (model_id, cell_no, year, mut1_days, mut2_days) 
+                INSERT INTO tgv_data.tgv_cell_calculations  
                 SELECT 
+                    project_id,
     			    model_id,
                     cell_no,
                     year(date_stamp - ydp) AS year, -- Is it necessary with the diplacement days ?
                     COUNT(*) AS days_tot,
-                    COUNT (*) FILTER (WHERE depth <= mut1) AS days_mut1,				
-                    COUNT (*) FILTER (WHERE depth <= mut2 AND depth > dmut1) AS days_mut2 -- perhaps: depth <= dmut2  ?			
-    		    FROM tgv_data.tgv_cell_values WHERE model_id = mod_id AND year(data_value) >= year_start AND year(data_value) < year_end -- Correct filter for years ?
-                GROUP BY 1,2,3;			
+                    -- Check sign in depth before release of product !!
+                    COUNT (*) FILTER (WHERE depth >= mut1) AS days_mut1,				
+                    COUNT (*) FILTER (WHERE depth >= mut2 /* AND depth < dmut1 */) AS days_mut2 -- Check with ENVIDAN
+    		    FROM tgv_data.tgv_cell_values WHERE project_id = proj_name AND model_id = mod_name AND year(data_value) >= year_start AND year(data_value) < year_end -- Correct filter for years ?
+                GROUP BY 1,2,3,4;			
             ELSE
                 RAISE EXCEPTION 'Non existing model id: %', mod_name USING HINT = 'Choose another id for model to copy';
             END IF;
@@ -551,7 +634,7 @@ CREATE OR REPLACE FUNCTION tgv_functions.building_costs_calculate(proj_name char
                 v180 = (parm_json ->> 'v180')::integer;
         
                 -- delete existing building costs for the model
-                DELETE FROM tgv_data.building_costs WHERE model_id = mod_id;
+                DELETE FROM tgv_data.building_costs WHERE project_id = proj_name AND model_id = mod_name;
                  
                 -- run INSERT query
                 WITH bc1 AS (
@@ -572,7 +655,7 @@ CREATE OR REPLACE FUNCTION tgv_functions.building_costs_calculate(proj_name char
                         END)::integer AS bclass 
                     FROM tgv_data.tgv_buildings b 
                         JOIN tgv_data.tgv_cell_calculations cc ON ST_Contains(cc.geom, ST_Centroid(b.geom))
-                    WHERE cc.model_id = mod_id
+                    WHERE cc.project_id = proj_name AND cc.model_id = mod_name
                 ),
                 bc2 AS (
                     SELECT 
@@ -581,7 +664,8 @@ CREATE OR REPLACE FUNCTION tgv_functions.building_costs_calculate(proj_name char
                         cell_no,
                         year,
                         (
-                            -- local column bclass: 1->cellar & no protection; 2->cellar & protected 3->no cellar & no protection; 4->no cellar & protected  
+                            -- local column bclass: 1->cellar & no protection; 2->cellar & protected 3->no cellar & no protection; 4->no cellar & protected
+                            -- Check function witj ENVIDAN !!                            
                             CASE WHEN days_mut1 > v0   AND bclass = 1          THEN s1*building_area      ELSE 0.00 END + -- H1
                             CASE WHEN days_mut1 > v7   AND bclass = 2          THEN s1*building_area      ELSE 0.00 END + -- H2
                             CASE WHEN days_mut2 > v7   AND bclass = 1          THEN s2*building_perimeter ELSE 0.00 END + -- V1
@@ -747,7 +831,7 @@ INSERT INTO tgv_data.tgv_cell_values
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION tgv_functions.imports_create_geometry (parm_name character varying) RETURNS void AS $$
+CREATE OR REPLACE FUNCTION tgv_functions.imports_standardize (parm_name character varying) RETURNS void AS $$
     DECLARE 
         parm_json jsonb := NULL; 		 
         epsg_code integer := NULL;
@@ -756,14 +840,15 @@ CREATE OR REPLACE FUNCTION tgv_functions.imports_create_geometry (parm_name char
 		date_name character varying := NULL;
 		depth_name character varying := NULL;
 		tab_name character varying := NULL;
+
+--ALTER TABLE tgv_import.%1$I ADD COLUMN IF NOT EXISTS geom geometry(Point,%2$s);
+--UPDATE tgv_import.%1$I SET geom = ST_SetSRID(ST_MakePoint(%3$I, %4$I), %2$s);
+--CREATE INDEX IF NOT EXISTS "%1$s_geom_idx" ON tgv_import.%1$I USING gist(geom);
         insert_sql character varying := '
-ALTER TABLE tgv_import.%1$I ADD COLUMN IF NOT EXISTS geom geometry(Point,%2$s);
-UPDATE tgv_import.%1$I SET geom = ST_SetSRID(ST_MakePoint(%3$I, %4$I), %2$s);
-CREATE INDEX IF NOT EXISTS "%1$s_geom_idx" ON tgv_import.%1$I USING gist(geom);
---ALTER TABLE tgv_import.%1$I RENAME COLUMN %3$I to x_pos;
---ALTER TABLE tgv_import.%1$I RENAME COLUMN %4$I to y_pos;
---ALTER TABLE tgv_import.%1$I RENAME COLUMN %5$I to date_stamp;
---ALTER TABLE tgv_import.%1$I RENAME COLUMN %6$I to depth;
+ALTER TABLE tgv_import.%1$I RENAME COLUMN %3$I to x_pos;
+ALTER TABLE tgv_import.%1$I RENAME COLUMN %4$I to y_pos;
+ALTER TABLE tgv_import.%1$I RENAME COLUMN %5$I to date_stamp;
+ALTER TABLE tgv_import.%1$I RENAME COLUMN %6$I to depth;
 ';
     BEGIN
         IF tgv_functions.parameter_groups_exists (parm_name) THEN 
@@ -774,9 +859,12 @@ CREATE INDEX IF NOT EXISTS "%1$s_geom_idx" ON tgv_import.%1$I USING gist(geom);
             date_name = (parm_json ->> 'import_date')::character varying;
             depth_name = (parm_json ->> 'import_depth')::character varying;
             epsg_code = (parm_json ->> 'epsg_code')::integer;
-            EXECUTE FORMAT(insert_sql, tab_name, epsg_code, x_name, y_name,date_name, depth_name);
+            EXECUTE FORMAT(insert_sql, tab_name, epsg_code, x_name, y_name, date_name, depth_name);
+            UPDATE tgv_data.tgv_parameter_groups 
+			    SET parameter_values = parameter_values || '{"import_x":"x_pos","import_y":"y_pos","import_date":"date_stamp","import_depth":"depth"}'::jsonb
+				WHERE parameter_id = parm_name;
         ELSE
-            RAISE EXCEPTION 'Non existing parameter id: %', mod_name USING HINT = 'Choose another id for parameter';
+            RAISE EXCEPTION 'Non existing parameter id: %', parm_name USING HINT = 'Choose another id for parameter';
         END IF;
         RETURN;
     END;
